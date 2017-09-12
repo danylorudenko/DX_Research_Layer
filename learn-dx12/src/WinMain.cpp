@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Utility\DirectAppDelegate.hpp>
 #include <Utility\Application.hpp>
 
