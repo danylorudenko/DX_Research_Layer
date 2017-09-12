@@ -37,7 +37,7 @@ private:
 class Window
 {
 public:
-	using NativeHandle = void*;
+	using NativeHandle = HWND;
 
 public:
 	Window(HINSTANCE instance, std::wstring title, std::uint32_t width, std::uint32_t height);

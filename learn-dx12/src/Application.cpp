@@ -1,5 +1,3 @@
-#include <cassert>
-
 #include <Utility\Application.hpp>
 
 Application::Application(HINSTANCE instance) : window_{ instance, L"DirectX Sample", 800, 600 }, delegate_{}, process_{ instance } {}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <pch.hpp>
+
 #include <Utility\Window.hpp>
 
 class Application final
