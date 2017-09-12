@@ -1,4 +1,4 @@
-#include <cassert>
+#include <pch.hpp>
 
 #include <Utility\DirectAppDelegate.hpp>
 
@@ -13,6 +13,7 @@ void DirectAppDelegate::start(Application& application)
     CreateDescriptorHeaps();
     CreateRenderTargetView();
     CreateDepthStencilBufferView();
+    SetViewport();
 }
 
 void DirectAppDelegate::update(Application& application)
@@ -26,9 +27,19 @@ void DirectAppDelegate::shutdown(Application& application)
 }
 
 
-Microsoft::WRL::ComPtr<ID3D12Device> DirectAppDelegate::Device()
+ID3D12Device& DirectAppDelegate::Device()
 {
-    return device_;
+    return *device_.Get();
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectAppDelegate::RenderTargetViewHandle() const
+{
+    return rtvHeap_->GetCPUDescriptorHandleForHeapStart();
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectAppDelegate::DepthStencilViewHandle() const
+{
+    return dsvHeap_->GetCPUDescriptorHandleForHeapStart();
 }
 
 void DirectAppDelegate::InitializeD3D12()
@@ -51,15 +62,15 @@ void DirectAppDelegate::InitializeD3D12()
 
 void DirectAppDelegate::CreateFence()
 {
-    HRESULT result = Device()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
+    HRESULT result = Device().CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
     ThrowIfFailed(result);
 }
 
 void DirectAppDelegate::GetDescriptorSizes()
 {
-    rtvDescriptorSize_ = Device()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-    dsvDescriptorSize_ = Device()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-    cvb_srv_uavDescriptorSize_ = Device()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    rtvDescriptorSize_ = Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    dsvDescriptorSize_ = Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+    cvb_srv_uavDescriptorSize_ = Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 void DirectAppDelegate::CheckMXAA4xQuality()
@@ -71,7 +82,7 @@ void DirectAppDelegate::CheckMXAA4xQuality()
     qualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
     qualityLevels.NumQualityLevels = 0;
 
-    HRESULT result = Device()->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &qualityLevels, sizeof(qualityLevels));
+    HRESULT result = Device().CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &qualityLevels, sizeof(qualityLevels));
     ThrowIfFailed(result);
 
     MSAA4xQuality_ = qualityLevels.NumQualityLevels;
@@ -85,13 +96,13 @@ void DirectAppDelegate::CreateCommandObjects()
     queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 
-    HRESULT result = Device()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue_));
+    HRESULT result = Device().CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue_));
     ThrowIfFailed(result);
 
-    result = Device()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator_));
+    result = Device().CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator_));
     ThrowIfFailed(result);
 
-    result = Device()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_.Get(), nullptr, IID_PPV_ARGS(&commandList_));
+    result = Device().CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_.Get(), nullptr, IID_PPV_ARGS(&commandList_));
     ThrowIfFailed(result);
 
     commandList_->Close();
@@ -132,7 +143,7 @@ void DirectAppDelegate::CreateDescriptorHeaps()
     rtvD.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     rtvD.NodeMask = 0;
 
-    HRESULT result = Device()->CreateDescriptorHeap(&rtvD, IID_PPV_ARGS(&rtvHeap_));
+    HRESULT result = Device().CreateDescriptorHeap(&rtvD, IID_PPV_ARGS(&rtvHeap_));
     ThrowIfFailed(result);
 
     D3D12_DESCRIPTOR_HEAP_DESC dsvD;
@@ -141,7 +152,7 @@ void DirectAppDelegate::CreateDescriptorHeaps()
     dsvD.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     dsvD.NodeMask = 0;
 
-    result = Device()->CreateDescriptorHeap(&dsvD, IID_PPV_ARGS(&dsvHeap_));
+    result = Device().CreateDescriptorHeap(&dsvD, IID_PPV_ARGS(&dsvHeap_));
     ThrowIfFailed(result);
 }
 
@@ -150,25 +161,20 @@ void DirectAppDelegate::CreateRenderTargetView()
     using namespace Microsoft::WRL;
     ComPtr<ID3D12Resource> swapChainBuffer[SWAP_CHAIN_BUFFER_COUNT];
 
-    CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(rtvHeap_->GetCPUDescriptorHandleForHeapStart());
+    CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(RenderTargetViewHandle());
 
     for (UINT i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) {
         // Get ith buffer in swap chain.
         HRESULT result = swapChain_->GetBuffer(i, IID_PPV_ARGS(&swapChainBuffer[i]));
         ThrowIfFailed(result);
 
-        Device()->CreateRenderTargetView(swapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
+        Device().CreateRenderTargetView(swapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
         rtvHeapHandle.Offset(1, rtvDescriptorSize_);
     }
 }
 
 void DirectAppDelegate::CreateDepthStencilBufferView()
 {
-    D3D12_CLEAR_VALUE clearVal;
-    clearVal.Format = depthStencilBufferFormat;
-    clearVal.DepthStencil.Depth = 1.0f;
-    clearVal.DepthStencil.Stencil = 0;
-
     D3D12_RESOURCE_DESC resDesc;
     resDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     resDesc.Alignment = 0;
@@ -184,7 +190,14 @@ void DirectAppDelegate::CreateDepthStencilBufferView()
     resDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     resDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
-    HRESULT result = Device()->CreateCommittedResource(
+    //=================
+
+    D3D12_CLEAR_VALUE clearVal;
+    clearVal.Format = depthStencilBufferFormat;
+    clearVal.DepthStencil.Depth = 1.0f;
+    clearVal.DepthStencil.Stencil = 0;
+
+    HRESULT result = Device().CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
         D3D12_HEAP_FLAG_NONE,
         &resDesc,
@@ -200,8 +213,8 @@ void DirectAppDelegate::CreateDepthStencilBufferView()
     depthStencDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
     depthStencDesc.Format = depthStencilBufferFormat;
     depthStencDesc.Texture2D.MipSlice = 0;
-
-    Device()->CreateDepthStencilView(depthStencilBuffer_.Get(), &depthStencDesc, dsvHeap_->GetCPUDescriptorHandleForHeapStart());
+    
+    Device().CreateDepthStencilView(depthStencilBuffer_.Get(), &depthStencDesc, DepthStencilViewHandle());
 
     commandList_->ResourceBarrier(
         1,
@@ -213,6 +226,21 @@ void DirectAppDelegate::CreateDepthStencilBufferView()
     commandList_->Close();
     ID3D12CommandList* cmdsLists[] = { commandList_.Get() };
     commandQueue_->ExecuteCommandLists(1, cmdsLists);
+}
 
-    aweyxahf
+void DirectAppDelegate::SetViewport()
+{
+    D3D12_VIEWPORT vp;
+
+    vp.TopLeftX = 0.0f;
+    vp.TopLeftY = 0.0f;
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    vp.Width = static_cast<float>(WIDTH);
+    vp.Height = static_cast<float>(HEIGHT);
+
+    commandList_->RSSetViewports(1, &vp);
+    ID3D12CommandList* list[] = { commandList_.Get() };
+
+    commandQueue_->ExecuteCommandLists(1, list);
 }

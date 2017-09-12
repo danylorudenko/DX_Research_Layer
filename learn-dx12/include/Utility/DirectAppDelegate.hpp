@@ -11,7 +11,11 @@ public:
     virtual void update(Application& application) override;
     virtual void shutdown(Application& application) override;
 
-    Microsoft::WRL::ComPtr<ID3D12Device> Device();
+    ID3D12Device& Device();
+
+    D3D12_CPU_DESCRIPTOR_HANDLE RenderTargetViewHandle() const;
+    D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilViewHandle() const;
+
 
     void InitializeD3D12();
     void CreateFence();
@@ -22,9 +26,9 @@ public:
     void CreateDescriptorHeaps();
     void CreateRenderTargetView();
     void CreateDepthStencilBufferView();
+    void SetViewport();
 
 
-    int currentBackBuffer = 0;
 
     static constexpr UINT WIDTH = 800;
     static constexpr UINT HEIGHT = 600;
@@ -32,7 +36,8 @@ public:
     static constexpr UINT SWAP_CHAIN_BUFFER_COUNT = 2;
 
     static constexpr DXGI_FORMAT backBufferFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
-    static constexpr DXGI_FORMAT depthStencilBufferFormat = DXGI_FORMAT_R24G8_TYPELESS;
+    static constexpr DXGI_FORMAT depthStencilBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
 
 private:
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory1_;
@@ -50,6 +55,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
 
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer_;
+
+    int currentBackBuffer = 0;
 
     UINT rtvDescriptorSize_;
     UINT dsvDescriptorSize_;
