@@ -35,7 +35,7 @@ int Application::run()
 	while (message.message != WM_QUIT) {
 		if (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&message);
-			DispatchMessage(&message);
+            DispatchMessage(&message);
 		} else {
 			delegate_->update(*this);
 		}
