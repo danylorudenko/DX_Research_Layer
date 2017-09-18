@@ -47,7 +47,7 @@ public:
     void FlushCommandQueue();
     void WaitForGPUFinish();
 
-    void ClearBuffers();
+    void Draw();
 
 private:
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory1_;

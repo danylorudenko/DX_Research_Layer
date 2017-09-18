@@ -20,7 +20,7 @@ void DirectAppDelegate::start(Application& application)
     SetViewport();
 
     LoadTriangleVertices();
-    LoadConstantBuffers();
+    //LoadConstantBuffers();
 
     //gameTimer_.Reset();
 }
@@ -28,7 +28,7 @@ void DirectAppDelegate::start(Application& application)
 void DirectAppDelegate::update(Application& application)
 {
     //gameTimer_.Tick();
-    ClearBuffers();
+    Draw();
 }
 
 void DirectAppDelegate::shutdown(Application& application)
@@ -175,7 +175,7 @@ void DirectAppDelegate::CreateDescriptorHeaps()
 
     result = Device().CreateDescriptorHeap(&dsvD, IID_PPV_ARGS(&dsvHeap_));
     ThrowIfFailed(result);
-
+/*
     D3D12_DESCRIPTOR_HEAP_DESC cbvDescr = {};
     cbvDescr.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     cbvDescr.NumDescriptors = 1;
@@ -183,7 +183,7 @@ void DirectAppDelegate::CreateDescriptorHeaps()
     cbvDescr.NodeMask = 0;
 
     result = Device().CreateDescriptorHeap(&cbvDescr, IID_PPV_ARGS(&cbvHeap_));
-    ThrowIfFailed(result);
+    ThrowIfFailed(result);*/
 }
 
 void DirectAppDelegate::CreateRenderTargetView()
@@ -304,7 +304,7 @@ void DirectAppDelegate::WaitForGPUFinish()
     }
 }
 
-void DirectAppDelegate::ClearBuffers()
+void DirectAppDelegate::Draw()
 {
     // Reset for command allocator and list.
     commandAllocator_->Reset();
@@ -314,11 +314,11 @@ void DirectAppDelegate::ClearBuffers()
     commandList_->SetGraphicsRootSignature(rootSignature_.Get());
 
     // Set descriptor heaps which will the pipeline will use.
-    ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap_.Get() };
-    commandList_->SetDescriptorHeaps(1, ppHeaps);
-
-    // Set the handle for the 0th descriptor table.
-    commandList_->SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
+    //ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap_.Get() };
+    //commandList_->SetDescriptorHeaps(1, ppHeaps);
+    //
+    //// Set the handle for the 0th descriptor table.
+    //commandList_->SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
 
     commandList_->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffers_[currentBackBuffer].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
     
@@ -339,30 +339,22 @@ void DirectAppDelegate::ClearBuffers()
 
     FlushCommandQueue();
     Present();
-
-    //clearColor[0] += 0.05f;
-    //auto duration = std::chrono::seconds(1);
-    //std::this_thread::sleep_for(duration);
 }
 
 void DirectAppDelegate::CreateRootSignature()
 {
     using namespace Microsoft::WRL;
     
-    CD3DX12_DESCRIPTOR_RANGE ranges[1];
+    /*CD3DX12_DESCRIPTOR_RANGE ranges[1];
     CD3DX12_ROOT_PARAMETER rootParameters[1];
 
     ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
     rootParameters[0].InitAsDescriptorTable(1, ranges);
-
-    D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+*/
+    D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-    rootSignatureDesc.Init(1, rootParameters, 0, nullptr, rootSignatureFlags);
+    rootSignatureDesc.Init(0, nullptr, 0, nullptr, rootSignatureFlags);
 
     ComPtr<ID3DBlob> signature;
     ComPtr<ID3DBlob> errors;
