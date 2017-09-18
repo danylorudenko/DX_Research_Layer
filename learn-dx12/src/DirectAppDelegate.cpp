@@ -27,7 +27,7 @@ void DirectAppDelegate::start(Application& application)
 
 void DirectAppDelegate::update(Application& application)
 {
-    //gameTimer_.Tick();
+    CustomAction();
     Draw();
 }
 
@@ -448,10 +448,10 @@ void DirectAppDelegate::LoadConstantBuffers()
     Device().CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
 
     CD3DX12_RANGE readRange = { 0, 0 };
-    result = constantBuffer_->Map(0, &readRange, reinterpret_cast<void**>(&consantBufferMappedData_));
+    result = constantBuffer_->Map(0, &readRange, reinterpret_cast<void**>(&constantBufferMappedData_));
     ThrowIfFailed(result);
 
-    memcpy(consantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
+    memcpy(constantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
 }
 
 void DirectAppDelegate::FlushCommandQueue()
@@ -522,5 +522,12 @@ void DirectAppDelegate::Draw()
 
 void DirectAppDelegate::CustomAction()
 {
+    constexpr float offset = 0.005f;
+    constexpr float offsetBounds = 1.25f;
 
+    constantBufferData_.offset.x += offset;
+    if (constantBufferData_.offset.x > offsetBounds) {
+        constantBufferData_.offset.x -= 2 * offsetBounds;
+    }
+    memcpy(constantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
 }

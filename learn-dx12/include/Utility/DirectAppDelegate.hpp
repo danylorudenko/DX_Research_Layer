@@ -77,7 +77,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
     Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
     SceneConstantBuffer constantBufferData_;
-    UINT8* consantBufferMappedData_;
+    UINT8* constantBufferMappedData_;
 
     Microsoft::WRL::ComPtr<ID3D12Resource> triangleVertices_;
     D3D12_VERTEX_BUFFER_VIEW triangleVerticesView_;
