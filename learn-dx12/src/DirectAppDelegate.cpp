@@ -7,6 +7,7 @@
 void DirectAppDelegate::start(Application& application)
 {
     InitializeD3D12();
+    SetViewportScissor();
     CreateFence();
     GetDescriptorSizes();
     CheckMXAA4xQuality();
@@ -17,7 +18,6 @@ void DirectAppDelegate::start(Application& application)
     CreateDescriptorHeaps();
     CreateRenderTargetView();
     CreateDepthStencilBufferView();
-    SetViewport();
 
     LoadTriangleVertices();
 
@@ -262,26 +262,16 @@ void DirectAppDelegate::CreateDepthStencilBufferView()
     FlushCommandQueue();
 }
 
-void DirectAppDelegate::SetViewport()
+void DirectAppDelegate::SetViewportScissor()
 {
-    D3D12_VIEWPORT vp;
+    viewportRect_.TopLeftX = 0.0f;
+    viewportRect_.TopLeftY = 0.0f;
+    viewportRect_.MinDepth = 0.0f;
+    viewportRect_.MaxDepth = 1.0f;
+    viewportRect_.Width = static_cast<float>(WIDTH);
+    viewportRect_.Height = static_cast<float>(HEIGHT);
 
-    vp.TopLeftX = 0.0f;
-    vp.TopLeftY = 0.0f;
-    vp.MinDepth = 0.0f;
-    vp.MaxDepth = 1.0f;
-    vp.Width = static_cast<float>(WIDTH);
-    vp.Height = static_cast<float>(HEIGHT);
-
-    WaitForGPUFinish();
-
-    commandAllocator_->Reset();
-    commandList_->Reset(commandAllocator_.Get(), pipelineState_.Get());
-
-    commandList_->RSSetViewports(1, &vp);
-    commandList_->Close();
-
-    FlushCommandQueue();
+    scissorRect_ = CD3DX12_RECT{ 0, 0, static_cast<LONG>(WIDTH), static_cast<LONG>(HEIGHT) };
 }
 
 void DirectAppDelegate::FlushCommandQueue()
@@ -317,6 +307,9 @@ void DirectAppDelegate::Draw()
 
     // Set signature of incoming data.
     commandList_->SetGraphicsRootSignature(rootSignature_.Get());
+
+    commandList_->RSSetViewports(1, &viewportRect_);
+    commandList_->RSSetScissorRects(1, &scissorRect_);
 
     // Set descriptor heaps which will the pipeline will use.
     //ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap_.Get() };
@@ -420,85 +413,6 @@ void DirectAppDelegate::CreatePipelineState()
     HRESULT result = Device().CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pipelineState_));
     ThrowIfFailed(result);
 }
-
-void DirectAppDelegate::CreateRootSignature()
-{
-    using namespace Microsoft::WRL;
-    
-    CD3DX12_DESCRIPTOR_RANGE ranges[1];
-    CD3DX12_ROOT_PARAMETER rootParameters[1];
-
-    ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-    rootParameters[0].InitAsDescriptorTable(1, ranges);
-
-    D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-        D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
-
-    CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-    rootSignatureDesc.Init(1, rootParameters, 0, nullptr, rootSignatureFlags);
-
-    ComPtr<ID3DBlob> signature;
-    ComPtr<ID3DBlob> errors;
-
-    HRESULT result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors);
-    ThrowIfFailed(result);
-
-    result = Device().CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-    ThrowIfFailed(result);
-}
-
-void DirectAppDelegate::CreatePipelineState()
-{
-    using namespace Microsoft::WRL;
-
-    ComPtr<ID3DBlob> vertexShader;
-    ComPtr<ID3DBlob> pixelShader;
-
-    // Compile shaders to the Blob.
-    {
-#if defined (_DEBUG) | (DEBUG)
-        UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-        UINT compileFlags = 0;
-#endif
-
-        HRESULT result = {};
-        result = D3DCompileFromFile(L"Shaders/triangle_shader.hlsl", nullptr, nullptr, "VS", "vs_5_0", compileFlags, 0, &vertexShader, nullptr);
-        ThrowIfFailed(result);
-        result = D3DCompileFromFile(L"Shaders/triangle_shader.hlsl", nullptr, nullptr, "PS", "ps_5_0", compileFlags, 0, &pixelShader, nullptr);
-        ThrowIfFailed(result);
-    }
-
-    // Define the vertex input layout.
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs[] = 
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-    };
-
-    // Setup pipeline state, which inludes setting shaders.
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-    psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
-    psoDesc.pRootSignature = rootSignature_.Get();
-    psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
-    psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
-    psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    psoDesc.DepthStencilState.DepthEnable = FALSE;
-    psoDesc.DepthStencilState.StencilEnable = FALSE;
-    psoDesc.SampleMask = UINT_MAX;
-    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    psoDesc.NumRenderTargets = 1;
-    psoDesc.RTVFormats[0] = backBufferFormat_;
-    psoDesc.SampleDesc.Count = 1;
-
-    HRESULT result = Device().CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pipelineState_));
-    ThrowIfFailed(result);
-}
-
 
 void DirectAppDelegate::LoadTriangleVertices()
 {

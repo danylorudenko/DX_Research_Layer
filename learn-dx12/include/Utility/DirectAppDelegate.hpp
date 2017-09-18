@@ -36,7 +36,7 @@ public:
     void CreateDescriptorHeaps();
     void CreateRenderTargetView();
     void CreateDepthStencilBufferView();
-    void SetViewport();
+    void SetViewportScissor();
 
     void CreateRootSignature();
     void CreatePipelineState();
@@ -81,6 +81,8 @@ private:
     D3D12_VERTEX_BUFFER_VIEW triangleVerticesView_;
 
     int currentBackBuffer = 0;
+    D3D12_VIEWPORT viewportRect_;
+    D3D12_RECT scissorRect_;
 
     UINT rtvDescriptorSize_;
     UINT dsvDescriptorSize_;
