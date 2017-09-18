@@ -40,6 +40,7 @@ public:
 
     void CreateRootSignature();
     void CreatePipelineState();
+
     void LoadTriangleVertices();
     void LoadConstantBuffers();
     
@@ -48,6 +49,7 @@ public:
     void WaitForGPUFinish();
 
     void Draw();
+    void CustomAction();
 
 private:
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory1_;

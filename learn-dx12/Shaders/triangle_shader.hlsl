@@ -1,3 +1,8 @@
+cbuffer SceneConstantBuffer : register(b0)
+{
+    float4 offset;
+};
+
 struct PSInput
 {
     float4 position : SV_POSITION;
@@ -8,7 +13,7 @@ PSInput VS(float3 position : POSITION, float4 color : COLOR)
 {
     PSInput result;
 
-    result.position = float4(position, 1.0);
+    result.position = float4(position, 1.0) + offset;
     result.color = color;
 
     return result;
