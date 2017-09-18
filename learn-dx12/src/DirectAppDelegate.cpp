@@ -241,6 +241,7 @@ void DirectAppDelegate::CreateDepthStencilBufferView()
     commandList_->Close();
     ID3D12CommandList* cmdsLists[] = { commandList_.Get() };
     commandQueue_->ExecuteCommandLists(1, cmdsLists);
+    WaitForEndOfFrame();
 }
 
 void DirectAppDelegate::SetViewport()
@@ -264,6 +265,7 @@ void DirectAppDelegate::SetViewport()
     ID3D12CommandList* list[] = { commandList_.Get() };
 
     commandQueue_->ExecuteCommandLists(1, list);
+    WaitForEndOfFrame();
 }
 
 void DirectAppDelegate::WaitForEndOfFrame()
@@ -273,21 +275,19 @@ void DirectAppDelegate::WaitForEndOfFrame()
     fenceValue_++;
 
     if (fence_->GetCompletedValue() < currentFenceValue) {
-        fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
+        fence_->SetEventOnCompletion(currentFenceValue, fenceEvent_);
         WaitForSingleObject(fenceEvent_, INFINITE);
     }
 }
 
 void DirectAppDelegate::ClearBuffers()
 {
-    WaitForEndOfFrame();
-    
     commandAllocator_->Reset();
     commandList_->Reset(commandAllocator_.Get(), pipelineState_.Get());
 
     commandList_->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffers_[currentBackBuffer].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
     
-    const FLOAT clearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    const FLOAT clearColor[4] = { 0.6f, 0.2f, 0.2f, 1.0f };
     CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = { RenderTargetViewHandle(), currentBackBuffer, rtvDescriptorSize_ };
     commandList_->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
     commandList_->ClearDepthStencilView(DepthStencilViewHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
@@ -299,7 +299,9 @@ void DirectAppDelegate::ClearBuffers()
     ID3D12CommandList* list[] = { commandList_.Get() };
     commandQueue_->ExecuteCommandLists(1, list);
 
-    swapChain_->Present(1, 0);
+    WaitForEndOfFrame();
 
+    swapChain_->Present(1, 0);
+    
     currentBackBuffer = currentBackBuffer & 1 ? 0 : 1;
 }
