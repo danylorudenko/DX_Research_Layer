@@ -96,8 +96,11 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)D3D12.lib;dxgi.lib;</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)D3D12.lib;dxgi.lib;D3DCompiler.lib</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <EntryPointName>VS</EntryPointName>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -111,8 +114,11 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)D3D12.lib;dxgi.lib;</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)D3D12.lib;dxgi.lib;D3DCompiler.lib</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <EntryPointName>VS</EntryPointName>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -163,7 +169,17 @@
     <ClInclude Include="include\Utility\Application.hpp" />
     <ClInclude Include="include\Utility\DirectAppDelegate.hpp" />
     <ClInclude Include="include\Utility\GameTimer.hpp" />
+    <ClInclude Include="include\Utility\SceneConstantBuffer.hpp" />
+    <ClInclude Include="include\Utility\Vertex.hpp" />
     <ClInclude Include="include\Utility\Window.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\triangle_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

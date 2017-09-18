@@ -37,8 +37,15 @@ public:
     void CreateRenderTargetView();
     void CreateDepthStencilBufferView();
     void SetViewport();
+
+    void CreateRootSignature();
+    void CreatePipelineState();
+    void LoadTriangleVertices();
+    void LoadConstantBuffers();
     
-    void WaitForEndOfFrame();
+    void Present();
+    void FlushCommandQueue();
+    void WaitForGPUFinish();
 
     void ClearBuffers();
 
@@ -60,9 +67,18 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> cbvHeap_;
 
     Microsoft::WRL::ComPtr<ID3D12Resource> swapChainBuffers_[SWAP_CHAIN_BUFFER_COUNT];
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer_;
+
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
+    SceneConstantBuffer constantBufferData_;
+    UINT8* consantBufferMappedData_;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> triangleVertices_;
+    D3D12_VERTEX_BUFFER_VIEW triangleVerticesView_;
 
     int currentBackBuffer = 0;
 
