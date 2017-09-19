@@ -27,7 +27,7 @@
     <ClCompile Include="src\DirectAppDelegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameTimer.cpp">
+    <ClCompile Include="src\PerformanceTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,13 +47,13 @@
     <ClInclude Include="include\d3dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utility\GameTimer.hpp">
+    <ClInclude Include="include\Data\Vertex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utility\Vertex.hpp">
+    <ClInclude Include="include\Data\SceneConstantBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utility\SceneConstantBuffer.hpp">
+    <ClInclude Include="include\Utility\PerformanceTimer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

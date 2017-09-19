@@ -22,13 +22,16 @@ void DirectAppDelegate::start(Application& application)
     LoadTriangleVertices();
     LoadConstantBuffers();
 
-    //gameTimer_.Reset();
+    gameTimer_.Reset();
 }
 
 void DirectAppDelegate::update(Application& application)
 {
     CustomAction();
     Draw();
+
+    gameTimer_.Tick();
+    DisplayFrameTime(application, Timer().DeltaTime());
 }
 
 void DirectAppDelegate::shutdown(Application& application)
@@ -36,10 +39,22 @@ void DirectAppDelegate::shutdown(Application& application)
 
 }
 
-//GameTimer& DirectAppDelegate::Timer()
-//{
-//    return gameTimer_;
-//}
+PerformanceTimer& DirectAppDelegate::Timer()
+{
+    return gameTimer_;
+}
+
+void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTime)
+{
+    std::wstring windowText = L"SPF: ";
+    windowText += std::to_wstring(drawTime);
+
+    windowText += L";    FPS: ";
+    windowText += std::to_wstring(1 / drawTime);
+
+    HWND windowHandle = application.window().nativeHandle();
+    SetWindowText(windowHandle, windowText.c_str());
+}
 
 ID3D12Device& DirectAppDelegate::Device()
 {

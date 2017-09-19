@@ -3,7 +3,7 @@
 #include <pch.hpp>
 
 #include <Utility\Application.hpp>
-#include <Utility\GameTimer.hpp>
+#include <Utility\PerformanceTimer.hpp>
 
 class DirectAppDelegate : public Application::Delegate
 {
@@ -12,7 +12,7 @@ public:
     virtual void update(Application& application) override;
     virtual void shutdown(Application& application) override;
 
-    //GameTimer& Timer();
+    //PerformanceTimer& Timer();
 
     static constexpr UINT WIDTH = 800;
     static constexpr UINT HEIGHT = 600;
@@ -23,6 +23,8 @@ public:
     static constexpr DXGI_FORMAT depthStencilBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
     ID3D12Device& Device();
+    PerformanceTimer& Timer();
+    void DisplayFrameTime(Application& application, float drawTime);
 
     D3D12_CPU_DESCRIPTOR_HANDLE RenderTargetViewHandle() const;
     D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilViewHandle() const;
@@ -52,6 +54,8 @@ public:
     void CustomAction();
 
 private:
+    PerformanceTimer gameTimer_;
+
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory1_;
 
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
