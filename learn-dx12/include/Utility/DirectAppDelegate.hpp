@@ -4,6 +4,7 @@
 
 #include <Utility\Application.hpp>
 #include <Utility\PerformanceTimer.hpp>
+#include <Data\FrameResource.hpp>
 
 class DirectAppDelegate : public Application::Delegate
 {
@@ -17,7 +18,7 @@ public:
     static constexpr UINT WIDTH = 800;
     static constexpr UINT HEIGHT = 600;
 
-    static constexpr UINT SWAP_CHAIN_BUFFER_COUNT = 2;
+    static constexpr UINT SWAP_CHAIN_BUFFER_COUNT = 3;
 
     static constexpr DXGI_FORMAT backBufferFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
     static constexpr DXGI_FORMAT depthStencilBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -30,14 +31,16 @@ public:
     D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilViewHandle() const;
 
     void InitializeD3D12();
-    void CreateFence();
     void GetDescriptorSizes();
-    void CheckMXAA4xQuality();
-    void CreateCommandObjects();
-    void CreateSwapChain(Application& application);
     void CreateDescriptorHeaps();
-    void CreateRenderTargetView();
-    void CreateDepthStencilBufferView();
+    void CreateMainCommandQueue();
+    void CreateMainCommandList();
+    void CreateFrameResources();
+
+    void CheckMXAA4xQuality();
+
+    void CreateSwapChain(Application& application);
+    void CreateDepthStencilBufferView(ID3D12GraphicsCommandList* startupCommandList);
     void SetViewportScissor();
 
     void CreateRootSignature();
@@ -46,12 +49,11 @@ public:
     void LoadTriangleVertices();
     void LoadConstantBuffers();
     
-    void Present();
-    void FlushCommandQueue();
-    void WaitForGPUFinish();
-
     void Draw();
     void CustomAction();
+
+    void Present();
+    void WaitForFence(FrameResource& frameResource);
 
 private:
     PerformanceTimer gameTimer_;
@@ -59,34 +61,25 @@ private:
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory1_;
 
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
-    Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
-    HANDLE fenceEvent_;
-    UINT64 fenceValue_ = 0;
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
 
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+    
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
+    FrameResource frameResources[SWAP_CHAIN_BUFFER_COUNT];
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> cbvHeap_;
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> swapChainBuffers_[SWAP_CHAIN_BUFFER_COUNT];
     Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer_;
 
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-    Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
-    SceneConstantBuffer constantBufferData_;
-    UINT8* constantBufferMappedData_;
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> triangleVertices_;
-    D3D12_VERTEX_BUFFER_VIEW triangleVerticesView_;
-
-    int currentBackBuffer = 0;
+    UINT currentRenderBuffer = 0U;
     D3D12_VIEWPORT viewportRect_;
     D3D12_RECT scissorRect_;
 
@@ -95,4 +88,15 @@ private:
     UINT cvb_srv_uavDescriptorSize_;
 
     UINT MSAA4xQuality_;
+
+
+    // Additional data and resources.
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
+    SceneConstantBuffer constantBufferData_;
+    UINT8* constantBufferMappedData_;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> triangleVertices_;
+    D3D12_VERTEX_BUFFER_VIEW triangleVerticesView_;
+
 };

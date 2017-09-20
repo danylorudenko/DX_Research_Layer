@@ -5,18 +5,18 @@
 UploadBuffer::UploadBuffer(
     ID3D12Device& device,
     void* data,
-    std::size_t dataSize,
+    std::size_t elementSize,
     bool isConstBuffer,
-    std::size_t dataCount) : dataSize_(dataSize), dataCount_(dataCount)
+    std::size_t elementCount)
 {
     if (isConstBuffer) {
-        dataSize_ = (dataSize_ + 255) & ~255;
+        elementSize_ = (elementSize_ + 255) & ~255;
     }
 
     HRESULT result = device.CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Buffer(dataSize_ * dataCount),
+        &CD3DX12_RESOURCE_DESC::Buffer(elementSize_ * elementCount),
         D3D12_RESOURCE_STATE_COPY_DEST,
         nullptr,
         IID_PPV_ARGS(&uploadBuffer_));
@@ -26,23 +26,12 @@ UploadBuffer::UploadBuffer(
     ThrowIfFailed(result);
 }
 
-ComPtr<ID3D12Resource> UploadBuffer::LoadToDefaultBuffer(ID3D12Device& device)
+BYTE* UploadBuffer::MappedData()
 {
-    ComPtr<ID3D12Resource> defaultBuffer;
+    return mappedData_;
+}
 
-    HRESULT result = device.CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-        D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Buffer(dataSize_ * dataCount_),
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(&defaultBuffer));
-
-    D3D12_SUBRESOURCE_DATA subResourceData = {};
-    subResourceData.pData = data_;
-    subResourceData.RowPitch = dataSize_;
-    subResourceData.SlicePitch = subResourceData.RowPitch;
-
-    //UpdateSubresources<1>()
-    return defaultBuffer;
+std::size_t UploadBuffer::BufferLength() const
+{
+    return elementSize_ * elementCount_;
 }

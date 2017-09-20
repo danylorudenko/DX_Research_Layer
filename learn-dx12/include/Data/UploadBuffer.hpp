@@ -10,18 +10,20 @@ public:
     UploadBuffer(
         ID3D12Device& device, 
         void* data, 
-        std::size_t dataSize, 
+        std::size_t elementSize, 
         bool isConstBuffer = false, 
-        std::size_t dataCount = 1);
+        std::size_t elementCount = 1);
 
-    ComPtr<ID3D12Resource> LoadToDefaultBuffer(ID3D12Device& device);
+    BYTE* MappedData();
+    std::size_t BufferLength() const;
+
 
 private:
-    ComPtr<ID3D12Resource> uploadBuffer_;
+    ComPtr<ID3D12Resource> uploadBuffer_ = nullptr;
+    BYTE* mappedData_ = nullptr;
 
     void* data_ = nullptr;
-    std::size_t dataSize_ = 0;
-    std::size_t dataCount_ = 0;
+    std::size_t elementSize_ = 0;
+    std::size_t elementCount_ = 0;
 
-    BYTE* mappedData_ = nullptr;
 };

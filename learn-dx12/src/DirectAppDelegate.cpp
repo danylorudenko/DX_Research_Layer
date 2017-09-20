@@ -7,22 +7,46 @@
 void DirectAppDelegate::start(Application& application)
 {
     InitializeD3D12();
-    SetViewportScissor();
-    CreateFence();
+    CreateMainCommandQueue();
+
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> startupCommandAllocator;
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> startupCommandList;
+    Microsoft::WRL::ComPtr<ID3D12Fence> startupFence;
+
+    HRESULT result = {};
+    result = Device().CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&startupCommandAllocator)); ThrowIfFailed(result);
+    result = Device().CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, startupCommandAllocator.Get(), nullptr, IID_PPV_ARGS(&startupCommandList)); ThrowIfFailed(result);
+    result = Device().CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&startupFence));
+
     GetDescriptorSizes();
+    CreateDescriptorHeaps();
     CheckMXAA4xQuality();
     CreateRootSignature();
     CreatePipelineState();
-    CreateCommandObjects();
     CreateSwapChain(application);
-    CreateDescriptorHeaps();
-    CreateRenderTargetView();
-    CreateDepthStencilBufferView();
+    CreateFrameResources();
+    CreateDepthStencilBufferView(startupCommandList.Get());
+    SetViewportScissor();
 
     LoadTriangleVertices();
     LoadConstantBuffers();
 
     gameTimer_.Reset();
+
+    startupCommandList->Close();
+    ID3D12CommandList* list[] = { startupCommandList.Get() };
+
+    commandQueue_->ExecuteCommandLists(1, list);
+    commandQueue_->Signal(startupFence.Get(), 1);
+
+    // Wait for initialization queue to be processed:
+    HANDLE initEvent = CreateEvent(nullptr, false, false, nullptr);
+    if (startupFence->GetCompletedValue() < 1) {
+        startupFence->SetEventOnCompletion(1, initEvent);
+        WaitForSingleObject(initEvent, INFINITE);
+    }
+
+    CreateMainCommandList();
 }
 
 void DirectAppDelegate::update(Application& application)
@@ -91,17 +115,6 @@ void DirectAppDelegate::InitializeD3D12()
     ThrowIfFailed(result);
 }
 
-void DirectAppDelegate::CreateFence()
-{
-    HRESULT result = Device().CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
-    ThrowIfFailed(result);
-
-    fenceEvent_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-    if (fenceEvent_ == nullptr) {
-        ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()));
-    }
-}
-
 void DirectAppDelegate::GetDescriptorSizes()
 {
     rtvDescriptorSize_ = Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -126,22 +139,28 @@ void DirectAppDelegate::CheckMXAA4xQuality()
     assert(MSAA4xQuality_ > 0 && "Unexpected MSAA quality level.");
 }
 
-void DirectAppDelegate::CreateCommandObjects()
+void DirectAppDelegate::CreateMainCommandQueue()
 {
     D3D12_COMMAND_QUEUE_DESC queueDesc = {};
     queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 
-    HRESULT result = Device().CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue_));
-    ThrowIfFailed(result);
+    HRESULT result = {};
+    result = Device().CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue_)); ThrowIfFailed(result);
+}
 
-    result = Device().CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator_));
-    ThrowIfFailed(result);
+void DirectAppDelegate::CreateMainCommandList()
+{
+    HRESULT result = Device().CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, frameResources[currentRenderBuffer].CommandAllocator(), nullptr , IID_PPV_ARGS(&commandList_)); ThrowIfFailed(result);
+}
 
-    result = Device().CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_.Get(), pipelineState_.Get(), IID_PPV_ARGS(&commandList_));
-    ThrowIfFailed(result);
-
-    commandList_->Close();
+void DirectAppDelegate::CreateFrameResources()
+{
+    for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) {
+        Microsoft::WRL::ComPtr<ID3D12Resource> frameBuffer = nullptr;
+        swapChain_->GetBuffer(i, IID_PPV_ARGS(&frameBuffer));
+        frameResources[i] = FrameResource(Device(), rtvHeap_, i * rtvDescriptorSize_, frameBuffer);
+    }
 }
 
 void DirectAppDelegate::CreateSwapChain(Application& application)
@@ -203,21 +222,7 @@ void DirectAppDelegate::CreateDescriptorHeaps()
 
 }
 
-void DirectAppDelegate::CreateRenderTargetView()
-{
-    CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(RenderTargetViewHandle());
-
-    for (UINT i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) {
-        // Get ith buffer in swap chain.
-        HRESULT result = swapChain_->GetBuffer(i, IID_PPV_ARGS(&swapChainBuffers_[i]));
-        ThrowIfFailed(result);
-
-        Device().CreateRenderTargetView(swapChainBuffers_[i].Get(), nullptr, rtvHeapHandle);
-        rtvHeapHandle.Offset(1, rtvDescriptorSize_);
-    }
-}
-
-void DirectAppDelegate::CreateDepthStencilBufferView()
+void DirectAppDelegate::CreateDepthStencilBufferView(ID3D12GraphicsCommandList* startupCommandList)
 {
     D3D12_RESOURCE_DESC resDesc;
     resDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -260,18 +265,12 @@ void DirectAppDelegate::CreateDepthStencilBufferView()
     
     Device().CreateDepthStencilView(depthStencilBuffer_.Get(), &depthStencDesc, DepthStencilViewHandle());
 
-    commandAllocator_->Reset();
-    commandList_->Reset(commandAllocator_.Get(), pipelineState_.Get());
-    commandList_->ResourceBarrier(
+    startupCommandList->ResourceBarrier(
         1,
         &CD3DX12_RESOURCE_BARRIER::Transition(
             depthStencilBuffer_.Get(),
             D3D12_RESOURCE_STATE_COMMON,
             D3D12_RESOURCE_STATE_DEPTH_WRITE));
-
-    commandList_->Close();
-    
-    FlushCommandQueue();
 }
 
 void DirectAppDelegate::SetViewportScissor()
@@ -469,36 +468,29 @@ void DirectAppDelegate::LoadConstantBuffers()
     memcpy(constantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
 }
 
-void DirectAppDelegate::FlushCommandQueue()
-{
-    ID3D12CommandList* list[] = { commandList_.Get() };
-    commandQueue_->ExecuteCommandLists(1, list);
-    WaitForGPUFinish();
-}
-
 void DirectAppDelegate::Present()
 {
     swapChain_->Present(1, 0);
-    currentBackBuffer = currentBackBuffer & 1 ? 0 : 1;
+    currentRenderBuffer = (currentRenderBuffer + 1) % SWAP_CHAIN_BUFFER_COUNT;
 }
 
-void DirectAppDelegate::WaitForGPUFinish()
+void DirectAppDelegate::WaitForFence(FrameResource& frameResource)
 {
-    const UINT64 currentFenceValue = fenceValue_;
-    commandQueue_->Signal(fence_.Get(), currentFenceValue);
-    fenceValue_++;
-
-    if (fence_->GetCompletedValue() < currentFenceValue) {
-        fence_->SetEventOnCompletion(currentFenceValue, fenceEvent_);
-        WaitForSingleObject(fenceEvent_, INFINITE);
+    if (frameResource.CompletedFenceValue() < frameResource.TargetFenceValue()) {
+        frameResource.Fence()->SetEventOnCompletion(frameResource.TargetFenceValue(), frameResource.FenceEvent());
+        WaitForSingleObject(frameResource.FenceEvent(), INFINITE);
     }
 }
 
 void DirectAppDelegate::Draw()
 {
     // Reset for command allocator and list.
-    commandAllocator_->Reset();
-    commandList_->Reset(commandAllocator_.Get(), pipelineState_.Get());
+    FrameResource& frameResource = frameResources[currentRenderBuffer];
+    UINT64 completedFenceValue = frameResource.CompletedFenceValue();
+    WaitForFence(frameResource);
+
+    frameResource.CommandAllocator()->Reset();
+    commandList_->Reset(frameResource.CommandAllocator(), pipelineState_.Get());
 
     // Set signature of incoming data.
     commandList_->SetGraphicsRootSignature(rootSignature_.Get());
@@ -514,9 +506,9 @@ void DirectAppDelegate::Draw()
     commandList_->SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
 
 
-    commandList_->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffers_[currentBackBuffer].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+    commandList_->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(frameResource.FrameBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
     
-    CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = { RenderTargetViewHandle(), currentBackBuffer, rtvDescriptorSize_ };
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = frameResource.CPUDescriptorHandle();
     commandList_->OMSetRenderTargets(1, &rtvHandle, FALSE, &DepthStencilViewHandle());
 
     // Drawing commands.
@@ -527,11 +519,11 @@ void DirectAppDelegate::Draw()
     commandList_->IASetVertexBuffers(0, 1, &triangleVerticesView_);
     commandList_->DrawInstanced(3, 1, 0, 0);
 
-    commandList_->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffers_[currentBackBuffer].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+    commandList_->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(frameResource.FrameBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
     commandList_->Close();
 
-    FlushCommandQueue();
+    frameResource.SetTargetFenceValue(frameResource.TargetFenceValue() + 1);
     Present();
 }
 
