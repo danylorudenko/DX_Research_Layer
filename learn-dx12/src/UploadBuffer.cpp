@@ -7,7 +7,10 @@ UploadBuffer::UploadBuffer(
     void* data,
     std::size_t elementSize,
     bool isConstBuffer,
-    std::size_t elementCount)
+    std::size_t elementCount) :
+
+    elementSize_(elementSize),
+    elementCount_(elementCount)
 {
     if (isConstBuffer) {
         elementSize_ = (elementSize_ + 255) & ~255;
@@ -17,7 +20,7 @@ UploadBuffer::UploadBuffer(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(elementSize_ * elementCount),
-        D3D12_RESOURCE_STATE_COPY_DEST,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
         IID_PPV_ARGS(&uploadBuffer_));
     ThrowIfFailed(result);

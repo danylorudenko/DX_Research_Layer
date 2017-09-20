@@ -47,7 +47,7 @@ public:
     void CreateRootSignature();
     void CreatePipelineState();
 
-    void LoadTriangleVertices();
+    void LoadTriangleVertices(ID3D12GraphicsCommandList* startupCommandList);
     void LoadConstantBuffers();
     
     void Draw();
