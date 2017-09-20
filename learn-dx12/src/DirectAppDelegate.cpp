@@ -153,6 +153,7 @@ void DirectAppDelegate::CreateMainCommandQueue()
 void DirectAppDelegate::CreateMainCommandList()
 {
     HRESULT result = Device().CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, frameResources[currentRenderBuffer].CommandAllocator(), nullptr , IID_PPV_ARGS(&commandList_)); ThrowIfFailed(result);
+    commandList_->Close();
 }
 
 void DirectAppDelegate::CreateFrameResources()
@@ -488,8 +489,9 @@ void DirectAppDelegate::Draw()
 {
     // Reset for command allocator and list.
     FrameResource& frameResource = frameResources[currentRenderBuffer];
-    UINT64 completedFenceValue = frameResource.CompletedFenceValue();
+    commandQueue_->Signal(frameResource.Fence(), frameResource.TargetFenceValue());
     WaitForFence(frameResource);
+    frameResource.SetTargetFenceValue(frameResource.TargetFenceValue() + 1);
 
     frameResource.CommandAllocator()->Reset();
     commandList_->Reset(frameResource.CommandAllocator(), pipelineState_.Get());
@@ -525,7 +527,8 @@ void DirectAppDelegate::Draw()
 
     commandList_->Close();
 
-    frameResource.SetTargetFenceValue(frameResource.TargetFenceValue() + 1);
+    ID3D12CommandList* list[] = { commandList_.Get() };
+    commandQueue_->ExecuteCommandLists(1, list);
     Present();
 }
 
