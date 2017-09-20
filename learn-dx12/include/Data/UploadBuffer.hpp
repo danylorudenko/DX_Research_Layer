@@ -17,6 +17,7 @@ public:
     BYTE* MappedData();
     std::size_t BufferLength() const;
 
+    ComPtr<ID3D12Resource> GenerateCommonResource(ID3D12GraphicsCommandList* helperCommandList) const;
 
 private:
     ComPtr<ID3D12Resource> uploadBuffer_ = nullptr;
