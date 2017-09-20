@@ -177,7 +177,7 @@ void DirectAppDelegate::CreateDepthStencilBuffer()
     resDesc.Format = depthStencilBufferFormat;
 
     resDesc.SampleDesc.Count = 1;
-    resDesc.SampleDesc.Quality = MSAA4xQuality_ - 1;
+    resDesc.SampleDesc.Quality = 0;
 
     resDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     resDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
@@ -213,7 +213,7 @@ void DirectAppDelegate::CreateSwapChain(Application& application)
     sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
     sd.SampleDesc.Count = 1;
-    sd.SampleDesc.Quality = MSAA4xQuality_ - 1;
+    sd.SampleDesc.Quality = 0;
 
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     sd.BufferCount = SWAP_CHAIN_BUFFER_COUNT;
@@ -473,7 +473,7 @@ void DirectAppDelegate::LoadConstantBuffers()
 
 void DirectAppDelegate::Present()
 {
-    swapChain_->Present(1, 0);
+    swapChain_->Present(0, 0);
     currentRenderBuffer = (currentRenderBuffer + 1) % SWAP_CHAIN_BUFFER_COUNT;
 }
 
