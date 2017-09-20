@@ -36,6 +36,7 @@ public:
     void CreateMainCommandQueue();
     void CreateMainCommandList();
     void CreateFrameResources();
+    void CreateDepthStencilBuffer();
 
     void CheckMXAA4xQuality();
 

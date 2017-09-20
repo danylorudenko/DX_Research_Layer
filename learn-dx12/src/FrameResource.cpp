@@ -19,6 +19,8 @@ FrameResource::FrameResource(
     );
     ThrowIfFailed(result);
 
+    // =============
+
     result = device.CreateFence(
         0,
         D3D12_FENCE_FLAG_NONE,
@@ -27,6 +29,10 @@ FrameResource::FrameResource(
     ThrowIfFailed(result);
 
     fenceEvent_ = CreateEvent(nullptr, false, false, nullptr);
+
+    // =============
+
+    device.CreateRenderTargetView(frameBuffer_.Get(), nullptr, CPUDescriptorHandle());
 }
 
 FrameResource::FrameResource(FrameResource&&) = default;

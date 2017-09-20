@@ -25,6 +25,7 @@ void DirectAppDelegate::start(Application& application)
     CreatePipelineState();
     CreateSwapChain(application);
     CreateFrameResources();
+    CreateDepthStencilBuffer();
     CreateDepthStencilBufferView(startupCommandList.Get());
     SetViewportScissor();
 
@@ -51,7 +52,7 @@ void DirectAppDelegate::start(Application& application)
 
 void DirectAppDelegate::update(Application& application)
 {
-    CustomAction();
+    //CustomAction();
     Draw();
 
     gameTimer_.Tick();
@@ -163,6 +164,40 @@ void DirectAppDelegate::CreateFrameResources()
     }
 }
 
+void DirectAppDelegate::CreateDepthStencilBuffer()
+{
+    D3D12_RESOURCE_DESC resDesc;
+    resDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    resDesc.Alignment = 0;
+    resDesc.Width = WIDTH;
+    resDesc.Height = HEIGHT;
+    resDesc.DepthOrArraySize = 1;
+    resDesc.MipLevels = 1;
+    resDesc.Format = depthStencilBufferFormat;
+
+    resDesc.SampleDesc.Count = 1;
+    resDesc.SampleDesc.Quality = MSAA4xQuality_ - 1;
+
+    resDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    resDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+    //=================
+
+    D3D12_CLEAR_VALUE clearVal;
+    clearVal.Format = depthStencilBufferFormat;
+    clearVal.DepthStencil.Depth = 1.0f;
+    clearVal.DepthStencil.Stencil = 0;
+
+    HRESULT result = Device().CreateCommittedResource(
+        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+        D3D12_HEAP_FLAG_NONE,
+        &resDesc,
+        D3D12_RESOURCE_STATE_COMMON,
+        &clearVal,
+        IID_PPV_ARGS(&depthStencilBuffer_));
+    ThrowIfFailed(result);
+}
+
 void DirectAppDelegate::CreateSwapChain(Application& application)
 {
     swapChain_.Reset();
@@ -224,39 +259,6 @@ void DirectAppDelegate::CreateDescriptorHeaps()
 
 void DirectAppDelegate::CreateDepthStencilBufferView(ID3D12GraphicsCommandList* startupCommandList)
 {
-    D3D12_RESOURCE_DESC resDesc;
-    resDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    resDesc.Alignment = 0;
-    resDesc.Width = WIDTH;
-    resDesc.Height = HEIGHT;
-    resDesc.DepthOrArraySize = 1;
-    resDesc.MipLevels = 1;
-    resDesc.Format = depthStencilBufferFormat;
-
-    resDesc.SampleDesc.Count = 1;
-    resDesc.SampleDesc.Quality = MSAA4xQuality_ - 1;
-
-    resDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    resDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-    //=================
-
-    D3D12_CLEAR_VALUE clearVal;
-    clearVal.Format = depthStencilBufferFormat;
-    clearVal.DepthStencil.Depth = 1.0f;
-    clearVal.DepthStencil.Stencil = 0;
-
-    HRESULT result = Device().CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-        D3D12_HEAP_FLAG_NONE,
-        &resDesc,
-        D3D12_RESOURCE_STATE_COMMON,
-        &clearVal,
-        IID_PPV_ARGS(&depthStencilBuffer_));
-    ThrowIfFailed(result);
-
-    //=================
-
     D3D12_DEPTH_STENCIL_VIEW_DESC depthStencDesc;
     depthStencDesc.Flags = D3D12_DSV_FLAG_NONE;
     depthStencDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
