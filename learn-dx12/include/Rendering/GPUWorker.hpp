@@ -4,6 +4,9 @@
 
 class GPUWorker
 {
+public:
+
+
 private:
     GPUCommandQueue commandQueue_;
 };

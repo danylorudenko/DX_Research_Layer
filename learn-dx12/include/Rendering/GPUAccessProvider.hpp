@@ -2,12 +2,15 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUCommandList.hpp>
+#include <Rendering\GPUWorker.hpp>
 
 class GPUAccessProvider
 {
+public:
+
+
 private:
-    GPUCommandList renderingCommandList_;
-    GPUCommandList copyCommandList_;
-    GPUCommandList computeCommandList_;
+    GPUWorker renderingWorker_;
+    GPUWorker copyWorker_;
+    GPUWorker computeWorker_;
 };
