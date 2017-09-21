@@ -12,9 +12,20 @@ public:
     Transform& operator=(const Transform& rhs);
     Transform& operator=(Transform&& rhs);
 
+    DirectX::XMVECTOR Position() const;
+    DirectX::XMVECTOR Orientation() const;
+    DirectX::XMVECTOR Scale() const;
+
+    void Position(DirectX::FXMVECTOR newPos);
+    void Orientation(DirectX::FXMVECTOR newOrientation);
+    void Scale(DirectX::FXMVECTOR newScale);
+
+    void AddPosition(DirectX::FXMVECTOR newPos);
+    void AddOrientation(DirectX::FXMVECTOR newOrientation);
+    void AddScale(DirectX::FXMVECTOR newScale);
 
 private:
-    DirectX::XMFLOAT4 orientation_;
-    DirectX::XMFLOAT3 position_;
-    DirectX::XMFLOAT3 scale_;
+    DirectX::XMFLOAT3A position_;
+    DirectX::XMFLOAT4A orientation_; // quaternion
+    DirectX::XMFLOAT3A scale_;
 };
