@@ -7,7 +7,7 @@
 class GPUCommandQueue
 {
 public:
-    GPUCommandQueue(ID3D12Device* device);
+    GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type);
     GPUCommandQueue(const GPUCommandQueue&) = delete;
     GPUCommandQueue(GPUCommandQueue&& rhs);
 
@@ -17,14 +17,8 @@ public:
 
     ID3D12CommandQueue* Get() { return commandQueue_.Get(); }
 
-    void ExecuteCommandLists(ID3D12CommandList* commandLists, std::size_t count = 1);
-    void WaitForFence();
-
-    UINT64 FenceCompletedValue() const;
-    UINT64 FenceTargetValue() const;
+    void ExecuteCommandLists(ID3D12GraphicsCommandList* commandLists, std::size_t count = 1);
 
 private:
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_ = nullptr;
-
-    GPUFence fence_;
 };

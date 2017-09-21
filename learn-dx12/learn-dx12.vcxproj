@@ -167,9 +167,13 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\Rendering\GPUCommandQueue.hpp" />
+    <ClCompile Include="include\Rendering\GPUAccessProvider.hpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
     <ClCompile Include="src\FrameResource.cpp" />
+    <ClCompile Include="src\GPUCommandQueue.cpp" />
+    <ClCompile Include="src\GPUFence.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />
     <ClCompile Include="src\UploadBuffer.cpp" />
     <ClCompile Include="src\Window.cpp" />
@@ -178,8 +182,12 @@
   <ItemGroup>
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Data\FrameResource.hpp" />
+    <ClInclude Include="include\Data\GPUResource.hpp" />
     <ClInclude Include="include\Data\UploadBuffer.hpp" />
     <ClInclude Include="include\pch.hpp" />
+    <ClInclude Include="include\Rendering\GPUCommandList.hpp" />
+    <ClInclude Include="include\Rendering\GPUFence.hpp" />
+    <ClInclude Include="include\Rendering\GPUWorker.hpp" />
     <ClInclude Include="include\Utility\Application.hpp" />
     <ClInclude Include="include\Utility\DirectAppDelegate.hpp" />
     <ClInclude Include="include\Utility\PerformanceTimer.hpp" />

@@ -19,5 +19,11 @@
 #include <Data\SceneConstantBuffer.hpp>
 
 #ifndef ThrowIfFailed
-#define ThrowIfFailed(result) { HRESULT hr__ = (result); if(FAILED(hr__)) { std::string msg = "HRESULT failed in file: "; msg += __FILE__; msg += ", line: "; msg += std::to_string(__LINE__); throw std::exception(msg.c_str()); } }
-#endif
+
+#if defined (DEBUG) || (_DEBUG)
+#define ThrowIfFailed(result) { assert(SUCCEEDED(result)); }
+#else
+#define ThrowIfFailed(result) ;
+#endif // DEBUG
+
+#endif // ThrowIfFailed
