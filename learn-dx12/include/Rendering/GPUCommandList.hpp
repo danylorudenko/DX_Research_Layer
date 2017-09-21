@@ -2,29 +2,33 @@
 
 #include <pch.hpp>
 
-template<std::size_t COMMAND_ALLOCATOR_COUNT>
+#include <memory>
+
 class GPUCommandList
 {
 public:
-    GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type);
+    GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type, std::size_t allocators);
     GPUCommandList(const GPUCommandList&) = delete;
     GPUCommandList(GPUCommandList&& rhs);
 
     GPUCommandList& operator=(const GPUCommandList&) = delete;
     GPUCommandList& operator=(GPUCommandList&& rhs);
 
-    constexpr std::size_t AllocatorCount() const { return COMMAND_ALLOCATOR_COUNT; }
+    ~GPUCommandList() { delete[] commandAllocators_; }
 
-    void Begin();
-    void End();
+    INT AllocatorCount() const { return allocatorCount_; }
 
     ID3D12CommandList* Get() const { return commandList_.Get(); }
     ID3D12CommandList& Ref() { return *commandList_.Get(); }
 
+    void Reset();
+    void Close() { commandList_->Close(); }
 
 private:
-    Microsoft::WRL::ComPtr<ID3D12CommandList> commandList_ = nullptr;
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocators_[COMMAND_ALLOCATOR_COUNT];
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
+    bool closed_ = false;
 
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator>* commandAllocators_;
     UINT64 currentAllocator = 0U;
+    INT allocatorCount_ = 0;
 };
