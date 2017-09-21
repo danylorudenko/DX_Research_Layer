@@ -171,6 +171,7 @@
     <ClCompile Include="src\DirectAppDelegate.cpp" />
     <ClCompile Include="src\FrameResource.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\UploadBuffer.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Data\FrameResource.hpp" />
     <ClInclude Include="include\Data\UploadBuffer.hpp" />
+    <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />
     <ClInclude Include="include\Utility\Application.hpp" />
     <ClInclude Include="include\Utility\DirectAppDelegate.hpp" />
