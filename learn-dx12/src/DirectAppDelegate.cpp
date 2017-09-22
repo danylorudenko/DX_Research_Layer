@@ -20,7 +20,6 @@ void DirectAppDelegate::start(Application& application)
 
     GetDescriptorSizes();
     CreateDescriptorHeaps();
-    CheckMXAA4xQuality();
     CreateRootSignature();
     CreatePipelineState();
     CreateSwapChain(application);
@@ -121,23 +120,6 @@ void DirectAppDelegate::GetDescriptorSizes()
     rtvDescriptorSize_ = Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     dsvDescriptorSize_ = Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
     cvb_srv_uavDescriptorSize_ = Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-}
-
-void DirectAppDelegate::CheckMXAA4xQuality()
-{
-    D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS qualityLevels;
-
-    qualityLevels.Format = backBufferFormat_;
-    qualityLevels.SampleCount = 4;
-    qualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
-    qualityLevels.NumQualityLevels = 0;
-
-    HRESULT result = Device().CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &qualityLevels, sizeof(qualityLevels));
-    ThrowIfFailed(result);
-
-    MSAA4xQuality_ = qualityLevels.NumQualityLevels;
-
-    assert(MSAA4xQuality_ > 0 && "Unexpected MSAA quality level.");
 }
 
 void DirectAppDelegate::CreateMainCommandQueue()

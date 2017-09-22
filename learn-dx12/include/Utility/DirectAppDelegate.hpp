@@ -38,8 +38,6 @@ public:
     void CreateFrameResources();
     void CreateDepthStencilBuffer();
 
-    void CheckMXAA4xQuality();
-
     void CreateSwapChain(Application& application);
     void CreateDepthStencilBufferView(ID3D12GraphicsCommandList* startupCommandList);
     void SetViewportScissor();
