@@ -176,6 +176,7 @@
     <ClCompile Include="src\GPUCommandList.cpp" />
     <ClCompile Include="src\GPUCommandQueue.cpp" />
     <ClCompile Include="src\GPUFence.cpp" />
+    <ClCompile Include="src\GPUWokrer.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />
     <ClCompile Include="src\UploadBuffer.cpp" />
     <ClCompile Include="src\Window.cpp" />

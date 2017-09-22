@@ -1,7 +1,9 @@
 #pragma once
 
 #include <pch.hpp>
+
 #include <Rendering\GPUCommandQueue.hpp>
+#include <Rendering\GPUCommandAllocator.hpp>
 
 class GPUFence
 {
@@ -19,7 +21,7 @@ public:
 
     UINT64 CompletedValue() const { return fence_->GetCompletedValue(); };
 
-    void WaitForQueue(GPUCommandQueue& queue);
+    void WaitForQueue(GPUCommandQueue& queue, GPUCommandAllocator& allocatorInUse);
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;

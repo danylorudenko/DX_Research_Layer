@@ -16,10 +16,11 @@ public:
 
     ~GPUCommandAllocator();
 
+    ID3D12CommandAllocator* Get() const { return commandAllocator_.Get(); }
+
     void Reset() { commandAllocator_->Reset(); }
 
     GPUFence& Fence() { return fence_; }
-
     UINT64 FenceTargetValue() const { return fenceTargetValue_; }
     UINT64 FenceCompletedValue() const { return fence_.CompletedValue(); }
     void SetFenceTargetValue(UINT64 targetValue) { fenceTargetValue_ = targetValue; }

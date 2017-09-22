@@ -22,7 +22,6 @@ public:
     GPUWorker& CopyWorker() { return copyWorker_; }
     GPUWorker& ComputeWorker() { return computeWorker_; }
 
-
 private:
     GPUWorker renderingWorker_;
     GPUWorker copyWorker_;

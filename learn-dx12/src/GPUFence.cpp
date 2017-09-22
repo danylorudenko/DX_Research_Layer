@@ -8,16 +8,16 @@ GPUFence::GPUFence(ID3D12Device* device)
 
 GPUFence::GPUFence(GPUFence&& rhs)
 {
-    fence_ = rhs.fence_;
-    event_ = rhs.event_;
+    fence_ = std::move(rhs.fence_);
+    event_ = std::move(rhs.event_);
 
     ZeroMemory(&rhs, sizeof(rhs));
 }
 
 GPUFence& GPUFence::operator=(GPUFence&& rhs)
 {
-    fence_ = rhs.fence_;
-    event_ = rhs.event_;
+    fence_ = std::move(rhs.fence_);
+    event_ = std::move(rhs.event_);
 
     ZeroMemory(&rhs, sizeof(rhs));
     return *this;
@@ -28,10 +28,10 @@ GPUFence::~GPUFence()
     CloseHandle(event_);
 }
 
-void GPUFence::WaitForQueue(GPUCommandQueue& queue)
+void GPUFence::WaitForQueue(GPUCommandQueue& queue, GPUCommandAllocator& allocatorInUse)
 {
-    if (CompletedValue() < queue.FenceTargetValue()) {
-        fence_->SetEventOnCompletion(queue.FenceTargetValue(), event_);
+    if (CompletedValue() < allocatorInUse.FenceTargetValue()) {
+        fence_->SetEventOnCompletion(allocatorInUse.FenceTargetValue(), event_);
         WaitForSingleObject(event_, INFINITY);
     }
 }

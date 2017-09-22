@@ -17,7 +17,7 @@ public:
 
     ID3D12CommandQueue* Get() { return commandQueue_.Get(); }
 
-    void ExecuteCommandLists(ID3D12GraphicsCommandList* commandLists, std::size_t count = 1);
+    void ExecuteCommandLists(ID3D12CommandList* commandLists, std::size_t count = 1);
 
 private:
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_ = nullptr;

@@ -13,20 +13,20 @@ GPUCommandQueue::GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE t
 
 GPUCommandQueue::GPUCommandQueue(GPUCommandQueue&& rhs)
 {
-    commandQueue_ = rhs.commandQueue_;
+    commandQueue_ = std::move(rhs.commandQueue_);
 
     ZeroMemory(&rhs, sizeof(rhs));
 }
 
 GPUCommandQueue& GPUCommandQueue::operator=(GPUCommandQueue&& rhs)
 {
-    commandQueue_ = rhs.commandQueue_;
+    commandQueue_ = std::move(rhs.commandQueue_);
 
     ZeroMemory(&rhs, sizeof(rhs));
     return *this;
 }
 
-void GPUCommandQueue::ExecuteCommandLists(ID3D12GraphicsCommandList* commandLists, std::size_t count)
+void GPUCommandQueue::ExecuteCommandLists(ID3D12CommandList* commandLists, std::size_t count)
 {
     ID3D12CommandList* const lists[] = { commandLists };
     commandQueue_->ExecuteCommandLists(count, lists);
