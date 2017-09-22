@@ -1,4 +1,5 @@
 #include <Rendering\GPUFence.hpp>
+#include <Rendering\GPUCommandAllocator.hpp>
 
 GPUFence::GPUFence(ID3D12Device* device)
 {
@@ -28,10 +29,10 @@ GPUFence::~GPUFence()
     CloseHandle(event_);
 }
 
-void GPUFence::WaitForQueue(GPUCommandQueue& queue, GPUCommandAllocator& allocatorInUse)
+void GPUFence::WaitForQueue(const GPUCommandQueue& queue, const GPUCommandAllocator& allocatorInUse)
 {
     if (CompletedValue() < allocatorInUse.FenceTargetValue()) {
         fence_->SetEventOnCompletion(allocatorInUse.FenceTargetValue(), event_);
-        WaitForSingleObject(event_, INFINITY);
+        WaitForSingleObject(event_, INFINITE);
     }
 }

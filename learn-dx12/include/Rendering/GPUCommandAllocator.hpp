@@ -14,8 +14,6 @@ public:
     GPUCommandAllocator& operator=(const GPUCommandAllocator&) = delete;
     GPUCommandAllocator& operator=(GPUCommandAllocator&& rhs);
 
-    ~GPUCommandAllocator();
-
     ID3D12CommandAllocator* Get() const { return commandAllocator_.Get(); }
 
     void Reset() { commandAllocator_->Reset(); }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Data\UploadBuffer.hpp>
+#include <Data\GPUUploadHeap.hpp>
 
 GPUUploadHeap::GPUUploadHeap(
     ID3D12Device& device,

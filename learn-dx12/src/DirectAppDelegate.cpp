@@ -3,7 +3,6 @@
 #include <chrono>
 
 #include <Utility\DirectAppDelegate.hpp>
-#include <Data\UploadBuffer.hpp>
 
 void DirectAppDelegate::start(Application& application)
 {

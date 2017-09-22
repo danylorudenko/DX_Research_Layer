@@ -2,8 +2,6 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUFence.hpp>
-
 class GPUCommandQueue
 {
 public:

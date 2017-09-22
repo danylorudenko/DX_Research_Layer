@@ -86,8 +86,6 @@ private:
     UINT dsvDescriptorSize_;
     UINT cvb_srv_uavDescriptorSize_;
 
-    UINT MSAA4xQuality_;
-
 
     // Additional data and resources.
 

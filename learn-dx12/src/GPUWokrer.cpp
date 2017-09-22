@@ -2,7 +2,7 @@
 
 GPUWorker::GPUWorker(ID3D12Device* device, GPU_WORKER_TYPE type)
 {
-    int commandListAllocCount = 0;
+    std::size_t commandListAllocCount = 0;
     switch (type)
     {
     case GPU_WORKER_TYPE_DIRECT:

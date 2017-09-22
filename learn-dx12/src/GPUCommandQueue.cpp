@@ -29,5 +29,5 @@ GPUCommandQueue& GPUCommandQueue::operator=(GPUCommandQueue&& rhs)
 void GPUCommandQueue::ExecuteCommandLists(ID3D12CommandList* commandLists, std::size_t count)
 {
     ID3D12CommandList* const lists[] = { commandLists };
-    commandQueue_->ExecuteCommandLists(count, lists);
+    commandQueue_->ExecuteCommandLists(static_cast<UINT>(count), lists);
 }

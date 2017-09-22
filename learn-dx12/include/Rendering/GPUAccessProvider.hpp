@@ -3,6 +3,8 @@
 #include <pch.hpp>
 
 #include <Rendering\GPUWorker.hpp>
+#include <Data\GPUResource.hpp>
+#include <Data\GPUUploadHeap.hpp>
 
 class GPUAccessProvider
 {
@@ -14,6 +16,15 @@ public:
     GPUAccessProvider& operator=(const GPUAccessProvider&) = delete;
     GPUAccessProvider& operator=(GPUAccessProvider&&);
 
+    void CreateGPUBuffer(GPUResource* dest, std::size_t size);
+    void UpdateGPUResource(GPUResource& dest, std::size_t offset, const void* userData, std::size_t size);
+    void CreateGPUUploadHeap(GPUUploadHeap* dest, std::size_t size);
+
+    void SetPipelineState(/*state for main rendering pipeline*/);
+
+    void TransitionGPUResource(GPUResource& resource, D3D12_RESOURCE_STATES state);
+    
+    void ScheduleRender(/*what to render*/);
 
 
 private:
