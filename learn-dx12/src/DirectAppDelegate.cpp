@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <Utility\DirectAppDelegate.hpp>
+#include <Data\UploadBuffer.hpp>
 
 void DirectAppDelegate::start(Application& application)
 {
@@ -28,7 +29,7 @@ void DirectAppDelegate::start(Application& application)
     CreateDepthStencilBufferView(startupCommandList.Get());
     SetViewportScissor();
 
-    LoadTriangleVertices();
+    LoadTriangleVertices(startupCommandList.Get());
     LoadConstantBuffers();
 
     gameTimer_.Reset();
@@ -344,7 +345,7 @@ void DirectAppDelegate::CreatePipelineState()
     ThrowIfFailed(result);
 }
 
-void DirectAppDelegate::LoadTriangleVertices()
+void DirectAppDelegate::LoadTriangleVertices(ID3D12GraphicsCommandList* startupCommandList)
 {
     using namespace Microsoft::WRL;
 
@@ -356,7 +357,11 @@ void DirectAppDelegate::LoadTriangleVertices()
 
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
-    Device().CreateCommittedResource(
+    UploadBuffer uploadBuffer{ Device(), verticesData, vertexDataSize };
+
+    triangleVertices_ = uploadBuffer.GenerateCommonResource(startupCommandList);
+
+    /*Device().CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize),
@@ -370,62 +375,12 @@ void DirectAppDelegate::LoadTriangleVertices()
     HRESULT result = triangleVertices_->Map(0, &range, reinterpret_cast<void**>(&vertexDataStart));
     ThrowIfFailed(result);
     memcpy(vertexDataStart, verticesData, vertexDataSize);
-    triangleVertices_->Unmap(0, nullptr);
+    triangleVertices_->Unmap(0, nullptr);*/
 
     triangleVerticesView_.BufferLocation = triangleVertices_->GetGPUVirtualAddress();
     triangleVerticesView_.SizeInBytes = vertexDataSize;
     triangleVerticesView_.StrideInBytes = sizeof(Vertex);
 
-    // Upload buffer logic. Not working.
-    /*using namespace Microsoft::WRL;
-
-    Vertex verticesData[] = {
-    { { 0.0f, 0.25f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
-    { { 0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
-    { { -0.25f, -0.25f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
-    };
-
-    constexpr UINT vertexDataSize = sizeof(verticesData);
-
-    ComPtr<ID3D12Resource> uploadHeap;
-    Device().CreateCommittedResource(
-    &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-    D3D12_HEAP_FLAG_NONE,
-    &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize),
-    D3D12_RESOURCE_STATE_GENERIC_READ,
-    nullptr,
-    IID_PPV_ARGS(&uploadHeap));
-
-    UINT8* uploadHeapStart = nullptr;
-    CD3DX12_RANGE range = { 0, 0 };
-    HRESULT result = uploadHeap->Map(0, &range, reinterpret_cast<void**>(&uploadHeapStart));
-    ThrowIfFailed(result);
-    memcpy(uploadHeapStart, verticesData, vertexDataSize);
-    uploadHeap->Unmap(0, nullptr);
-
-    Device().CreateCommittedResource(
-    &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-    D3D12_HEAP_FLAG_NONE,
-    &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize),
-    D3D12_RESOURCE_STATE_COPY_DEST,
-    nullptr,
-    IID_PPV_ARGS(&triangleVertices_));
-
-    D3D12_SUBRESOURCE_DATA bufferData = {};
-    bufferData.pData = verticesData;
-    bufferData.RowPitch = vertexDataSize;
-    bufferData.SlicePitch = 1;
-
-    commandAllocator_.Reset();
-    commandList_->Reset(commandAllocator_.Get(), pipelineState_.Get());
-    UpdateSubresources(commandList_.Get(), triangleVertices_.Get(), uploadHeap.Get(), 0, 0, 1, &bufferData);
-    commandList_->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(triangleVertices_.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ));
-
-    triangleVerticesView_.BufferLocation = triangleVertices_->GetGPUVirtualAddress();
-    triangleVerticesView_.SizeInBytes = vertexDataSize;
-    triangleVerticesView_.StrideInBytes = sizeof(Vertex);
-
-    FlushCommandQueue();*/
 }
 
 void DirectAppDelegate::LoadConstantBuffers()
