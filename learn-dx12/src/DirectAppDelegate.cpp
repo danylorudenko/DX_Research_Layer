@@ -357,11 +357,11 @@ void DirectAppDelegate::LoadTriangleVertices(ID3D12GraphicsCommandList* startupC
 
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
-    UploadBuffer uploadBuffer{ Device(), verticesData, vertexDataSize };
+    //GPUUploadHeap uploadHeap{ Device(), verticesData, vertexDataSize };
+    //
+    //triangleVertices_ = uploadHeap.GenerateDefault(startupCommandList);
 
-    triangleVertices_ = uploadBuffer.GenerateCommonResource(startupCommandList);
-
-    /*Device().CreateCommittedResource(
+    Device().CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize),
@@ -375,7 +375,7 @@ void DirectAppDelegate::LoadTriangleVertices(ID3D12GraphicsCommandList* startupC
     HRESULT result = triangleVertices_->Map(0, &range, reinterpret_cast<void**>(&vertexDataStart));
     ThrowIfFailed(result);
     memcpy(vertexDataStart, verticesData, vertexDataSize);
-    triangleVertices_->Unmap(0, nullptr);*/
+    triangleVertices_->Unmap(0, nullptr);
 
     triangleVerticesView_.BufferLocation = triangleVertices_->GetGPUVirtualAddress();
     triangleVerticesView_.SizeInBytes = vertexDataSize;

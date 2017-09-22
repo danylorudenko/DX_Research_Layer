@@ -57,6 +57,9 @@
     <ClCompile Include="src\GPUWokrer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">
