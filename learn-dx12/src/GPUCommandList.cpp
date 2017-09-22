@@ -35,6 +35,8 @@ GPUCommandList& GPUCommandList::operator=(GPUCommandList&& rhs)
     closed_ = rhs.closed_;
 
     ZeroMemory(&rhs, sizeof(rhs));
+
+    return *this;
 }
 
 void GPUCommandList::Reset(GPUCommandQueue& queueContext)

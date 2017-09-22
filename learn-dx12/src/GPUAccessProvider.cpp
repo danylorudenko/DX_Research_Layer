@@ -21,6 +21,8 @@ GPUAccessProvider& GPUAccessProvider::operator=(GPUAccessProvider&& rhs)
     renderingWorker_ = std::move(rhs.renderingWorker_);
     copyWorker_ = std::move(rhs.copyWorker_);
     computeWorker_ = std::move(rhs.computeWorker_);
+
+    return *this;
 }
 
 void GPUAccessProvider::CreateGPUBuffer(GPUResource* dest, std::size_t size)
