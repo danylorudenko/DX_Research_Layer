@@ -5,7 +5,7 @@
 class GPUUploadHeap
 {
 public:
-    GPUUploadHeap(ID3D12Device& device, void* data, std::size_t elementSize, bool isConstBuffer = false, std::size_t elementCount = 1);
+    GPUUploadHeap(ID3D12Device* device, void const* data, std::size_t elementSize, std::size_t elementCount = 1, bool isConstBuffer = false);
 
     BYTE* MappedData();
     std::size_t BufferLength() const;

@@ -48,13 +48,13 @@
     <ClCompile Include="src\GPUWokrer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUAccessProvider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GPUResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GPUUploadHeap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUAccess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,7 +107,7 @@
     <ClInclude Include="include\Rendering\GPUWorker.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\GPUAccessProvider.hpp">
+    <ClInclude Include="include\Rendering\GPUAccess.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -170,7 +170,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
     <ClCompile Include="src\FrameResource.cpp" />
-    <ClCompile Include="src\GPUAccessProvider.cpp" />
+    <ClCompile Include="src\GPUAccess.cpp" />
     <ClCompile Include="src\GPUCommandAllocator.cpp" />
     <ClCompile Include="src\GPUCommandList.cpp" />
     <ClCompile Include="src\GPUCommandQueue.cpp" />
@@ -188,7 +188,7 @@
     <ClInclude Include="include\Data\GPUResource.hpp" />
     <ClInclude Include="include\Data\GPUUploadHeap.hpp" />
     <ClInclude Include="include\pch.hpp" />
-    <ClInclude Include="include\Rendering\GPUAccessProvider.hpp" />
+    <ClInclude Include="include\Rendering\GPUAccess.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandList.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandQueue.hpp" />

@@ -3,11 +3,11 @@
 #include <Data\GPUUploadHeap.hpp>
 
 GPUUploadHeap::GPUUploadHeap(
-    ID3D12Device& device,
-    void* data,
+    ID3D12Device* device,
+    void const* data,
     std::size_t elementSize,
-    bool isConstBuffer,
-    std::size_t elementCount) :
+    std::size_t elementCount,
+    bool isConstBuffer) :
 
     elementSize_(elementSize),
     elementCount_(elementCount)
@@ -16,7 +16,7 @@ GPUUploadHeap::GPUUploadHeap(
         elementSize_ = (elementSize_ + 255) & ~255;
     }
 
-    HRESULT result = device.CreateCommittedResource(
+    HRESULT result = device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(elementSize_ * elementCount),
