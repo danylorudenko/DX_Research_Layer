@@ -5,7 +5,7 @@
 class GPUResource
 {
 public:
-    GPUResource(ID3D12Device* device, UINT64 size);
+    GPUResource(ID3D12Device* device, UINT64 size, D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON);
     GPUResource(const GPUResource&) = delete;
     GPUResource(GPUResource&& rhs);
 
@@ -20,12 +20,12 @@ public:
     void Map(void** dest, const D3D12_RANGE& range) { ThrowIfFailed(resource_->Map(0, &range, dest)); }
     void Unmap(const D3D12_RANGE& range) { resource_->Unmap(0, &range); }
 
-    D3D12_RESOURCE_STATES SetTargetState(D3D12_RESOURCE_STATES state) { auto previousState = targetState_; targetState_ = state; return previousState; }
-    D3D12_RESOURCE_STATES TargetState() const { return targetState_; }
+    void Transition(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state);
+    D3D12_RESOURCE_STATES State() const { return state_; }
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
     UINT64 size_;
     D3D12_GPU_VIRTUAL_ADDRESS gpuAddress_ = 0;
-    D3D12_RESOURCE_STATES targetState_ = D3D12_RESOURCE_STATE_COMMON;
+    D3D12_RESOURCE_STATES state_ = D3D12_RESOURCE_STATE_COMMON;
 };

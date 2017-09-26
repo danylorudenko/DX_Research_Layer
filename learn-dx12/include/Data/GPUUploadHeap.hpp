@@ -5,19 +5,24 @@
 class GPUUploadHeap
 {
 public:
-    GPUUploadHeap(ID3D12Device* device, void const* data, std::size_t elementSize, std::size_t elementCount = 1, bool isConstBuffer = false);
+    GPUUploadHeap(ID3D12Device* device, void const* data, std::size_t size, bool isConstBuffer = false);
+    GPUUploadHeap(const GPUUploadHeap&) = delete;
+    GPUUploadHeap(GPUUploadHeap&& rhs);
 
-    D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress() const { return uploadBuffer_->GetGPUVirtualAddress(); }
+    GPUUploadHeap& operator=(const GPUUploadHeap&) = delete;
+    GPUUploadHeap& operator=(GPUUploadHeap&& rhs);
 
+    ~GPUUploadHeap();
+
+    ID3D12Resource* Get() const { return resource_.Get(); }
+    std::size_t Size() const;
     BYTE* MappedData();
-    std::size_t BufferLength() const;
+
+    D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress() const { return resource_->GetGPUVirtualAddress(); }
 
 private:
-    Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer_ = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
     BYTE* mappedData_ = nullptr;
-
-    void* data_ = nullptr;
-    std::size_t elementSize_;
-    std::size_t elementCount_;
+    std::size_t size_;
 
 };
