@@ -90,6 +90,10 @@ void GPUAccess::CreateDepthStencilBuffer()
         &clearVal,
         IID_PPV_ARGS(&depthStencilBuffer_));
     ThrowIfFailed(result);
+
+    Begin();
+    Worker<GPU_WORKER_TYPE_COPY>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    End();
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()
@@ -194,7 +198,10 @@ void GPUAccess::End()
     Worker<GPU_WORKER_TYPE_DIRECT>().Finalize();
     Worker<GPU_WORKER_TYPE_COPY>().Finalize();
     Worker<GPU_WORKER_TYPE_COMPUTE>().Finalize();
+}
 
+void GPUAccess::Present()
+{
     swapChain_->Present(0, 0);
     currentFrame_ = (currentFrame_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
 }
@@ -209,12 +216,12 @@ void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> dest)
     ThrowIfFailed(device_->CreateRootSignature(0, dest->GetBufferPointer(), dest->GetBufferSize(), IID_PPV_ARGS(&dest)));
 }
 
-void GPUAccess::CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC * desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle)
+void GPUAccess::CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle)
 {
     device_->CreateConstantBufferView(desc, heapHandle);
 }
 
-void GPUAccess::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC * desc, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& dest)
+void GPUAccess::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& dest)
 {
     ThrowIfFailed(device_->CreateDescriptorHeap(desc, IID_PPV_ARGS(&dest)));
 }
@@ -224,7 +231,7 @@ void GPUAccess::CreateGPUUploadHeap(GPUUploadHeap** dest, void const* data, std:
     *dest = new GPUUploadHeap{ device_.Get(), data, elementSize, elementsCount, isConstBuffer };
 }
 
-void GPUAccess::CompileShader(LPWSTR fileName, ID3DBlob * dest, LPCSTR entryPoint, LPCSTR type)
+void GPUAccess::CompileShader(LPWSTR fileName, ID3DBlob* dest, LPCSTR entryPoint, LPCSTR type)
 {
 #if defined (_DEBUG) | (DEBUG)
     UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
@@ -238,14 +245,6 @@ void GPUAccess::CompileShader(LPWSTR fileName, ID3DBlob * dest, LPCSTR entryPoin
 void GPUAccess::CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc)
 {
     ThrowIfFailed(device_->CreateGraphicsPipelineState(desc, IID_PPV_ARGS(&dest)));
-}
-
-D3D12_RESOURCE_STATES GPUAccess::TransitionGPUResource(GPUResource& resource, D3D12_RESOURCE_STATES state)
-{
-    auto prevState = resource.SetTargetState(state);
-    Worker<GPU_WORKER_TYPE_COPY>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource.Get(), prevState, resource.TargetState()));
-
-    return prevState;
 }
 
 void GPUAccess::UpdateGPUResource(GPUResource& dest, std::size_t offset, const void* data, std::size_t size)

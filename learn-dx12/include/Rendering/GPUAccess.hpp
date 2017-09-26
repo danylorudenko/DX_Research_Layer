@@ -39,6 +39,7 @@ public:
 
     void Begin();
     void End();
+    void Present();
 
     ID3D12GraphicsCommandList& Commit() { return Worker<GPU_WORKER_TYPE_DIRECT>().Commit(); }
 
@@ -49,7 +50,6 @@ public:
     void CreateGPUUploadHeap(GPUUploadHeap** dest, void const* data, std::size_t elementSize, std::size_t elementsCount = 1, bool isConstBuffer = false);
     void CreateGPUBuffer(GPUResource** dest, std::size_t size);
     void UpdateGPUResource(GPUResource& dest, std::size_t offset, const void* userData, std::size_t size);
-    D3D12_RESOURCE_STATES TransitionGPUResource(GPUResource& resource, D3D12_RESOURCE_STATES state);
 
     static void CompileShader(LPWSTR fileName, ID3DBlob* dest, LPCSTR entryPoint, LPCSTR type);
 
@@ -69,6 +69,8 @@ private:
     void CreateDepthStencilBufferView();
 
 private:
+    static int usageNumber_;
+    
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory_;
 
