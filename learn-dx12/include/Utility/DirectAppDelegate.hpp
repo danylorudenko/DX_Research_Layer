@@ -39,16 +39,13 @@ private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 
 
-
-    
-
     // Additional data and resources.
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_;
+    GPUUploadHeap* constantBuffer_ = nullptr;
     SceneConstantBuffer constantBufferData_;
     UINT8* constantBufferMappedData_;
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> triangleVertices_;
+    GPUUploadHeap* triangleVertices_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW triangleVerticesView_;
 
 };

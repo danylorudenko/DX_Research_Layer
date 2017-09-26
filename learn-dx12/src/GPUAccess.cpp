@@ -2,9 +2,24 @@
 
 GPUAccess::GPUAccess(Application& application)
 {
+    // Create device and dxgiFactory.
     InitializeD3D12();
+
+    // Create main accessors to GPU.
+    CreateGPUWorkers();
+    Begin();
+
+    // Create swap chain and supporting resources.
     CreateSwapChain(application, dxgiFactory_.Get());
+    CreateFrameResources();
     CreateDepthStencilBuffer();
+    CreateDefaultDescriptorHeaps();
+    CreateDepthStencilBufferView();
+
+    // Set default viewport and scissor values.
+    SetViewportScissor();
+
+    End();
 }
 
 GPUAccess::GPUAccess(GPUAccess&& rhs)
@@ -23,18 +38,13 @@ void GPUAccess::InitializeD3D12()
 #if defined(DEBUG) || defined(_DEBUG)
     {
         ComPtr<ID3D12Debug> debugController;
-        HRESULT result = D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
-        ThrowIfFailed(result);
-
+        ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))
         debugController->EnableDebugLayer();
     }
 #endif
-    HRESULT result;
-    result = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory_));
-    ThrowIfFailed(result);
 
-    result = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device_));
-    ThrowIfFailed(result);
+    ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory_)));
+    ThrowIfFailed(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device_)));
 }
 
 void GPUAccess::CreateFrameResources()
@@ -82,7 +92,7 @@ void GPUAccess::CreateDepthStencilBuffer()
     ThrowIfFailed(result);
 }
 
-void GPUAccess::CreateDescriptorHeaps()
+void GPUAccess::CreateDefaultDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC rtvD;
     rtvD.NumDescriptors = SWAP_CHAIN_BUFFER_COUNT;
@@ -101,9 +111,13 @@ void GPUAccess::CreateDescriptorHeaps()
 
     result = device_->CreateDescriptorHeap(&dsvD, IID_PPV_ARGS(&dsvHeap_));
     ThrowIfFailed(result);
+
+    rtvDescriptorSize_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    dsvDescriptorSize_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+    cbv_srv_uavDescriptorSize_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-void GPUAccess::CreateDepthStencilBufferView(ID3D12GraphicsCommandList* startupCommandList)
+void GPUAccess::CreateDepthStencilBufferView()
 {
     D3D12_DEPTH_STENCIL_VIEW_DESC depthStencDesc;
     depthStencDesc.Flags = D3D12_DSV_FLAG_NONE;
@@ -113,12 +127,7 @@ void GPUAccess::CreateDepthStencilBufferView(ID3D12GraphicsCommandList* startupC
 
     device_->CreateDepthStencilView(depthStencilBuffer_.Get(), &depthStencDesc, dsvHeap_->GetCPUDescriptorHandleForHeapStart());
 
-    startupCommandList->ResourceBarrier(
-        1,
-        &CD3DX12_RESOURCE_BARRIER::Transition(
-            depthStencilBuffer_.Get(),
-            D3D12_RESOURCE_STATE_COMMON,
-            D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 }
 
 void GPUAccess::SetViewportScissor()
@@ -156,8 +165,21 @@ void GPUAccess::CreateSwapChain(Application& application, IDXGIFactory* factory)
     sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    HRESULT result = factory->CreateSwapChain(RenderingQueue(), &sd, swapChain_.GetAddressOf());
-    ThrowIfFailed(result);
+    ThrowIfFailed(factory->CreateSwapChain(Worker<GPU_WORKER_TYPE_DIRECT>().CommandQueue(), &sd, swapChain_.GetAddressOf()));
+}
+
+void GPUAccess::CreateGPUWorkers()
+{
+    // Workers are being reset automatically on creation.
+
+    workers_[0] = new GPUWorker(device_.Get(), GPU_WORKER_TYPE_DIRECT);
+    //workers_[0]->Reset();
+
+    workers_[1] = new GPUWorker(device_.Get(), GPU_WORKER_TYPE_COPY);
+    //workers_[1]->Reset();
+
+    workers_[2] = new GPUWorker(device_.Get(), GPU_WORKER_TYPE_COMPUTE);
+    //workers_[2]->Reset();
 }
 
 void GPUAccess::Begin()
@@ -182,19 +204,24 @@ void GPUAccess::CreateGPUBuffer(GPUResource** dest, std::size_t size)
     *dest = new GPUResource{ device_.Get(), static_cast<UINT64>(size) };
 }
 
+void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> dest)
+{
+    ThrowIfFailed(device_->CreateRootSignature(0, dest->GetBufferPointer(), dest->GetBufferSize(), IID_PPV_ARGS(&dest)));
+}
+
+void GPUAccess::CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC * desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle)
+{
+    device_->CreateConstantBufferView(desc, heapHandle);
+}
+
+void GPUAccess::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC * desc, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& dest)
+{
+    ThrowIfFailed(device_->CreateDescriptorHeap(desc, IID_PPV_ARGS(&dest)));
+}
+
 void GPUAccess::CreateGPUUploadHeap(GPUUploadHeap** dest, void const* data, std::size_t elementSize, std::size_t elementsCount, bool isConstBuffer)
 {
     *dest = new GPUUploadHeap{ device_.Get(), data, elementSize, elementsCount, isConstBuffer };
-}
-
-void GPUAccess::ScheduleRender(UINT vertexCount)
-{
-    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().DrawInstanced(vertexCount, 1, 0, 0);
-}
-
-void GPUAccess::SheduleIndexedRender(UINT indexCount)
-{
-    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().DrawIndexedInstanced(indexCount, 0, 0, 0, 0);
 }
 
 void GPUAccess::CompileShader(LPWSTR fileName, ID3DBlob * dest, LPCSTR entryPoint, LPCSTR type)
@@ -213,15 +240,10 @@ void GPUAccess::CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D
     ThrowIfFailed(device_->CreateGraphicsPipelineState(desc, IID_PPV_ARGS(&dest)));
 }
 
-D3D12_RESOURCE_STATES GPUAccess::TransitionGPUResource(GPUResource& resource, D3D12_RESOURCE_STATES state, bool immediate)
+D3D12_RESOURCE_STATES GPUAccess::TransitionGPUResource(GPUResource& resource, D3D12_RESOURCE_STATES state)
 {
     auto prevState = resource.SetTargetState(state);
     Worker<GPU_WORKER_TYPE_COPY>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource.Get(), prevState, resource.TargetState()));
-
-    if (immediate) {
-        Worker<GPU_WORKER_TYPE_COPY>().Finalize();
-        Worker<GPU_WORKER_TYPE_COPY>().Reset();
-    }
 
     return prevState;
 }
@@ -237,14 +259,3 @@ void GPUAccess::UpdateGPUResource(GPUResource& dest, std::size_t offset, const v
     memcpy(bufferPtr, data, size);
     dest.Unmap(mapRange);
 }
-
-void GPUAccess::SetVertexBuffer(D3D12_VERTEX_BUFFER_VIEW const* bufferView)
-{
-    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().IASetVertexBuffers(0, 1, bufferView);
-}
-
-void GPUAccess::SetIndexBuffer(D3D12_INDEX_BUFFER_VIEW const* bufferView)
-{
-    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().IASetIndexBuffer(bufferView);
-}
-

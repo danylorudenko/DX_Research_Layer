@@ -26,6 +26,11 @@ GPUUploadHeap::GPUUploadHeap(
     ThrowIfFailed(result);
 
     result = uploadBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&mappedData_));
+
+    if (data != nullptr) {
+        memcpy(mappedData_, data, elementSize_ * elementCount_);
+    }
+    
     ThrowIfFailed(result);
 }
 

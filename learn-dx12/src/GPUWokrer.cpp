@@ -40,11 +40,18 @@ GPUWorker& GPUWorker::operator=(GPUWorker&& rhs)
 
 void GPUWorker::Reset()
 {
-    commandList_->Reset(*commandQueue_);
+    // Only finalized worker is allowed to be reset.
+    if (finalized_) {
+        commandList_->Reset(*commandQueue_);
+        finalized_ = false;
+    }
 }
 
 void GPUWorker::Finalize()
 {
-    commandList_->Close();
-    commandQueue_->ExecuteCommandLists(commandList_->Get(), 1);
+    if (!finalized_) {
+        commandList_->Close();
+        commandQueue_->ExecuteCommandLists(commandList_->Get(), 1);
+        finalized_ = true;
+    }
 }

@@ -27,6 +27,8 @@ public:
     void Reset();
     void Finalize();
 
+    bool Finalized() const { return finalized_; }
+
     ID3D12GraphicsCommandList& Commit() { return *commandList_->Get(); }
     ID3D12CommandQueue* CommandQueue() const { return commandQueue_->Get(); }
 
@@ -35,5 +37,5 @@ private:
     std::unique_ptr<GPUCommandList> commandList_ = nullptr;
     std::unique_ptr<GPUCommandQueue> commandQueue_ = nullptr;
 
-    bool finalized_ = false;
+    bool finalized_ = true;
 };

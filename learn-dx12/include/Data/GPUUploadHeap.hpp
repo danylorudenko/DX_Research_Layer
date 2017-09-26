@@ -7,6 +7,8 @@ class GPUUploadHeap
 public:
     GPUUploadHeap(ID3D12Device* device, void const* data, std::size_t elementSize, std::size_t elementCount = 1, bool isConstBuffer = false);
 
+    D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress() const { return uploadBuffer_->GetGPUVirtualAddress(); }
+
     BYTE* MappedData();
     std::size_t BufferLength() const;
 

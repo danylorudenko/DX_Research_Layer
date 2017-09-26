@@ -8,16 +8,7 @@ void DirectAppDelegate::start(Application& application)
 {
     gpuAccess_ = std::make_unique<GPUAccess>(application);
 
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> startupCommandAllocator;
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> startupCommandList;
-    Microsoft::WRL::ComPtr<ID3D12Fence> startupFence;
-
-    HRESULT result = {};
-    //result = Device().CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&startupCommandAllocator)); ThrowIfFailed(result);
-    //result = Device().CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, startupCommandAllocator.Get(), nullptr, IID_PPV_ARGS(&startupCommandList)); ThrowIfFailed(result);
-    //result = Device().CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&startupFence));
-    //
-    //CreateRootSignature();
+    CreateRootSignature();
     //CreatePipelineState();
     //
     //LoadTriangleVertices(startupCommandList.Get());
@@ -70,29 +61,20 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
     HWND windowHandle = application.window().nativeHandle();
     SetWindowText(windowHandle, windowText.c_str());
 }
-//
-//ID3D12Device& DirectAppDelegate::Device()
-//{
-//    return *device_.Get();
-//}
 
 void DirectAppDelegate::CreateConstantBufferDescriptorHeap()
 {
-    //D3D12_DESCRIPTOR_HEAP_DESC cbvDescr = {};
-    //cbvDescr.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    //cbvDescr.NumDescriptors = 1;
-    //cbvDescr.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    //cbvDescr.NodeMask = 0;
-    //
-    //HRESULT result = Device().CreateDescriptorHeap(&cbvDescr, IID_PPV_ARGS(&cbvHeap_));
-    //ThrowIfFailed(result);
-    //
+    D3D12_DESCRIPTOR_HEAP_DESC cbvDescr = {};
+    cbvDescr.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    cbvDescr.NumDescriptors = 1;
+    cbvDescr.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    cbvDescr.NodeMask = 0;
+    
+    gpuAccess_->CreateDescriptorHeap(&cbvDescr, cbvHeap_);
 }
 
 void DirectAppDelegate::CreateRootSignature()
 {
-    using namespace Microsoft::WRL;
-
     CD3DX12_DESCRIPTOR_RANGE ranges[1];
     CD3DX12_ROOT_PARAMETER rootParameters[1];
 
@@ -104,37 +86,21 @@ void DirectAppDelegate::CreateRootSignature()
     CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
     rootSignatureDesc.Init(1, rootParameters, 0, nullptr, rootSignatureFlags);
 
-    ComPtr<ID3DBlob> signature;
-    ComPtr<ID3DBlob> errors;
+    Microsoft::WRL::ComPtr<ID3DBlob> signature;
+    Microsoft::WRL::ComPtr<ID3DBlob> errors;
 
-    HRESULT result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors);
-    ThrowIfFailed(result);
+    ThrowIfFailed(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors));
 
-    //result = Device().CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature_));
-    ThrowIfFailed(result);
+    gpuAccess_->CreateRootSignature(signature);
 }
 
 void DirectAppDelegate::CreatePipelineState()
 {
-    using namespace Microsoft::WRL;
+    Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
+    Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
 
-    ComPtr<ID3DBlob> vertexShader;
-    ComPtr<ID3DBlob> pixelShader;
-
-    // Compile shaders to the Blob.
-    {
-#if defined (_DEBUG) | (DEBUG)
-        UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-        UINT compileFlags = 0;
-#endif
-
-        HRESULT result = {};
-        result = D3DCompileFromFile(L"Shaders/triangle_shader.hlsl", nullptr, nullptr, "VS", "vs_5_0", compileFlags, 0, &vertexShader, nullptr);
-        ThrowIfFailed(result);
-        result = D3DCompileFromFile(L"Shaders/triangle_shader.hlsl", nullptr, nullptr, "PS", "ps_5_0", compileFlags, 0, &pixelShader, nullptr);
-        ThrowIfFailed(result);
-    }
+    gpuAccess_->CompileShader(L"Shaders/triangle_shader.hlsl", vertexShader.Get(), "VS", "vs_5_0");
+    gpuAccess_->CompileShader(L"Shaders/triangle_shader.hlsl", pixelShader.Get(), "PS", "ps_5_0");
 
     // Define the vertex input layout.
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -159,14 +125,11 @@ void DirectAppDelegate::CreatePipelineState()
     psoDesc.RTVFormats[0] = GPUAccess::backBufferFormat_;
     psoDesc.SampleDesc.Count = 1;
 
-    //HRESULT result = Device().CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pipelineState_));
-    //ThrowIfFailed(result);
+    gpuAccess_->CreatePSO(pipelineState_, &psoDesc);
 }
 
 void DirectAppDelegate::LoadTriangleVertices(ID3D12GraphicsCommandList* startupCommandList)
 {
-    using namespace Microsoft::WRL;
-
     Vertex verticesData[] = {
         { { 0.0f, 0.25f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
         { { 0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
@@ -175,27 +138,12 @@ void DirectAppDelegate::LoadTriangleVertices(ID3D12GraphicsCommandList* startupC
 
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
-    //GPUUploadHeap uploadHeap{ Device(), verticesData, vertexDataSize };
-    //
-    //triangleVertices_ = uploadHeap.GenerateDefault(startupCommandList);
+    gpuAccess_->CreateGPUUploadHeap(&triangleVertices_, verticesData, vertexDataSize);
+    BYTE* vertexDataStart = triangleVertices_->MappedData();
 
-    //Device().CreateCommittedResource(
-    //    &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-    //    D3D12_HEAP_FLAG_NONE,
-    //    &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize),
-    //    D3D12_RESOURCE_STATE_GENERIC_READ,
-    //    nullptr,
-    //    IID_PPV_ARGS(&triangleVertices_));
-
-    UINT8* vertexDataStart = nullptr;
-    CD3DX12_RANGE range = { 0, 0 };
-
-    HRESULT result = triangleVertices_->Map(0, &range, reinterpret_cast<void**>(&vertexDataStart));
-    ThrowIfFailed(result);
     memcpy(vertexDataStart, verticesData, vertexDataSize);
-    triangleVertices_->Unmap(0, nullptr);
 
-    triangleVerticesView_.BufferLocation = triangleVertices_->GetGPUVirtualAddress();
+    triangleVerticesView_.BufferLocation = triangleVertices_->GPUVirtualAddress();
     triangleVerticesView_.SizeInBytes = vertexDataSize;
     triangleVerticesView_.StrideInBytes = sizeof(Vertex);
 
@@ -205,25 +153,12 @@ void DirectAppDelegate::LoadConstantBuffers()
 {
     constexpr UINT cbSize = sizeof(SceneConstantBuffer) + 255 & ~255;
 
-    //HRESULT result = Device().CreateCommittedResource(
-    //    &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-    //    D3D12_HEAP_FLAG_NONE,
-    //    &CD3DX12_RESOURCE_DESC::Buffer(cbSize),
-    //    D3D12_RESOURCE_STATE_GENERIC_READ,
-    //    nullptr,
-    //    IID_PPV_ARGS(&constantBuffer_)
-    //);
-    //
-    //D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    //cbvDesc.BufferLocation = constantBuffer_->GetGPUVirtualAddress();
-    //cbvDesc.SizeInBytes = cbSize;
-    //Device().CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
-    //
-    //CD3DX12_RANGE readRange = { 0, 0 };
-    //result = constantBuffer_->Map(0, &readRange, reinterpret_cast<void**>(&constantBufferMappedData_));
-    //ThrowIfFailed(result);
-    //
-    //memcpy(constantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
+    gpuAccess_->CreateGPUUploadHeap(&constantBuffer_, constantBufferMappedData_, sizeof(constantBufferMappedData_));
+    
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+    cbvDesc.BufferLocation = constantBuffer_->GPUVirtualAddress();
+    cbvDesc.SizeInBytes = cbSize;
+    gpuAccess_->CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 //void DirectAppDelegate::Draw()
