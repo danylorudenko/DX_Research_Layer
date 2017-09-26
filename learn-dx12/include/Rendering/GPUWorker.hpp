@@ -28,6 +28,7 @@ public:
     void Finalize();
 
     ID3D12GraphicsCommandList& Commit() { return *commandList_->Get(); }
+    ID3D12CommandQueue* CommandQueue() const { return commandQueue_->Get(); }
 
 
 private:
