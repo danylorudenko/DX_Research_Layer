@@ -21,11 +21,11 @@ public:
     void CreateRootSignature();
     void CreatePipelineState();
 
-    void LoadTriangleVertices(ID3D12GraphicsCommandList* startupCommandList);
+    void LoadTriangleVertices();
     void CreateConstantBufferDescriptorHeap();
     void LoadConstantBuffers();
     
-    //void Draw();
+    void Draw();
     void CustomAction();
 
 private:

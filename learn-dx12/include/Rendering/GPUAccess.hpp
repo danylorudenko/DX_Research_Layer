@@ -33,15 +33,25 @@ public:
     template<> constexpr GPUWorker& Worker<GPU_WORKER_TYPE_COPY>() { return *workers_[1]; }
     template<> constexpr GPUWorker& Worker<GPU_WORKER_TYPE_COMPUTE>() { return *workers_[2]; }
 
+    void FinalizeAll();
+    void ResetAll();
+
+    ID3D12Resource* DepthStencilBuffer() const;
+    ID3D12Resource* CurrentFramebuffer() const;
+
+    D3D12_GPU_VIRTUAL_ADDRESS CurrentFramebufferGPUVirtualAddress() const;
+    D3D12_GPU_VIRTUAL_ADDRESS DepthStencilBufferGPUVirtualAddress() const;
+
+    D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const;
+    D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilHandle() const;
+
     UINT RtvIncrementalSize() const { return rtvDescriptorSize_; }
     UINT DsvIncrementalSize() const { return dsvDescriptorSize_; }
     UINT CbvSrvUavIncrementalSize() const { return cbv_srv_uavDescriptorSize_; }
 
-    void Begin();
-    void End();
-    void Present();
+    void CommitDefaultViewportScissorRects();
 
-    ID3D12GraphicsCommandList& Commit() { return Worker<GPU_WORKER_TYPE_DIRECT>().Commit(); }
+    void Present();
 
     void CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> dest);
     void CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle);
@@ -56,7 +66,6 @@ public:
     void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
 
 private:
-
     void InitializeD3D12();
     void CreateGPUWorkers();
 
@@ -69,15 +78,13 @@ private:
     void CreateDepthStencilBufferView();
 
 private:
-    static int usageNumber_;
-    
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory_;
 
     GPUWorker* workers_[3];
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
-    FrameResource frameResources[SWAP_CHAIN_BUFFER_COUNT];
+    FrameResource frameResources_[SWAP_CHAIN_BUFFER_COUNT];
     UINT64 currentFrame_ = 0U;
     D3D12_VIEWPORT viewportRect_;
     D3D12_RECT scissorRect_;

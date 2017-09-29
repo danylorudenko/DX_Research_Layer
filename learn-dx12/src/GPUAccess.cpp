@@ -7,19 +7,17 @@ GPUAccess::GPUAccess(Application& application)
 
     // Create main accessors to GPU.
     CreateGPUWorkers();
-    Begin();
 
     // Create swap chain and supporting resources.
     CreateSwapChain(application, dxgiFactory_.Get());
+
+    CreateDefaultDescriptorHeaps();
     CreateFrameResources();
     CreateDepthStencilBuffer();
-    CreateDefaultDescriptorHeaps();
     CreateDepthStencilBufferView();
 
     // Set default viewport and scissor values.
     SetViewportScissor();
-
-    End();
 }
 
 GPUAccess::GPUAccess(GPUAccess&& rhs)
@@ -54,7 +52,7 @@ void GPUAccess::CreateFrameResources()
     for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) {
         Microsoft::WRL::ComPtr<ID3D12Resource> frameBuffer = nullptr;
         swapChain_->GetBuffer(i, IID_PPV_ARGS(&frameBuffer));
-        frameResources[i] = FrameResource(*device_.Get(), rtvHeap_, i * rtvDescriptorSize, frameBuffer);
+        frameResources_[i] = FrameResource(*device_.Get(), rtvHeap_, i * rtvDescriptorSize, frameBuffer);
     }
 }
 
@@ -91,9 +89,9 @@ void GPUAccess::CreateDepthStencilBuffer()
         IID_PPV_ARGS(&depthStencilBuffer_));
     ThrowIfFailed(result);
 
-    Begin();
+    Worker<GPU_WORKER_TYPE_COPY>().Reset();
     Worker<GPU_WORKER_TYPE_COPY>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
-    End();
+    Worker<GPU_WORKER_TYPE_COPY>().Finalize();
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()
@@ -186,18 +184,54 @@ void GPUAccess::CreateGPUWorkers()
     //workers_[2]->Reset();
 }
 
-void GPUAccess::Begin()
+void GPUAccess::ResetAll()
 {
     Worker<GPU_WORKER_TYPE_DIRECT>().Reset();
     Worker<GPU_WORKER_TYPE_COPY>().Reset();
     Worker<GPU_WORKER_TYPE_COMPUTE>().Reset();
 }
 
-void GPUAccess::End()
+ID3D12Resource* GPUAccess::DepthStencilBuffer() const
+{
+    return depthStencilBuffer_.Get();
+}
+
+ID3D12Resource* GPUAccess::CurrentFramebuffer() const
+{
+    return frameResources_[currentFrame_].FrameBuffer();
+}
+
+D3D12_GPU_VIRTUAL_ADDRESS GPUAccess::CurrentFramebufferGPUVirtualAddress() const
+{
+    return frameResources_[currentFrame_].FrameBuffer()->GetGPUVirtualAddress();
+}
+
+D3D12_GPU_VIRTUAL_ADDRESS GPUAccess::DepthStencilBufferGPUVirtualAddress() const
+{
+    return depthStencilBuffer_->GetGPUVirtualAddress();
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE GPUAccess::CurrentRtvHandle() const
+{
+    return frameResources_[currentFrame_].CPUDescriptorHandle();
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE GPUAccess::DepthStencilHandle() const
+{
+    return dsvHeap_->GetCPUDescriptorHandleForHeapStart();
+}
+
+void GPUAccess::FinalizeAll()
 {
     Worker<GPU_WORKER_TYPE_DIRECT>().Finalize();
     Worker<GPU_WORKER_TYPE_COPY>().Finalize();
     Worker<GPU_WORKER_TYPE_COMPUTE>().Finalize();
+}
+
+void GPUAccess::CommitDefaultViewportScissorRects()
+{
+    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().RSSetViewports(1, &viewportRect_);
+    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().RSSetScissorRects(1, &scissorRect_);
 }
 
 void GPUAccess::Present()
