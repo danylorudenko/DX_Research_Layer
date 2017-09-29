@@ -258,9 +258,9 @@ void GPUAccess::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft
     ThrowIfFailed(device_->CreateDescriptorHeap(desc, IID_PPV_ARGS(&dest)));
 }
 
-void GPUAccess::CreateGPUUploadHeap(GPUUploadHeap** dest, void const* data, std::size_t elementSize, std::size_t elementsCount, bool isConstBuffer)
+void GPUAccess::CreateGPUUploadHeap(GPUUploadHeap** dest, void const* data, std::size_t elementSize, bool isConstBuffer)
 {
-    *dest = new GPUUploadHeap{ device_.Get(), data, elementSize, elementsCount, isConstBuffer };
+    *dest = new GPUUploadHeap{ device_.Get(), data, elementSize, isConstBuffer };
 }
 
 void GPUAccess::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type)

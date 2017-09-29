@@ -14,6 +14,7 @@ void DirectAppDelegate::start(Application& application)
     CreatePipelineState();
     
     LoadTriangleVertices();
+    CreateConstantBufferDescriptorHeap();
     LoadConstantBuffers();
     
     gpuAccess_->FinalizeAll();
@@ -82,7 +83,7 @@ void DirectAppDelegate::CreateRootSignature()
 
     ThrowIfFailed(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors));
 
-    gpuAccess_->CreateRootSignature(signature);
+    gpuAccess_->CreateRootSignature(signature, rootSignature_);
 }
 
 void DirectAppDelegate::CreatePipelineState()
@@ -90,8 +91,10 @@ void DirectAppDelegate::CreatePipelineState()
     Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
     Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
 
-    gpuAccess_->CompileShader(L"Shaders/triangle_shader.hlsl", vertexShader.Get(), "VS", "vs_5_0");
-    gpuAccess_->CompileShader(L"Shaders/triangle_shader.hlsl", pixelShader.Get(), "PS", "ps_5_0");
+    gpuAccess_->CompileShader(L"Shaders\\triangle_shader.hlsl", vertexShader, "VS", "vs_5_0");
+    gpuAccess_->CompileShader(L"Shaders\\triangle_shader.hlsl", pixelShader, "PS", "ps_5_0");
+    //D3DCompileFromFile(L"Shaders\\triangle_shader.hlsl", nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &vertexShader, nullptr);
+    //D3DCompileFromFile(L"Shaders\\triangle_shader.hlsl", nullptr, nullptr, "PS", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &pixelShader, nullptr);
 
     // Define the vertex input layout.
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -144,7 +147,8 @@ void DirectAppDelegate::LoadConstantBuffers()
 {
     constexpr UINT cbSize = sizeof(SceneConstantBuffer) + 255 & ~255;
 
-    gpuAccess_->CreateGPUUploadHeap(&constantBuffer_, constantBufferMappedData_, sizeof(constantBufferMappedData_));
+    gpuAccess_->CreateGPUUploadHeap(&constantBuffer_, nullptr, cbSize);
+    constantBufferMappedData_ = constantBuffer_->MappedData();
     
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = constantBuffer_->GPUVirtualAddress();
@@ -155,6 +159,8 @@ void DirectAppDelegate::LoadConstantBuffers()
 void DirectAppDelegate::Draw()
 {
     GPUWorker& graphicsWorker = gpuAccess_->Worker<GPU_WORKER_TYPE_DIRECT>();
+    graphicsWorker.Reset();
+
     // Set signature of incoming data.
     graphicsWorker.Commit().SetGraphicsRootSignature(rootSignature_.Get());
 
@@ -184,6 +190,8 @@ void DirectAppDelegate::Draw()
 
     graphicsWorker.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_->CurrentFramebuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
+
+    graphicsWorker.Finalize();
     gpuAccess_->Present();
 }
 
