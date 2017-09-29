@@ -282,10 +282,17 @@ void GPUAccess::UpdateGPUResource(GPUResource& dest, std::size_t offset, const v
 {
     assert(size + offset <= dest.Size());
 
-    const D3D12_RANGE mapRange = { offset, offset + size };
-    void* bufferPtr = nullptr;
-    dest.Map(&bufferPtr, mapRange);
+    GPUUploadHeap uploadHeap{ device_.Get(), data, size };
 
-    memcpy(bufferPtr, data, size);
-    dest.Unmap(mapRange);
+    D3D12_RESOURCE_STATES prevState = dest.State();
+    dest.Transition(&Worker<GPU_WORKER_TYPE_COPY>().Commit(), D3D12_RESOURCE_STATE_COPY_DEST);
+
+    Worker<GPU_WORKER_TYPE_COPY>().Commit().CopyBufferRegion(
+        dest.Get(),
+        offset,
+        uploadHeap.Get(),
+        0,
+        size);
+    
+    dest.Transition(&Worker<GPU_WORKER_TYPE_COPY>().Commit(), prevState);
 }
