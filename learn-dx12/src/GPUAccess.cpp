@@ -89,9 +89,9 @@ void GPUAccess::CreateDepthStencilBuffer()
         IID_PPV_ARGS(&depthStencilBuffer_));
     ThrowIfFailed(result);
 
-    Worker<GPU_WORKER_TYPE_COPY>().Reset();
-    Worker<GPU_WORKER_TYPE_COPY>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
-    Worker<GPU_WORKER_TYPE_COPY>().Finalize();
+    Worker<GPU_WORKER_TYPE_DIRECT>().Reset();
+    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    Worker<GPU_WORKER_TYPE_DIRECT>().Finalize();
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()
@@ -128,8 +128,6 @@ void GPUAccess::CreateDepthStencilBufferView()
     depthStencDesc.Texture2D.MipSlice = 0;
 
     device_->CreateDepthStencilView(depthStencilBuffer_.Get(), &depthStencDesc, dsvHeap_->GetCPUDescriptorHandleForHeapStart());
-
-    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 }
 
 void GPUAccess::SetViewportScissor()
@@ -245,9 +243,9 @@ void GPUAccess::CreateGPUBuffer(GPUResource** dest, std::size_t size)
     *dest = new GPUResource{ device_.Get(), static_cast<UINT64>(size) };
 }
 
-void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> dest)
+void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
 {
-    ThrowIfFailed(device_->CreateRootSignature(0, dest->GetBufferPointer(), dest->GetBufferSize(), IID_PPV_ARGS(&dest)));
+    ThrowIfFailed(device_->CreateRootSignature(0, serializedRootSignature->GetBufferPointer(), serializedRootSignature->GetBufferSize(), IID_PPV_ARGS(&dest)));
 }
 
 void GPUAccess::CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle)
@@ -265,14 +263,13 @@ void GPUAccess::CreateGPUUploadHeap(GPUUploadHeap** dest, void const* data, std:
     *dest = new GPUUploadHeap{ device_.Get(), data, elementSize, elementsCount, isConstBuffer };
 }
 
-void GPUAccess::CompileShader(LPWSTR fileName, ID3DBlob* dest, LPCSTR entryPoint, LPCSTR type)
+void GPUAccess::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type)
 {
 #if defined (_DEBUG) | (DEBUG)
     UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #else
     UINT compileFlags = 0;
 #endif
-
     ThrowIfFailed(D3DCompileFromFile(fileName, nullptr, nullptr, entryPoint, type, compileFlags, 0, &dest, nullptr));
 }
 
