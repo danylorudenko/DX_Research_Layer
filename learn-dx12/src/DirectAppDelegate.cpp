@@ -158,7 +158,7 @@ void DirectAppDelegate::LoadConstantBuffers()
 
 void DirectAppDelegate::Draw()
 {
-    GPUEngine& graphicsEngine = gpuAccess_->Worker<GPU_WORKER_TYPE_DIRECT>();
+    GPUEngine& graphicsEngine = gpuAccess_->Engine<GPU_ENGINE_TYPE_DIRECT>();
     graphicsEngine.Reset();
 
     // Set signature of incoming data.
@@ -172,7 +172,6 @@ void DirectAppDelegate::Draw()
     
     // Set the handle for the 0th descriptor table.
     graphicsEngine.Commit().SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
-
 
     graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_->CurrentFramebuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
     

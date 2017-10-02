@@ -27,11 +27,11 @@ public:
     static constexpr DXGI_FORMAT backBufferFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
     static constexpr DXGI_FORMAT depthStencilBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-    template<GPU_WORKER_TYPE TYPE> GPUEngine& Worker();
+    template<GPU_ENGINE_TYPE TYPE> GPUEngine& Engine();
     
-    template<> constexpr GPUEngine& Worker<GPU_WORKER_TYPE_DIRECT>() { return *workers_[0]; }
-    template<> constexpr GPUEngine& Worker<GPU_WORKER_TYPE_COPY>() { return *workers_[1]; }
-    template<> constexpr GPUEngine& Worker<GPU_WORKER_TYPE_COMPUTE>() { return *workers_[2]; }
+    template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_DIRECT>() { return *engines_[0]; }
+    template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_COPY>() { return *engines_[1]; }
+    template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_COMPUTE>() { return *engines_[2]; }
 
     void FinalizeAll();
     void ResetAll();
@@ -81,7 +81,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory_;
 
-    GPUEngine* workers_[3];
+    GPUEngine* engines_[3];
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
     FrameResource frameResources_[SWAP_CHAIN_BUFFER_COUNT];

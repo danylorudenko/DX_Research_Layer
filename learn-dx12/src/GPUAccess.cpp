@@ -89,9 +89,9 @@ void GPUAccess::CreateDepthStencilBuffer()
         IID_PPV_ARGS(&depthStencilBuffer_));
     ThrowIfFailed(result);
 
-    Worker<GPU_WORKER_TYPE_DIRECT>().Reset();
-    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
-    Worker<GPU_WORKER_TYPE_DIRECT>().Finalize();
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Finalize();
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()
@@ -165,28 +165,28 @@ void GPUAccess::CreateSwapChain(Application& application, IDXGIFactory* factory)
     sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    ThrowIfFailed(factory->CreateSwapChain(Worker<GPU_WORKER_TYPE_DIRECT>().CommandQueue(), &sd, swapChain_.GetAddressOf()));
+    ThrowIfFailed(factory->CreateSwapChain(Engine<GPU_ENGINE_TYPE_DIRECT>().CommandQueue(), &sd, swapChain_.GetAddressOf()));
 }
 
 void GPUAccess::CreateGPUWorkers()
 {
     // Workers are being reset automatically on creation.
 
-    workers_[0] = new GPUEngine(device_.Get(), GPU_WORKER_TYPE_DIRECT);
+    engines_[0] = new GPUEngine(device_.Get(), GPU_ENGINE_TYPE_DIRECT);
     //workers_[0]->Reset();
 
-    workers_[1] = new GPUEngine(device_.Get(), GPU_WORKER_TYPE_COPY);
+    engines_[1] = new GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COPY);
     //workers_[1]->Reset();
 
-    workers_[2] = new GPUEngine(device_.Get(), GPU_WORKER_TYPE_COMPUTE);
+    engines_[2] = new GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COMPUTE);
     //workers_[2]->Reset();
 }
 
 void GPUAccess::ResetAll()
 {
-    Worker<GPU_WORKER_TYPE_DIRECT>().Reset();
-    Worker<GPU_WORKER_TYPE_COPY>().Reset();
-    Worker<GPU_WORKER_TYPE_COMPUTE>().Reset();
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
+    Engine<GPU_ENGINE_TYPE_COPY>().Reset();
+    Engine<GPU_ENGINE_TYPE_COMPUTE>().Reset();
 }
 
 ID3D12Resource* GPUAccess::DepthStencilBuffer() const
@@ -221,15 +221,15 @@ D3D12_CPU_DESCRIPTOR_HANDLE GPUAccess::DepthStencilHandle() const
 
 void GPUAccess::FinalizeAll()
 {
-    Worker<GPU_WORKER_TYPE_DIRECT>().Finalize();
-    Worker<GPU_WORKER_TYPE_COPY>().Finalize();
-    Worker<GPU_WORKER_TYPE_COMPUTE>().Finalize();
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Finalize();
+    Engine<GPU_ENGINE_TYPE_COPY>().Finalize();
+    Engine<GPU_ENGINE_TYPE_COMPUTE>().Finalize();
 }
 
 void GPUAccess::CommitDefaultViewportScissorRects()
 {
-    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().RSSetViewports(1, &viewportRect_);
-    Worker<GPU_WORKER_TYPE_DIRECT>().Commit().RSSetScissorRects(1, &scissorRect_);
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetViewports(1, &viewportRect_);
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetScissorRects(1, &scissorRect_);
 }
 
 void GPUAccess::Present()
@@ -285,14 +285,14 @@ void GPUAccess::UpdateGPUResource(GPUResource& dest, std::size_t offset, const v
     GPUUploadHeap uploadHeap{ device_.Get(), data, size };
 
     D3D12_RESOURCE_STATES prevState = dest.State();
-    dest.Transition(&Worker<GPU_WORKER_TYPE_COPY>().Commit(), D3D12_RESOURCE_STATE_COPY_DEST);
+    dest.Transition(&Engine<GPU_ENGINE_TYPE_COPY>().Commit(), D3D12_RESOURCE_STATE_COPY_DEST);
 
-    Worker<GPU_WORKER_TYPE_COPY>().Commit().CopyBufferRegion(
+    Engine<GPU_ENGINE_TYPE_COPY>().Commit().CopyBufferRegion(
         dest.Get(),
         offset,
         uploadHeap.Get(),
         0,
         size);
     
-    dest.Transition(&Worker<GPU_WORKER_TYPE_COPY>().Commit(), prevState);
+    dest.Transition(&Engine<GPU_ENGINE_TYPE_COPY>().Commit(), prevState);
 }

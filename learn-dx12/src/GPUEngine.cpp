@@ -1,22 +1,22 @@
 #include <Rendering\GPUEngine.hpp>
 
-GPUEngine::GPUEngine(ID3D12Device* device, GPU_WORKER_TYPE type)
+GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type)
 {
-    std::size_t commandListAllocCount = 0;
+    std::size_t commandQueueAllocatorsCount = 0;
     switch (type)
     {
-    case GPU_WORKER_TYPE_DIRECT:
-        commandListAllocCount = 3;
+    case GPU_ENGINE_TYPE_DIRECT:
+        commandQueueAllocatorsCount = 3;
         break;
-    case GPU_WORKER_TYPE_COPY:
-        commandListAllocCount = 1;
+    case GPU_ENGINE_TYPE_COPY:
+        commandQueueAllocatorsCount = 1;
         break;
-    case GPU_WORKER_TYPE_COMPUTE:
-        commandListAllocCount = 1;
+    case GPU_ENGINE_TYPE_COMPUTE:
+        commandQueueAllocatorsCount = 1;
         break;
     }
 
-    commandQueue_.reset(new GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandListAllocCount });
+    commandQueue_.reset(new GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueueAllocatorsCount });
     commandList_.reset(new GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueue_->CurrentAlloc().Get() });
 }
 
