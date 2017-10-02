@@ -90,7 +90,7 @@ void GPUAccess::CreateDepthStencilBuffer()
     ThrowIfFailed(result);
 
     Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
     Engine<GPU_ENGINE_TYPE_DIRECT>().Finalize();
 }
 
@@ -228,8 +228,8 @@ void GPUAccess::FinalizeAll()
 
 void GPUAccess::CommitDefaultViewportScissorRects()
 {
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetViewports(1, &viewportRect_);
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetScissorRects(1, &scissorRect_);
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit()->RSSetViewports(1, &viewportRect_);
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit()->RSSetScissorRects(1, &scissorRect_);
 }
 
 void GPUAccess::Present()
@@ -285,14 +285,14 @@ void GPUAccess::UpdateGPUResource(GPUResource& dest, std::size_t offset, const v
     GPUUploadHeap uploadHeap{ device_.Get(), data, size };
 
     D3D12_RESOURCE_STATES prevState = dest.State();
-    dest.Transition(&Engine<GPU_ENGINE_TYPE_COPY>().Commit(), D3D12_RESOURCE_STATE_COPY_DEST);
+    dest.Transition(Engine<GPU_ENGINE_TYPE_COPY>().Commit(), D3D12_RESOURCE_STATE_COPY_DEST);
 
-    Engine<GPU_ENGINE_TYPE_COPY>().Commit().CopyBufferRegion(
+    Engine<GPU_ENGINE_TYPE_COPY>().Commit()->CopyBufferRegion(
         dest.Get(),
         offset,
         uploadHeap.Get(),
         0,
         size);
     
-    dest.Transition(&Engine<GPU_ENGINE_TYPE_COPY>().Commit(), prevState);
+    dest.Transition(Engine<GPU_ENGINE_TYPE_COPY>().Commit(), prevState);
 }

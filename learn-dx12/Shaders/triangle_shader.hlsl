@@ -13,7 +13,7 @@ PSInput VS(float3 position : POSITION, float4 color : COLOR)
 {
     PSInput result;
 
-    result.position = float4(position, 1.0) + offset;
+    result.position = float4(position, 1.0)/* + offset*/;
     result.color = color;
 
     return result;

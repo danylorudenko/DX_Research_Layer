@@ -15,7 +15,6 @@ public:
     GPUCommandList& operator=(GPUCommandList&& rhs);
 
     ID3D12GraphicsCommandList* Get() const { return commandList_.Get(); }
-    ID3D12CommandList& Ref() { return *commandList_.Get(); }
 
     void Reset(GPUCommandAllocator& allocContext);
     void Execute(GPUCommandQueue& queueContext);

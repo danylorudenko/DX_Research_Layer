@@ -44,14 +44,15 @@ PerformanceTimer& DirectAppDelegate::Timer()
 
 void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTime)
 {
-    std::wstring windowText = L"SPF: ";
-    windowText += std::to_wstring(drawTime);
+    windowText_.resize(0);
+    windowText_ = L"SPF: ";
+    windowText_ += std::to_wstring(drawTime);
 
-    windowText += L";    FPS: ";
-    windowText += std::to_wstring(1 / drawTime);
+    windowText_ += L";    FPS: ";
+    windowText_ += std::to_wstring(1 / drawTime);
 
     HWND windowHandle = application.window().nativeHandle();
-    SetWindowText(windowHandle, windowText.c_str());
+    SetWindowText(windowHandle, windowText_.c_str());
 }
 
 void DirectAppDelegate::CreateConstantBufferDescriptorHeap()
@@ -133,10 +134,7 @@ void DirectAppDelegate::LoadTriangleVertices()
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
     gpuAccess_->CreateGPUUploadHeap(&triangleVertices_, verticesData, vertexDataSize);
-    BYTE* vertexDataStart = triangleVertices_->MappedData();
-
-    memcpy(vertexDataStart, verticesData, vertexDataSize);
-
+    
     triangleVerticesView_.BufferLocation = triangleVertices_->GPUVirtualAddress();
     triangleVerticesView_.SizeInBytes = vertexDataSize;
     triangleVerticesView_.StrideInBytes = sizeof(Vertex);
@@ -147,7 +145,7 @@ void DirectAppDelegate::LoadConstantBuffers()
 {
     constexpr UINT cbSize = sizeof(SceneConstantBuffer) + 255 & ~255;
 
-    gpuAccess_->CreateGPUUploadHeap(&constantBuffer_, nullptr, cbSize);
+    gpuAccess_->CreateGPUUploadHeap(&constantBuffer_, nullptr, cbSize, true);
     constantBufferMappedData_ = constantBuffer_->MappedData();
     
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
@@ -162,32 +160,32 @@ void DirectAppDelegate::Draw()
     graphicsEngine.Reset();
 
     // Set signature of incoming data.
-    graphicsEngine.Commit().SetGraphicsRootSignature(rootSignature_.Get());
+    graphicsEngine.Commit()->SetGraphicsRootSignature(rootSignature_.Get());
 
     gpuAccess_->CommitDefaultViewportScissorRects();
 
     // Set descriptor heaps which will the pipeline will use.
     ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap_.Get() };
-    graphicsEngine.Commit().SetDescriptorHeaps(1, ppHeaps);
+    graphicsEngine.Commit()->SetDescriptorHeaps(1, ppHeaps);
     
     // Set the handle for the 0th descriptor table.
-    graphicsEngine.Commit().SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
+    graphicsEngine.Commit()->SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
 
-    graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_->CurrentFramebuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+    graphicsEngine.Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_->CurrentFramebuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
     
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = gpuAccess_->CurrentRtvHandle();
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = gpuAccess_->DepthStencilHandle();
-    graphicsEngine.Commit().OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+    graphicsEngine.Commit()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
     // Drawing commands.
     static FLOAT clearColor[4] = { 0.6f, 0.2f, 0.2f, 1.0f };
-    graphicsEngine.Commit().ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-    graphicsEngine.Commit().ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-    graphicsEngine.Commit().IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    graphicsEngine.Commit().IASetVertexBuffers(0, 1, &triangleVerticesView_);
-    graphicsEngine.Commit().DrawInstanced(3, 1, 0, 0);
+    graphicsEngine.Commit()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+    graphicsEngine.Commit()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+    graphicsEngine.Commit()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    graphicsEngine.Commit()->IASetVertexBuffers(0, 1, &triangleVerticesView_);
+    graphicsEngine.Commit()->DrawInstanced(3, 1, 0, 0);
 
-    graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_->CurrentFramebuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+    graphicsEngine.Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_->CurrentFramebuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
 
     graphicsEngine.Finalize();

@@ -29,7 +29,7 @@ public:
 
     bool Finalized() const { return finalized_; }
 
-    ID3D12GraphicsCommandList& Commit() { return *commandList_->Get(); }
+    ID3D12GraphicsCommandList* Commit() { return commandList_->Get(); }
     ID3D12CommandQueue* CommandQueue() const { return commandQueue_->Get(); }
 
 
