@@ -1,6 +1,6 @@
-#include <Rendering\GPUWorker.hpp>
+#include <Rendering\GPUEngine.hpp>
 
-GPUWorker::GPUWorker(ID3D12Device* device, GPU_WORKER_TYPE type)
+GPUEngine::GPUEngine(ID3D12Device* device, GPU_WORKER_TYPE type)
 {
     std::size_t commandListAllocCount = 0;
     switch (type)
@@ -16,11 +16,11 @@ GPUWorker::GPUWorker(ID3D12Device* device, GPU_WORKER_TYPE type)
         break;
     }
 
-    commandList_.reset(new GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandListAllocCount });
-    commandQueue_.reset(new GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type) });
+    commandQueue_.reset(new GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandListAllocCount });
+    commandList_.reset(new GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueue_->CurrentAlloc().Get() });
 }
 
-GPUWorker::GPUWorker(GPUWorker&& rhs)
+GPUEngine::GPUEngine(GPUEngine&& rhs)
 {
     commandList_ = std::move(rhs.commandList_);
     commandQueue_ = std::move(rhs.commandQueue_);
@@ -28,7 +28,7 @@ GPUWorker::GPUWorker(GPUWorker&& rhs)
     ZeroMemory(&rhs, sizeof(rhs));
 }
 
-GPUWorker& GPUWorker::operator=(GPUWorker&& rhs)
+GPUEngine& GPUEngine::operator=(GPUEngine&& rhs)
 {
     commandList_ = std::move(rhs.commandList_);
     commandQueue_ = std::move(rhs.commandQueue_);
@@ -38,16 +38,17 @@ GPUWorker& GPUWorker::operator=(GPUWorker&& rhs)
     return *this;
 }
 
-void GPUWorker::Reset()
+void GPUEngine::Reset()
 {
     // Only finalized worker is allowed to be reset.
     if (finalized_) {
-        commandList_->Reset(*commandQueue_);
+        auto& allocContext = commandQueue_->ProvideNextAlloc();
+        commandList_->Reset(allocContext);
         finalized_ = false;
     }
 }
 
-void GPUWorker::Finalize()
+void GPUEngine::Finalize()
 {
     if (!finalized_) {
         commandList_->Close();

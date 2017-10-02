@@ -22,9 +22,12 @@ public:
     UINT64 FenceTargetValue() const { return fenceTargetValue_; }
     UINT64 FenceCompletedValue() const { return fence_.CompletedValue(); }
     void SetFenceTargetValue(UINT64 targetValue) { fenceTargetValue_ = targetValue; }
+    void SendFenceGPUSignal(ID3D12CommandQueue* queue, UINT64 signalValue);
+    void WaitForFence();
 
 private:
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
+
     GPUFence fence_;
     UINT64 fenceTargetValue_ = 0U;
 };

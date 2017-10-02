@@ -21,7 +21,7 @@ public:
 
     UINT64 CompletedValue() const { return fence_->GetCompletedValue(); }
 
-    void WaitForQueue(const GPUCommandQueue& queue, const GPUCommandAllocator& allocatorInUse);
+    void WaitForValue(UINT64 value);
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;

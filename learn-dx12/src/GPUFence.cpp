@@ -29,10 +29,10 @@ GPUFence::~GPUFence()
     CloseHandle(event_);
 }
 
-void GPUFence::WaitForQueue(const GPUCommandQueue& queue, const GPUCommandAllocator& allocatorInUse)
+void GPUFence::WaitForValue(UINT64 value)
 {
-    if (CompletedValue() < allocatorInUse.FenceTargetValue()) {
-        fence_->SetEventOnCompletion(allocatorInUse.FenceTargetValue(), event_);
+    if (CompletedValue() < value) {
+        fence_->SetEventOnCompletion(value, event_);
         WaitForSingleObject(event_, INFINITE);
     }
 }

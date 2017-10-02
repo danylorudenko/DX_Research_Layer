@@ -3,7 +3,7 @@
 #include <pch.hpp>
 
 #include <Utility\Application.hpp>
-#include <Rendering\GPUWorker.hpp>
+#include <Rendering\GPUEngine.hpp>
 #include <Data\FrameResource.hpp>
 #include <Data\GPUResource.hpp>
 #include <Data\GPUUploadHeap.hpp>
@@ -27,11 +27,11 @@ public:
     static constexpr DXGI_FORMAT backBufferFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
     static constexpr DXGI_FORMAT depthStencilBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-    template<GPU_WORKER_TYPE TYPE> GPUWorker& Worker();
+    template<GPU_WORKER_TYPE TYPE> GPUEngine& Worker();
     
-    template<> constexpr GPUWorker& Worker<GPU_WORKER_TYPE_DIRECT>() { return *workers_[0]; }
-    template<> constexpr GPUWorker& Worker<GPU_WORKER_TYPE_COPY>() { return *workers_[1]; }
-    template<> constexpr GPUWorker& Worker<GPU_WORKER_TYPE_COMPUTE>() { return *workers_[2]; }
+    template<> constexpr GPUEngine& Worker<GPU_WORKER_TYPE_DIRECT>() { return *workers_[0]; }
+    template<> constexpr GPUEngine& Worker<GPU_WORKER_TYPE_COPY>() { return *workers_[1]; }
+    template<> constexpr GPUEngine& Worker<GPU_WORKER_TYPE_COMPUTE>() { return *workers_[2]; }
 
     void FinalizeAll();
     void ResetAll();
@@ -81,7 +81,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory_;
 
-    GPUWorker* workers_[3];
+    GPUEngine* workers_[3];
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
     FrameResource frameResources_[SWAP_CHAIN_BUFFER_COUNT];

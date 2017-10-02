@@ -177,7 +177,7 @@
     <ClCompile Include="src\GPUFence.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPUUploadHeap.cpp" />
-    <ClCompile Include="src\GPUWokrer.cpp" />
+    <ClCompile Include="src\GPUEngine.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
@@ -193,7 +193,7 @@
     <ClInclude Include="include\Rendering\GPUCommandList.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandQueue.hpp" />
     <ClInclude Include="include\Rendering\GPUFence.hpp" />
-    <ClInclude Include="include\Rendering\GPUWorker.hpp" />
+    <ClInclude Include="include\Rendering\GPUEngine.hpp" />
     <ClInclude Include="include\Utility\Application.hpp" />
     <ClInclude Include="include\Utility\DirectAppDelegate.hpp" />
     <ClInclude Include="include\Utility\PerformanceTimer.hpp" />

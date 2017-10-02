@@ -14,15 +14,15 @@ enum GPU_WORKER_TYPE
     GPU_WORKER_TYPE_COMPUTE = D3D12_COMMAND_LIST_TYPE_COMPUTE
 };
 
-class GPUWorker
+class GPUEngine
 {
 public:
-    GPUWorker(ID3D12Device* device, GPU_WORKER_TYPE type);
-    GPUWorker(const GPUWorker&) = delete;
-    GPUWorker(GPUWorker&& rhs);
+    GPUEngine(ID3D12Device* device, GPU_WORKER_TYPE type);
+    GPUEngine(const GPUEngine&) = delete;
+    GPUEngine(GPUEngine&& rhs);
 
-    GPUWorker& operator=(const GPUWorker&) = delete;
-    GPUWorker& operator=(GPUWorker&& rhs);
+    GPUEngine& operator=(const GPUEngine&) = delete;
+    GPUEngine& operator=(GPUEngine&& rhs);
 
     void Reset();
     void Finalize();

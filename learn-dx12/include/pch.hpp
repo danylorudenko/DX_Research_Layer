@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <string>
+#include <vector>
 
 #include <Windows.h>
 #include <wrl.h>
