@@ -18,7 +18,7 @@ public:
 
     void Reset(GPUCommandAllocator& allocContext);
     void Execute(GPUCommandQueue& queueContext);
-    void Close() { commandList_->Close(); closed_ = true; }
+    void Close();
     bool Closed() { return closed_; }
 
 private:

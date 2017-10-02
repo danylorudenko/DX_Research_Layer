@@ -172,13 +172,13 @@ void GPUAccess::CreateGPUWorkers()
 {
     // Workers are being reset automatically on creation.
 
-    engines_[0] = new GPUEngine(device_.Get(), GPU_ENGINE_TYPE_DIRECT);
+    engines_[0] = GPUEngine(device_.Get(), GPU_ENGINE_TYPE_DIRECT);
     //workers_[0]->Reset();
 
-    engines_[1] = new GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COPY);
+    engines_[1] = GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COPY);
     //workers_[1]->Reset();
 
-    engines_[2] = new GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COMPUTE);
+    engines_[2] = GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COMPUTE);
     //workers_[2]->Reset();
 }
 

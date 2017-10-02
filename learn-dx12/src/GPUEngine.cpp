@@ -1,5 +1,7 @@
 #include <Rendering\GPUEngine.hpp>
 
+GPUEngine::GPUEngine() = default;
+
 GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type)
 {
     std::size_t commandQueueAllocatorsCount = 0;

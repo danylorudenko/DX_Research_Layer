@@ -18,7 +18,6 @@ public:
     GPUAccess& operator=(const GPUAccess&) = delete;
     GPUAccess& operator=(GPUAccess&&);
 
-
     static constexpr UINT WIDTH = 800;
     static constexpr UINT HEIGHT = 600;
 
@@ -29,9 +28,9 @@ public:
 
     template<GPU_ENGINE_TYPE TYPE> GPUEngine& Engine();
     
-    template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_DIRECT>() { return *engines_[0]; }
-    template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_COPY>() { return *engines_[1]; }
-    template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_COMPUTE>() { return *engines_[2]; }
+    template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_DIRECT>() { return engines_[0]; }
+    template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_COPY>() { return engines_[1]; }
+    template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_COMPUTE>() { return engines_[2]; }
 
     void FinalizeAll();
     void ResetAll();
@@ -81,7 +80,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory_;
 
-    GPUEngine* engines_[3];
+    GPUEngine engines_[3];
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
     FrameResource frameResources_[SWAP_CHAIN_BUFFER_COUNT];

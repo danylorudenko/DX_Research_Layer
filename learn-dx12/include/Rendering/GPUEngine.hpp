@@ -17,6 +17,7 @@ enum GPU_ENGINE_TYPE
 class GPUEngine
 {
 public:
+    GPUEngine();
     GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type);
     GPUEngine(const GPUEngine&) = delete;
     GPUEngine(GPUEngine&& rhs);

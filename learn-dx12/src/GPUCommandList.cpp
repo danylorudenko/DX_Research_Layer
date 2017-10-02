@@ -34,3 +34,9 @@ void GPUCommandList::Execute(GPUCommandQueue& queueContext)
 {
     queueContext.ExecuteCommandLists(commandList_.Get(), 1);
 }
+
+void GPUCommandList::Close()
+{
+    commandList_->Close(); 
+    closed_ = true;
+}

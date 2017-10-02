@@ -15,7 +15,7 @@ GPUCommandQueue::GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE t
     {
         commandAllocators_.emplace_back(device, type);
     }
-    commandAllocators_.shrink_to_fit();
+    //commandAllocators_.shrink_to_fit();
 }
 
 GPUCommandQueue::GPUCommandQueue(GPUCommandQueue&& rhs)
