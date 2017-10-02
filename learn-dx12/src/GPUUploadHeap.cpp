@@ -2,14 +2,15 @@
 
 #include <Data\GPUUploadHeap.hpp>
 
+GPUUploadHeap::GPUUploadHeap() = default;
+
 GPUUploadHeap::GPUUploadHeap(
     ID3D12Device* device,
     void const* data,
     std::size_t size,
-    bool isConstBuffer) :
-
-    size_(size)
+    bool isConstBuffer)
 {
+    size_ = size;
     if (isConstBuffer) {
         size_ = (size_ + 255) & ~255;
     }
@@ -23,47 +24,28 @@ GPUUploadHeap::GPUUploadHeap(
         IID_PPV_ARGS(&resource_));
     ThrowIfFailed(result);
 
-    ThrowIfFailed(resource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedData_)));
+    gpuAddress_ = resource_->GetGPUVirtualAddress();
+    state_ = D3D12_RESOURCE_STATE_GENERIC_READ;
 
     if (data != nullptr) {
-        memcpy(mappedData_, data, size_);
+        BYTE* mappedHeap = nullptr;
+        Map(reinterpret_cast<void**>(&mappedHeap), nullptr);
+        memcpy(mappedHeap, data, size);
+        Unmap(nullptr);
     }
 }
 
-GPUUploadHeap::GPUUploadHeap(GPUUploadHeap&& rhs) :
-    size_(rhs.size_)
+GPUUploadHeap::GPUUploadHeap(GPUUploadHeap&& rhs)
 {
-    resource_ = std::move(rhs.resource_);
-    mappedData_ = rhs.mappedData_;
+    GPUResource::operator=(std::move(rhs));
 
     ZeroMemory(&rhs, sizeof(rhs));
 }
 
 GPUUploadHeap& GPUUploadHeap::operator=(GPUUploadHeap&& rhs)
 {
-    resource_ = std::move(rhs.resource_);
-    mappedData_ = rhs.mappedData_;
-    size_ = rhs.size_;
+    GPUResource::operator=(std::move(rhs));
 
     ZeroMemory(&rhs, sizeof(rhs));
     return *this;
-}
-
-GPUUploadHeap::~GPUUploadHeap()
-{
-    resource_->Unmap(0, nullptr);
-    mappedData_ = nullptr;
-}
-
-BYTE* GPUUploadHeap::MappedData()
-{
-    if (mappedData_ == nullptr) {
-        resource_->Map(0, nullptr, reinterpret_cast<void**>(&mappedData_));
-    }
-    return mappedData_;
-}
-
-std::size_t GPUUploadHeap::Size() const
-{
-    return size_;
 }

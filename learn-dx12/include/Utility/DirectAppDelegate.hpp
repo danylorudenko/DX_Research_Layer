@@ -46,7 +46,7 @@ private:
     SceneConstantBuffer constantBufferData_;
     UINT8* constantBufferMappedData_;
 
-    GPUUploadHeap* triangleVertices_ = nullptr;
+    GPUResource* triangleVertices_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW triangleVerticesView_;
 
 };

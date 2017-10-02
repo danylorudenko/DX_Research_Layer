@@ -1,5 +1,7 @@
 #include <Data\GPUResource.hpp>
 
+GPUResource::GPUResource() = default;
+
 GPUResource::GPUResource(ID3D12Device* device, UINT64 size, D3D12_RESOURCE_STATES state) :
     state_(state),
     size_(size)
@@ -40,10 +42,6 @@ GPUResource& GPUResource::operator=(GPUResource&& rhs)
 
 void GPUResource::Transition(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state)
 {
-    commandList->ResourceBarrier(
-        1, 
-        &CD3DX12_RESOURCE_BARRIER::Transition(
-            resource_.Get(),
-            state_,
-            state));
+    commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource_.Get(), state_, state));
+    state_ = state;
 }

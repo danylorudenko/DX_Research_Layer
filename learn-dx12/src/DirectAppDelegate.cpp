@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <Utility\DirectAppDelegate.hpp>
+#include <Data\GPUUploadHeap.hpp>
 
 void DirectAppDelegate::start(Application& application)
 {
@@ -130,7 +131,8 @@ void DirectAppDelegate::LoadTriangleVertices()
 
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
-    gpuAccess_->CreateGPUUploadHeap(&triangleVertices_, verticesData, vertexDataSize);
+    gpuAccess_->CreateGPUBuffer(&triangleVertices_, vertexDataSize);
+    gpuAccess_->UpdateGPUResource(*triangleVertices_, 0, verticesData, vertexDataSize);
     
     triangleVerticesView_.BufferLocation = triangleVertices_->GPUVirtualAddress();
     triangleVerticesView_.SizeInBytes = vertexDataSize;
@@ -143,7 +145,7 @@ void DirectAppDelegate::LoadConstantBuffers()
     constexpr UINT cbSize = sizeof(SceneConstantBuffer) + 255 & ~255;
 
     gpuAccess_->CreateGPUUploadHeap(&constantBuffer_, nullptr, cbSize, true);
-    constantBufferMappedData_ = constantBuffer_->MappedData();
+    constantBuffer_->Map(reinterpret_cast<void**>(&constantBufferMappedData_), nullptr);
     
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = constantBuffer_->GPUVirtualAddress();
@@ -194,12 +196,15 @@ void DirectAppDelegate::Draw()
 
 void DirectAppDelegate::CustomAction()
 {
-    constexpr float offset = 0.005f;
+    constexpr float offset = 0.0005f;
     constexpr float offsetBounds = 1.25f;
 
     constantBufferData_.offset.x += offset;
     if (constantBufferData_.offset.x > offsetBounds) {
         constantBufferData_.offset.x -= 2 * offsetBounds;
     }
+
+    //gpuAccess_->UpdateGPUResource(*constantBuffer_, 0, &constantBufferData_, sizeof(constantBufferData_));
+
     memcpy(constantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
 }
