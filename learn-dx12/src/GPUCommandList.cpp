@@ -26,6 +26,7 @@ GPUCommandList& GPUCommandList::operator=(GPUCommandList&& rhs)
 void GPUCommandList::Reset(GPUCommandAllocator& allocContext)
 {
     allocContext.WaitForFence();
+    allocContext.Reset();
     commandList_->Reset(allocContext.Get(), nullptr);
 }
 

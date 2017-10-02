@@ -42,7 +42,7 @@ void GPUEngine::Reset()
 {
     // Only finalized worker is allowed to be reset.
     if (finalized_) {
-        auto& allocContext = commandQueue_->ProvideNextAlloc();
+        GPUCommandAllocator& allocContext = commandQueue_->ProvideNextAlloc();
         commandList_->Reset(allocContext);
         finalized_ = false;
     }
