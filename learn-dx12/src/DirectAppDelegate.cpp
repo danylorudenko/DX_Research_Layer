@@ -156,6 +156,9 @@ void DirectAppDelegate::Draw()
     GPUEngine& graphicsEngine = gpuAccess_->Engine<GPU_ENGINE_TYPE_DIRECT>();
     graphicsEngine.Reset();
 
+    // Set general pipeline state.
+    graphicsEngine.Commit()->SetPipelineState(pipelineState_.Get());
+
     // Set signature of incoming data.
     graphicsEngine.Commit()->SetGraphicsRootSignature(rootSignature_.Get());
 
