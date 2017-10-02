@@ -1,4 +1,5 @@
 #include <Rendering\GPUCommandList.hpp>
+#include <Rendering\GPUCommandQueue.hpp>
 
 GPUCommandList::GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator* allocatorContext)
 {
@@ -26,4 +27,9 @@ void GPUCommandList::Reset(GPUCommandAllocator& allocContext)
 {
     allocContext.WaitForFence();
     commandList_->Reset(allocContext.Get(), nullptr);
+}
+
+void GPUCommandList::Execute(GPUCommandQueue& queueContext)
+{
+    queueContext.ExecuteCommandLists(commandList_.Get(), 1);
 }

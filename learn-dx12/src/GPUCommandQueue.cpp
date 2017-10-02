@@ -52,6 +52,6 @@ GPUCommandAllocator& GPUCommandQueue::CurrentAlloc()
 
 GPUCommandAllocator& GPUCommandQueue::ProvideNextAlloc()
 {
-    const std::size_t nextAllocIndex = (currentAllocator_ + 1) % commandAllocators_.size();
-    return commandAllocators_[nextAllocIndex];
+    currentAllocator_ = (currentAllocator_ + 1) % commandAllocators_.size();
+    return commandAllocators_[currentAllocator_];
 }

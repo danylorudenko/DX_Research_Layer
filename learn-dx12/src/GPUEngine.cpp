@@ -52,7 +52,7 @@ void GPUEngine::Finalize()
 {
     if (!finalized_) {
         commandList_->Close();
-        commandQueue_->ExecuteCommandLists(commandList_->Get(), 1);
+        commandList_->Execute(*commandQueue_);
         finalized_ = true;
     }
 }
