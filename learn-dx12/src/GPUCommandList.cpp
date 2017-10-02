@@ -1,6 +1,8 @@
 #include <Rendering\GPUCommandList.hpp>
 #include <Rendering\GPUCommandQueue.hpp>
 
+GPUCommandList::GPUCommandList() = default;
+
 GPUCommandList::GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator* allocatorContext)
 {
     ThrowIfFailed(device->CreateCommandList(0, type, allocatorContext, nullptr, IID_PPV_ARGS(&commandList_)));

@@ -30,13 +30,15 @@ public:
 
     bool Finalized() const { return finalized_; }
 
-    ID3D12GraphicsCommandList* Commit() { return commandList_->Get(); }
-    ID3D12CommandQueue* CommandQueue() const { return commandQueue_->Get(); }
+    ID3D12GraphicsCommandList* Commit() { return commandList_.Get(); }
+
+    ID3D12CommandQueue* CommandQueue() { return commandQueue_.Get(); }
+    ID3D12GraphicsCommandList* CommandList() { return commandList_.Get(); }
 
 
 private:
-    std::unique_ptr<GPUCommandList> commandList_ = nullptr;
-    std::unique_ptr<GPUCommandQueue> commandQueue_ = nullptr;
+    GPUCommandList commandList_;
+    GPUCommandQueue commandQueue_;
 
     bool finalized_ = true;
 };

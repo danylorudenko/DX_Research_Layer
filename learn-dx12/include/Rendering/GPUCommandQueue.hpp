@@ -7,6 +7,7 @@
 class GPUCommandQueue
 {
 public:
+    GPUCommandQueue();
     GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type, std::size_t allocatorCount);
     GPUCommandQueue(const GPUCommandQueue&) = delete;
     GPUCommandQueue(GPUCommandQueue&& rhs);

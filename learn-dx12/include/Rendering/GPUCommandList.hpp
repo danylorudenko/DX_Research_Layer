@@ -7,6 +7,7 @@
 class GPUCommandList
 {
 public:
+    GPUCommandList();
     GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator* allocatorContext);
     GPUCommandList(const GPUCommandList&) = delete;
     GPUCommandList(GPUCommandList&& rhs);

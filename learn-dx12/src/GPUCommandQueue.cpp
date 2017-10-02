@@ -1,5 +1,7 @@
 #include <Rendering\GPUCommandQueue.hpp>
 
+GPUCommandQueue::GPUCommandQueue() = default;
+
 GPUCommandQueue::GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type, std::size_t allocatorCount)
 {
     D3D12_COMMAND_QUEUE_DESC queueDesc;
@@ -14,8 +16,8 @@ GPUCommandQueue::GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE t
     for (size_t i = 0; i < allocatorCount; i++)
     {
         commandAllocators_.emplace_back(device, type);
+        //commandAllocators_.back().Reset();
     }
-    //commandAllocators_.shrink_to_fit();
 }
 
 GPUCommandQueue::GPUCommandQueue(GPUCommandQueue&& rhs)

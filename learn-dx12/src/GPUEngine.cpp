@@ -18,8 +18,8 @@ GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type)
         break;
     }
 
-    commandQueue_.reset(new GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueueAllocatorsCount });
-    commandList_.reset(new GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueue_->CurrentAlloc().Get() });
+    commandQueue_ = GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueueAllocatorsCount };
+    commandList_ = GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueue_.CurrentAlloc().Get() };
 }
 
 GPUEngine::GPUEngine(GPUEngine&& rhs)
@@ -44,8 +44,8 @@ void GPUEngine::Reset()
 {
     // Only finalized worker is allowed to be reset.
     if (finalized_) {
-        GPUCommandAllocator& allocContext = commandQueue_->ProvideNextAlloc();
-        commandList_->Reset(allocContext);
+        GPUCommandAllocator& allocContext = commandQueue_.ProvideNextAlloc();
+        commandList_.Reset(allocContext);
         finalized_ = false;
     }
 }
@@ -53,8 +53,8 @@ void GPUEngine::Reset()
 void GPUEngine::Finalize()
 {
     if (!finalized_) {
-        commandList_->Close();
-        commandList_->Execute(*commandQueue_);
+        commandList_.Close();
+        commandList_.Execute(commandQueue_);
         finalized_ = true;
     }
 }
