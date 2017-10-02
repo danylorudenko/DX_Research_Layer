@@ -30,19 +30,43 @@ GPUAccess& GPUAccess::operator=(GPUAccess&& rhs)
     return *this;
 }
 
+void GPUAccess::GetHardwareAdapter(IDXGIAdapter1** dest, IDXGIFactory1* factory)
+{
+    Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
+    *dest = nullptr;
+
+    for (UINT i = 0; factory->EnumAdapters1(i, adapter.GetAddressOf()) != DXGI_ERROR_NOT_FOUND; i++) {
+        DXGI_ADAPTER_DESC1 desc;
+        adapter->GetDesc1(&desc);
+
+        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
+            continue;
+        }
+
+        if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), nullptr))) {
+            break;
+        }
+    }
+
+    *dest = adapter.Detach();
+}
+
 void GPUAccess::InitializeD3D12()
 {
-    using namespace Microsoft::WRL;
 #if defined(DEBUG) || defined(_DEBUG)
     {
-        ComPtr<ID3D12Debug> debugController;
+        Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
         ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))
         debugController->EnableDebugLayer();
     }
 #endif
 
     ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory_)));
-    ThrowIfFailed(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device_)));
+
+    Microsoft::WRL::ComPtr<IDXGIAdapter1> hardwareAdapter;
+    GetHardwareAdapter(hardwareAdapter.GetAddressOf(), dxgiFactory_.Get());
+    
+    ThrowIfFailed(D3D12CreateDevice(hardwareAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device_)));
 }
 
 void GPUAccess::CreateFrameResources()

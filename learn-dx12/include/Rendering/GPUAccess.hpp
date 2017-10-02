@@ -65,6 +65,7 @@ public:
     void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
 
 private:
+    static void GetHardwareAdapter(IDXGIAdapter1** dest, IDXGIFactory1* factory);
     void InitializeD3D12();
     void CreateGPUWorkers();
 

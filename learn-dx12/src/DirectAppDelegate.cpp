@@ -20,7 +20,6 @@ void DirectAppDelegate::start(Application& application)
     gpuAccess_->FinalizeAll();
 
     gameTimer_.Reset();
-    
 }
 
 void DirectAppDelegate::update(Application& application)
