@@ -56,8 +56,8 @@ public:
     void CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle);
     void CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& dest);
 
-    void CreateGPUUploadHeap(GPUUploadHeap** dest, void const* data, std::size_t elementSize, bool isConstBuffer = false);
-    void CreateGPUBuffer(GPUResource** dest, std::size_t size);
+    void CreateGPUUploadHeap(GPUUploadHeap& dest, void const* data, std::size_t elementSize, bool isConstBuffer = false);
+    void CreateGPUBuffer(GPUResource& dest, std::size_t size);
     void UpdateGPUResource(GPUResource& dest, std::size_t offset, const void* userData, std::size_t size);
 
     static void CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type);

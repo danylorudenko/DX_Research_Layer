@@ -113,6 +113,17 @@ void GPUAccess::CreateDepthStencilBuffer()
     Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
 }
 
+void GPUAccess::CreateDepthStencilBufferView()
+{
+    D3D12_DEPTH_STENCIL_VIEW_DESC depthStencDesc;
+    depthStencDesc.Flags = D3D12_DSV_FLAG_NONE;
+    depthStencDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+    depthStencDesc.Format = depthStencilBufferFormat;
+    depthStencDesc.Texture2D.MipSlice = 0;
+
+    device_->CreateDepthStencilView(depthStencilBuffer_.Get(), &depthStencDesc, dsvHeap_->GetCPUDescriptorHandleForHeapStart());
+}
+
 void GPUAccess::CreateDefaultDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC rtvD;
@@ -136,17 +147,6 @@ void GPUAccess::CreateDefaultDescriptorHeaps()
     rtvDescriptorSize_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     dsvDescriptorSize_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
     cbv_srv_uavDescriptorSize_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-}
-
-void GPUAccess::CreateDepthStencilBufferView()
-{
-    D3D12_DEPTH_STENCIL_VIEW_DESC depthStencDesc;
-    depthStencDesc.Flags = D3D12_DSV_FLAG_NONE;
-    depthStencDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-    depthStencDesc.Format = depthStencilBufferFormat;
-    depthStencDesc.Texture2D.MipSlice = 0;
-
-    device_->CreateDepthStencilView(depthStencilBuffer_.Get(), &depthStencDesc, dsvHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void GPUAccess::SetViewportScissor()
@@ -250,9 +250,9 @@ void GPUAccess::Present()
     currentFrame_ = (currentFrame_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
 }
 
-void GPUAccess::CreateGPUBuffer(GPUResource** dest, std::size_t size)
+void GPUAccess::CreateGPUBuffer(GPUResource& dest, std::size_t size)
 {
-    *dest = new GPUResource{ device_.Get(), static_cast<UINT64>(size) };
+    dest = GPUResource{ device_.Get(), static_cast<UINT64>(size) };
 }
 
 void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
@@ -270,9 +270,9 @@ void GPUAccess::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft
     ThrowIfFailed(device_->CreateDescriptorHeap(desc, IID_PPV_ARGS(&dest)));
 }
 
-void GPUAccess::CreateGPUUploadHeap(GPUUploadHeap** dest, void const* data, std::size_t elementSize, bool isConstBuffer)
+void GPUAccess::CreateGPUUploadHeap(GPUUploadHeap& dest, void const* data, std::size_t elementSize, bool isConstBuffer)
 {
-    *dest = new GPUUploadHeap{ device_.Get(), data, elementSize, isConstBuffer };
+    dest = GPUUploadHeap{ device_.Get(), data, elementSize, isConstBuffer };
 }
 
 void GPUAccess::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type)

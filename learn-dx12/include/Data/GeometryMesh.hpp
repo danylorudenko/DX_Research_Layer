@@ -11,8 +11,8 @@ class GeometryMesh
     using SubmeshMap = std::map<std::string, SubgeometryInfo>;
 
 private:
-    ComPtr<ID3DBlob> geometryCPUHanle_;
-    ComPtr<ID3DBlob> indexCPUHandle_;
+    ComPtr<ID3DBlob> verticesCPU_;
+    ComPtr<ID3DBlob> indiciesCPU_;
 
     ComPtr<ID3D12Resource> geometryGPUHandle_;
     ComPtr<ID3D12Resource> indexGPUHandle_;

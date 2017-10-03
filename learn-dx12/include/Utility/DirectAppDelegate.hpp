@@ -42,11 +42,12 @@ private:
 
     // Additional data and resources.
 
-    GPUUploadHeap* constantBuffer_ = nullptr;
-    SceneConstantBuffer constantBufferData_;
     UINT8* constantBufferMappedData_;
 
-    GPUResource* triangleVertices_ = nullptr;
+    GPUUploadHeap constantBuffer_;
+    SceneConstantBuffer constantBufferData_;
+
+    GPUResource triangleVertices_;
     D3D12_VERTEX_BUFFER_VIEW triangleVerticesView_;
 
 };

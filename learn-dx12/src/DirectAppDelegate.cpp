@@ -127,10 +127,10 @@ void DirectAppDelegate::LoadTriangleVertices()
 
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
-    gpuAccess_.CreateGPUBuffer(&triangleVertices_, vertexDataSize);
-    gpuAccess_.UpdateGPUResource(*triangleVertices_, 0, verticesData, vertexDataSize);
+    gpuAccess_.CreateGPUBuffer(triangleVertices_, vertexDataSize);
+    gpuAccess_.UpdateGPUResource(triangleVertices_, 0, verticesData, vertexDataSize);
     
-    triangleVerticesView_.BufferLocation = triangleVertices_->GPUVirtualAddress();
+    triangleVerticesView_.BufferLocation = triangleVertices_.GPUVirtualAddress();
     triangleVerticesView_.SizeInBytes = vertexDataSize;
     triangleVerticesView_.StrideInBytes = sizeof(Vertex);
 
@@ -140,11 +140,11 @@ void DirectAppDelegate::LoadConstantBuffers()
 {
     constexpr UINT cbSize = sizeof(SceneConstantBuffer) + 255 & ~255;
 
-    gpuAccess_.CreateGPUUploadHeap(&constantBuffer_, nullptr, cbSize, true);
-    constantBuffer_->Map(reinterpret_cast<void**>(&constantBufferMappedData_), nullptr);
-    
+    gpuAccess_.CreateGPUUploadHeap(constantBuffer_, nullptr, cbSize, true);
+    constantBuffer_.Map(reinterpret_cast<void**>(&constantBufferMappedData_), nullptr);
+
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = constantBuffer_->GPUVirtualAddress();
+    cbvDesc.BufferLocation = constantBuffer_.GPUVirtualAddress();
     cbvDesc.SizeInBytes = cbSize;
     gpuAccess_.CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
 }
@@ -198,7 +198,6 @@ void DirectAppDelegate::CustomAction()
         constantBufferData_.offset.x -= 2 * offsetBounds;
     }
 
-    //gpuAccess_->UpdateGPUResource(*constantBuffer_, 0, &constantBufferData_, sizeof(constantBufferData_));
-
+    // Update constant buffer uploadheap.
     memcpy(constantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
 }
