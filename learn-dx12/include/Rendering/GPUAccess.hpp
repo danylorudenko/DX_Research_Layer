@@ -11,6 +11,7 @@
 class GPUAccess
 {
 public:
+    GPUAccess();
     GPUAccess(Application& application);
     GPUAccess(const ID3D12Device&) = delete;
     GPUAccess(GPUAccess&& rhs);
@@ -32,7 +33,6 @@ public:
     template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_COPY>() { return engines_[1]; }
     template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_COMPUTE>() { return engines_[2]; }
 
-    void FinalizeAll();
     void ResetAll();
 
     ID3D12Resource* DepthStencilBuffer() const;

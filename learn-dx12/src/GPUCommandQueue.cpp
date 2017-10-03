@@ -16,7 +16,6 @@ GPUCommandQueue::GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE t
     for (size_t i = 0; i < allocatorCount; i++)
     {
         commandAllocators_.emplace_back(device, type);
-        //commandAllocators_.back().Reset();
     }
 }
 

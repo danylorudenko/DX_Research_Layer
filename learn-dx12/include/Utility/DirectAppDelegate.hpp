@@ -31,7 +31,7 @@ public:
 private:
     PerformanceTimer gameTimer_;
     std::wstring windowText_;
-    std::unique_ptr<GPUAccess> gpuAccess_ = nullptr;
+    GPUAccess gpuAccess_;
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
 

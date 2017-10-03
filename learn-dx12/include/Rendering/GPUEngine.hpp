@@ -26,9 +26,6 @@ public:
     GPUEngine& operator=(GPUEngine&& rhs);
 
     void Reset();
-    void Finalize();
-
-    bool Finalized() const { return finalized_; }
 
     ID3D12GraphicsCommandList* Commit() { return commandList_.Get(); }
 
@@ -39,6 +36,4 @@ public:
 private:
     GPUCommandList commandList_;
     GPUCommandQueue commandQueue_;
-
-    bool finalized_ = true;
 };

@@ -7,9 +7,7 @@
 
 void DirectAppDelegate::start(Application& application)
 {
-    gpuAccess_ = std::make_unique<GPUAccess>(application);
-
-    gpuAccess_->ResetAll();
+    gpuAccess_ = GPUAccess{ application };
 
     CreateRootSignature();
     CreatePipelineState();
@@ -17,8 +15,6 @@ void DirectAppDelegate::start(Application& application)
     LoadTriangleVertices();
     CreateConstantBufferDescriptorHeap();
     LoadConstantBuffers();
-    
-    gpuAccess_->FinalizeAll();
 
     gameTimer_.Reset();
 }
@@ -63,7 +59,7 @@ void DirectAppDelegate::CreateConstantBufferDescriptorHeap()
     cbvDescr.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     cbvDescr.NodeMask = 0;
     
-    gpuAccess_->CreateDescriptorHeap(&cbvDescr, cbvHeap_);
+    gpuAccess_.CreateDescriptorHeap(&cbvDescr, cbvHeap_);
 }
 
 void DirectAppDelegate::CreateRootSignature()
@@ -84,7 +80,7 @@ void DirectAppDelegate::CreateRootSignature()
 
     ThrowIfFailed(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors));
 
-    gpuAccess_->CreateRootSignature(signature, rootSignature_);
+    gpuAccess_.CreateRootSignature(signature, rootSignature_);
 }
 
 void DirectAppDelegate::CreatePipelineState()
@@ -92,8 +88,8 @@ void DirectAppDelegate::CreatePipelineState()
     Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
     Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
 
-    gpuAccess_->CompileShader(L"Shaders\\triangle_shader.hlsl", vertexShader, "VS", "vs_5_0");
-    gpuAccess_->CompileShader(L"Shaders\\triangle_shader.hlsl", pixelShader, "PS", "ps_5_0");
+    gpuAccess_.CompileShader(L"Shaders\\triangle_shader.hlsl", vertexShader, "VS", "vs_5_0");
+    gpuAccess_.CompileShader(L"Shaders\\triangle_shader.hlsl", pixelShader, "PS", "ps_5_0");
 
     // Define the vertex input layout.
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -118,7 +114,7 @@ void DirectAppDelegate::CreatePipelineState()
     psoDesc.RTVFormats[0] = GPUAccess::backBufferFormat_;
     psoDesc.SampleDesc.Count = 1;
 
-    gpuAccess_->CreatePSO(pipelineState_, &psoDesc);
+    gpuAccess_.CreatePSO(pipelineState_, &psoDesc);
 }
 
 void DirectAppDelegate::LoadTriangleVertices()
@@ -131,8 +127,8 @@ void DirectAppDelegate::LoadTriangleVertices()
 
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
-    gpuAccess_->CreateGPUBuffer(&triangleVertices_, vertexDataSize);
-    gpuAccess_->UpdateGPUResource(*triangleVertices_, 0, verticesData, vertexDataSize);
+    gpuAccess_.CreateGPUBuffer(&triangleVertices_, vertexDataSize);
+    gpuAccess_.UpdateGPUResource(*triangleVertices_, 0, verticesData, vertexDataSize);
     
     triangleVerticesView_.BufferLocation = triangleVertices_->GPUVirtualAddress();
     triangleVerticesView_.SizeInBytes = vertexDataSize;
@@ -144,19 +140,18 @@ void DirectAppDelegate::LoadConstantBuffers()
 {
     constexpr UINT cbSize = sizeof(SceneConstantBuffer) + 255 & ~255;
 
-    gpuAccess_->CreateGPUUploadHeap(&constantBuffer_, nullptr, cbSize, true);
+    gpuAccess_.CreateGPUUploadHeap(&constantBuffer_, nullptr, cbSize, true);
     constantBuffer_->Map(reinterpret_cast<void**>(&constantBufferMappedData_), nullptr);
     
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = constantBuffer_->GPUVirtualAddress();
     cbvDesc.SizeInBytes = cbSize;
-    gpuAccess_->CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
+    gpuAccess_.CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void DirectAppDelegate::Draw()
 {
-    GPUEngine& graphicsEngine = gpuAccess_->Engine<GPU_ENGINE_TYPE_DIRECT>();
-    graphicsEngine.Reset();
+    GPUEngine& graphicsEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
 
     // Set general pipeline state.
     graphicsEngine.Commit()->SetPipelineState(pipelineState_.Get());
@@ -164,7 +159,7 @@ void DirectAppDelegate::Draw()
     // Set signature of incoming data.
     graphicsEngine.Commit()->SetGraphicsRootSignature(rootSignature_.Get());
 
-    gpuAccess_->CommitDefaultViewportScissorRects();
+    gpuAccess_.CommitDefaultViewportScissorRects();
 
     // Set descriptor heaps which will the pipeline will use.
     ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap_.Get() };
@@ -173,10 +168,10 @@ void DirectAppDelegate::Draw()
     // Set the handle for the 0th descriptor table.
     graphicsEngine.Commit()->SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
 
-    graphicsEngine.Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_->CurrentFramebuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+    graphicsEngine.Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_.CurrentFramebuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
     
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = gpuAccess_->CurrentRtvHandle();
-    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = gpuAccess_->DepthStencilHandle();
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = gpuAccess_.CurrentRtvHandle();
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = gpuAccess_.DepthStencilHandle();
     graphicsEngine.Commit()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
     // Drawing commands.
@@ -187,11 +182,10 @@ void DirectAppDelegate::Draw()
     graphicsEngine.Commit()->IASetVertexBuffers(0, 1, &triangleVerticesView_);
     graphicsEngine.Commit()->DrawInstanced(3, 1, 0, 0);
 
-    graphicsEngine.Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_->CurrentFramebuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+    graphicsEngine.Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_.CurrentFramebuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
-
-    graphicsEngine.Finalize();
-    gpuAccess_->Present();
+    graphicsEngine.Reset();
+    gpuAccess_.Present();
 }
 
 void DirectAppDelegate::CustomAction()

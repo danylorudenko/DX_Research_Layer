@@ -1,5 +1,7 @@
 #include <Rendering\GPUAccess.hpp>
 
+GPUAccess::GPUAccess() = default;
+
 GPUAccess::GPUAccess(Application& application)
 {
     // Create device and dxgiFactory.
@@ -20,15 +22,9 @@ GPUAccess::GPUAccess(Application& application)
     SetViewportScissor();
 }
 
-GPUAccess::GPUAccess(GPUAccess&& rhs)
-{
-    
-}
+GPUAccess::GPUAccess(GPUAccess&& rhs) = default;
 
-GPUAccess& GPUAccess::operator=(GPUAccess&& rhs)
-{
-    return *this;
-}
+GPUAccess& GPUAccess::operator=(GPUAccess&& rhs) = default;
 
 void GPUAccess::GetHardwareAdapter(IDXGIAdapter1** dest, IDXGIFactory1* factory)
 {
@@ -113,9 +109,8 @@ void GPUAccess::CreateDepthStencilBuffer()
         IID_PPV_ARGS(&depthStencilBuffer_));
     ThrowIfFailed(result);
 
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
     Engine<GPU_ENGINE_TYPE_DIRECT>().Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Finalize();
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()
@@ -243,13 +238,6 @@ D3D12_CPU_DESCRIPTOR_HANDLE GPUAccess::DepthStencilHandle() const
     return dsvHeap_->GetCPUDescriptorHandleForHeapStart();
 }
 
-void GPUAccess::FinalizeAll()
-{
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Finalize();
-    Engine<GPU_ENGINE_TYPE_COPY>().Finalize();
-    Engine<GPU_ENGINE_TYPE_COMPUTE>().Finalize();
-}
-
 void GPUAccess::CommitDefaultViewportScissorRects()
 {
     Engine<GPU_ENGINE_TYPE_DIRECT>().Commit()->RSSetViewports(1, &viewportRect_);
@@ -306,11 +294,12 @@ void GPUAccess::UpdateGPUResource(GPUResource& dest, std::size_t offset, const v
 {
     assert(size + offset <= dest.Size());
 
-    GPUUploadHeap uploadHeap{ device_.Get(), data, size };
+    auto& copyEngine = Engine<GPU_ENGINE_TYPE_COPY>();
 
     D3D12_RESOURCE_STATES prevState = dest.State();
-    dest.Transition(Engine<GPU_ENGINE_TYPE_COPY>().Commit(), D3D12_RESOURCE_STATE_COPY_DEST);
+    dest.Transition(copyEngine.CommandList(), D3D12_RESOURCE_STATE_COPY_DEST);
 
+    GPUUploadHeap uploadHeap{ device_.Get(), data, size };
     Engine<GPU_ENGINE_TYPE_COPY>().Commit()->CopyBufferRegion(
         dest.Get(),
         offset,
@@ -318,5 +307,7 @@ void GPUAccess::UpdateGPUResource(GPUResource& dest, std::size_t offset, const v
         0,
         size);
     
-    dest.Transition(Engine<GPU_ENGINE_TYPE_COPY>().Commit(), prevState);
+    dest.Transition(copyEngine.CommandList(), prevState);
+
+    copyEngine.Reset();
 }

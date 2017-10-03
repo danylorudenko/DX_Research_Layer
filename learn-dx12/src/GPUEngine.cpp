@@ -20,6 +20,8 @@ GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type)
 
     commandQueue_ = GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueueAllocatorsCount };
     commandList_ = GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueue_.CurrentAlloc().Get() };
+
+    Reset();
 }
 
 GPUEngine::GPUEngine(GPUEngine&& rhs)
@@ -42,19 +44,9 @@ GPUEngine& GPUEngine::operator=(GPUEngine&& rhs)
 
 void GPUEngine::Reset()
 {
-    // Only finalized worker is allowed to be reset.
-    if (finalized_) {
-        GPUCommandAllocator& allocContext = commandQueue_.ProvideNextAlloc();
-        commandList_.Reset(allocContext);
-        finalized_ = false;
-    }
-}
+    commandList_.Close();
+    commandList_.Execute(commandQueue_);
 
-void GPUEngine::Finalize()
-{
-    if (!finalized_) {
-        commandList_.Close();
-        commandList_.Execute(commandQueue_);
-        finalized_ = true;
-    }
+    GPUCommandAllocator& allocContext = commandQueue_.ProvideNextAlloc();
+    commandList_.Reset(allocContext);
 }
