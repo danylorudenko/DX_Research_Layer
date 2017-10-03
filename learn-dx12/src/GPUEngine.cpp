@@ -21,7 +21,8 @@ GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type)
     commandQueue_ = GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueueAllocatorsCount };
     commandList_ = GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueue_.CurrentAlloc().Get() };
 
-    Reset();
+    GPUCommandAllocator& allocContext = commandQueue_.ProvideNextAlloc();
+    commandList_.Reset(allocContext);
 }
 
 GPUEngine::GPUEngine(GPUEngine&& rhs)
