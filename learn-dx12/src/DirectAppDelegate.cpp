@@ -78,8 +78,11 @@ void DirectAppDelegate::CreateRootSignature()
     Microsoft::WRL::ComPtr<ID3DBlob> signature;
     Microsoft::WRL::ComPtr<ID3DBlob> errors;
 
-    ThrowIfFailed(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors));
-
+    {
+        auto const result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors);
+        ThrowIfFailed(result);
+    }
+    
     gpuAccess_.CreateRootSignature(signature, rootSignature_);
 }
 
@@ -177,7 +180,6 @@ void DirectAppDelegate::Draw()
     // Drawing commands.
     static FLOAT clearColor[4] = { 0.6f, 0.2f, 0.2f, 1.0f };
     graphicsEngine.Commit()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-    graphicsEngine.Commit()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
     graphicsEngine.Commit()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     graphicsEngine.Commit()->IASetVertexBuffers(0, 1, &triangleVerticesView_);
     graphicsEngine.Commit()->DrawInstanced(3, 1, 0, 0);

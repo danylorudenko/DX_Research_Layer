@@ -10,7 +10,11 @@ GPUCommandQueue::GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE t
     queueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 
-    ThrowIfFailed(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue_)));
+    device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(commandQueue_.ReleaseAndGetAddressOf()));
+
+    if (!commandQueue_.Get()) {
+        OutputDebugString(L"CommandQueue isn't inited\n");
+    }
 
     // Create backing allocators
     for (size_t i = 0; i < allocatorCount; i++)

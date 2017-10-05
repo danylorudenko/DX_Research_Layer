@@ -40,6 +40,7 @@ void GPUAccess::GetHardwareAdapter(IDXGIAdapter1** dest, IDXGIFactory1* factory)
         }
 
         if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), nullptr))) {
+            OutputDebugStringA("Selected device\n");
             break;
         }
     }
@@ -52,17 +53,21 @@ void GPUAccess::InitializeD3D12()
 #if defined(DEBUG) || defined(_DEBUG)
     {
         Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
-        ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))
+        D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
         debugController->EnableDebugLayer();
     }
 #endif
 
-    ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory_)));
+    HRESULT res = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory_));
+    assert(SUCCEEDED(res) && "Failed to create dxgiFactory\n");
 
     Microsoft::WRL::ComPtr<IDXGIAdapter1> hardwareAdapter;
     GetHardwareAdapter(hardwareAdapter.GetAddressOf(), dxgiFactory_.Get());
     
-    ThrowIfFailed(D3D12CreateDevice(hardwareAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device_)));
+    D3D12CreateDevice(hardwareAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(device_.ReleaseAndGetAddressOf()));
+    if (!device_) {
+        OutputDebugStringA("Failed to create device\n");
+    }
 }
 
 void GPUAccess::CreateFrameResources()
@@ -184,7 +189,10 @@ void GPUAccess::CreateSwapChain(Application& application, IDXGIFactory* factory)
     sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    ThrowIfFailed(factory->CreateSwapChain(Engine<GPU_ENGINE_TYPE_DIRECT>().CommandQueue(), &sd, swapChain_.GetAddressOf()));
+    {
+        auto const result = factory->CreateSwapChain(Engine<GPU_ENGINE_TYPE_DIRECT>().CommandQueue(), &sd, swapChain_.GetAddressOf());
+        ThrowIfFailed(result);
+    }
 }
 
 void GPUAccess::CreateGPUWorkers()
@@ -257,7 +265,8 @@ void GPUAccess::CreateGPUBuffer(GPUResource& dest, std::size_t size)
 
 void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
 {
-    ThrowIfFailed(device_->CreateRootSignature(0, serializedRootSignature->GetBufferPointer(), serializedRootSignature->GetBufferSize(), IID_PPV_ARGS(&dest)));
+    auto const result = device_->CreateRootSignature(0, serializedRootSignature->GetBufferPointer(), serializedRootSignature->GetBufferSize(), IID_PPV_ARGS(&dest));
+    ThrowIfFailed(result);
 }
 
 void GPUAccess::CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle)
@@ -267,7 +276,8 @@ void GPUAccess::CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* desc, 
 
 void GPUAccess::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& dest)
 {
-    ThrowIfFailed(device_->CreateDescriptorHeap(desc, IID_PPV_ARGS(&dest)));
+    auto const result = device_->CreateDescriptorHeap(desc, IID_PPV_ARGS(&dest));
+    ThrowIfFailed(result);
 }
 
 void GPUAccess::CreateGPUUploadHeap(GPUUploadHeap& dest, void const* data, std::size_t elementSize, bool isConstBuffer)
@@ -282,12 +292,16 @@ void GPUAccess::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>
 #else
     UINT compileFlags = 0;
 #endif
-    ThrowIfFailed(D3DCompileFromFile(fileName, nullptr, nullptr, entryPoint, type, compileFlags, 0, &dest, nullptr));
+    {
+        auto const result = D3DCompileFromFile(fileName, nullptr, nullptr, entryPoint, type, compileFlags, 0, &dest, nullptr);
+        ThrowIfFailed(result);
+    }
 }
 
 void GPUAccess::CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc)
 {
-    ThrowIfFailed(device_->CreateGraphicsPipelineState(desc, IID_PPV_ARGS(&dest)));
+    auto const result = device_->CreateGraphicsPipelineState(desc, IID_PPV_ARGS(&dest));
+    ThrowIfFailed(result);
 }
 
 void GPUAccess::UpdateGPUResource(GPUResource& dest, std::size_t offset, const void* data, std::size_t size)

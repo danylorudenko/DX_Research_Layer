@@ -4,19 +4,15 @@ GPUEngine::GPUEngine() = default;
 
 GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type)
 {
-    std::size_t commandQueueAllocatorsCount = 0;
-    switch (type)
-    {
-    case GPU_ENGINE_TYPE_DIRECT:
-        commandQueueAllocatorsCount = 3;
-        break;
-    case GPU_ENGINE_TYPE_COPY:
-        commandQueueAllocatorsCount = 1;
-        break;
-    case GPU_ENGINE_TYPE_COMPUTE:
-        commandQueueAllocatorsCount = 1;
-        break;
-    }
+    std::size_t const commandQueueAllocatorsCount = [=] {
+        switch (type)
+        {
+            case GPU_ENGINE_TYPE_DIRECT: return 3;
+            case GPU_ENGINE_TYPE_COPY: return 1;
+            case GPU_ENGINE_TYPE_COMPUTE: return 1;
+            default: return 1;
+        }
+    } ();
 
     commandQueue_ = GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueueAllocatorsCount };
     commandList_ = GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), commandQueue_.CurrentAlloc().Get() };

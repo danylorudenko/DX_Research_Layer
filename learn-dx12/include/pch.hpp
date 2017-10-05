@@ -24,7 +24,7 @@
 #if defined (DEBUG) || (_DEBUG)
 #define ThrowIfFailed(result) { assert(SUCCEEDED(result)); }
 #else
-#define ThrowIfFailed(result) ;
+#define ThrowIfFailed(result) result;
 #endif // DEBUG
 
 #endif // ThrowIfFailed
