@@ -110,6 +110,9 @@
     <ClInclude Include="include\Rendering\GPUEngine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Data\GeometryMesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\triangle_shader.hlsl" />

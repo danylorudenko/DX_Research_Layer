@@ -186,7 +186,7 @@ void DirectAppDelegate::Draw()
 
     graphicsEngine.Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_.CurrentFramebuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
-    graphicsEngine.Reset();
+    graphicsEngine.FlushReset();
     gpuAccess_.Present();
 }
 

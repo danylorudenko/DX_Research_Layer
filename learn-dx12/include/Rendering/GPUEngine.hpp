@@ -25,7 +25,9 @@ public:
     GPUEngine& operator=(const GPUEngine&) = delete;
     GPUEngine& operator=(GPUEngine&& rhs);
 
+    void Flush();
     void Reset();
+    void FlushReset();
 
     ID3D12GraphicsCommandList* Commit() { return commandList_.Get(); }
 

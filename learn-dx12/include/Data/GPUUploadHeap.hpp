@@ -14,4 +14,7 @@ public:
 
     GPUUploadHeap& operator=(const GPUUploadHeap&) = delete;
     GPUUploadHeap& operator=(GPUUploadHeap&& rhs);
+
+    void Map(void** dest, D3D12_RANGE* range) { ThrowIfFailed(resource_->Map(0, range, dest)); }
+    void Unmap(D3D12_RANGE* range) { resource_->Unmap(0, range); }
 };

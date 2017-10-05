@@ -185,6 +185,7 @@
   <ItemGroup>
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Data\FrameResource.hpp" />
+    <ClInclude Include="include\Data\GeometryMesh.hpp" />
     <ClInclude Include="include\Data\GPUResource.hpp" />
     <ClInclude Include="include\Data\GPUUploadHeap.hpp" />
     <ClInclude Include="include\pch.hpp" />

@@ -8,7 +8,7 @@ GPUAccess::GPUAccess(Application& application)
     InitializeD3D12();
 
     // Create main accessors to GPU.
-    CreateGPUWorkers();
+    CreateGPUEngines();
 
     // Create swap chain and supporting resources.
     CreateSwapChain(application, dxgiFactory_.Get());
@@ -115,7 +115,7 @@ void GPUAccess::CreateDepthStencilBuffer()
     ThrowIfFailed(result);
 
     Engine<GPU_ENGINE_TYPE_DIRECT>().Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
+    Engine<GPU_ENGINE_TYPE_DIRECT>().FlushReset();
 }
 
 void GPUAccess::CreateDepthStencilBufferView()
@@ -195,25 +195,25 @@ void GPUAccess::CreateSwapChain(Application& application, IDXGIFactory* factory)
     }
 }
 
-void GPUAccess::CreateGPUWorkers()
+void GPUAccess::CreateGPUEngines()
 {
-    // Workers are being reset automatically on creation.
+    // Engines are being reset automatically on creation.
 
     engines_[0] = GPUEngine(device_.Get(), GPU_ENGINE_TYPE_DIRECT);
-    //workers_[0]->Reset();
+    //workers_[0]->FlushReset();
 
     engines_[1] = GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COPY);
-    //workers_[1]->Reset();
+    //workers_[1]->FlushReset();
 
     engines_[2] = GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COMPUTE);
-    //workers_[2]->Reset();
+    //workers_[2]->FlushReset();
 }
 
 void GPUAccess::ResetAll()
 {
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
-    Engine<GPU_ENGINE_TYPE_COPY>().Reset();
-    Engine<GPU_ENGINE_TYPE_COMPUTE>().Reset();
+    Engine<GPU_ENGINE_TYPE_DIRECT>().FlushReset();
+    Engine<GPU_ENGINE_TYPE_COPY>().FlushReset();
+    Engine<GPU_ENGINE_TYPE_COMPUTE>().FlushReset();
 }
 
 ID3D12Resource* GPUAccess::DepthStencilBuffer() const
@@ -258,11 +258,6 @@ void GPUAccess::Present()
     currentFrame_ = (currentFrame_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
 }
 
-void GPUAccess::CreateGPUBuffer(GPUResource& dest, std::size_t size)
-{
-    dest = GPUResource{ device_.Get(), static_cast<UINT64>(size) };
-}
-
 void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
 {
     auto const result = device_->CreateRootSignature(0, serializedRootSignature->GetBufferPointer(), serializedRootSignature->GetBufferSize(), IID_PPV_ARGS(&dest));
@@ -278,11 +273,6 @@ void GPUAccess::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft
 {
     auto const result = device_->CreateDescriptorHeap(desc, IID_PPV_ARGS(&dest));
     ThrowIfFailed(result);
-}
-
-void GPUAccess::CreateGPUUploadHeap(GPUUploadHeap& dest, void const* data, std::size_t elementSize, bool isConstBuffer)
-{
-    dest = GPUUploadHeap{ device_.Get(), data, elementSize, isConstBuffer };
 }
 
 void GPUAccess::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type)
@@ -302,26 +292,4 @@ void GPUAccess::CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D
 {
     auto const result = device_->CreateGraphicsPipelineState(desc, IID_PPV_ARGS(&dest));
     ThrowIfFailed(result);
-}
-
-void GPUAccess::UpdateGPUResource(GPUResource& dest, std::size_t offset, const void* data, std::size_t size)
-{
-    assert(size + offset <= dest.Size());
-
-    auto& copyEngine = Engine<GPU_ENGINE_TYPE_COPY>();
-
-    D3D12_RESOURCE_STATES prevState = dest.State();
-    dest.Transition(copyEngine.CommandList(), D3D12_RESOURCE_STATE_COPY_DEST);
-
-    GPUUploadHeap uploadHeap{ device_.Get(), data, size };
-    Engine<GPU_ENGINE_TYPE_COPY>().Commit()->CopyBufferRegion(
-        dest.Get(),
-        offset,
-        uploadHeap.Get(),
-        0,
-        size);
-    
-    dest.Transition(copyEngine.CommandList(), prevState);
-
-    copyEngine.Reset();
 }

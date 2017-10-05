@@ -55,19 +55,14 @@ public:
     void CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest);
     void CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle);
     void CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& dest);
-
-    void CreateGPUUploadHeap(GPUUploadHeap& dest, void const* data, std::size_t elementSize, bool isConstBuffer = false);
-    void CreateGPUBuffer(GPUResource& dest, std::size_t size);
-    void UpdateGPUResource(GPUResource& dest, std::size_t offset, const void* userData, std::size_t size);
+    void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
 
     static void CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type);
-
-    void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
 
 private:
     static void GetHardwareAdapter(IDXGIAdapter1** dest, IDXGIFactory1* factory);
     void InitializeD3D12();
-    void CreateGPUWorkers();
+    void CreateGPUEngines();
 
     void CreateSwapChain(Application& application, IDXGIFactory* factory);
     void CreateFrameResources();

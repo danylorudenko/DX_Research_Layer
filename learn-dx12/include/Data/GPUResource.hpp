@@ -15,18 +15,19 @@ public:
     
     ID3D12Resource* Get() const { return resource_.Get(); }
     UINT64 Size() const { return size_; };
+    UINT64 Capacity() const { return capacity_; }
 
     D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress() const { return gpuAddress_; }
 
-    void Map(void** dest, D3D12_RANGE* range) { ThrowIfFailed(resource_->Map(0, range, dest)); }
-    void Unmap(D3D12_RANGE* range) { resource_->Unmap(0, range); }
+    void UpdateData(ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUResource& src, std::size_t offsetInSrc, std::size_t numBytes);
 
     void Transition(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state);
     D3D12_RESOURCE_STATES State() const { return state_; }
 
 protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
-    UINT64 size_;
+    UINT64 size_ = 0;
+    UINT64 capacity_ = 0;
     D3D12_GPU_VIRTUAL_ADDRESS gpuAddress_ = 0;
     D3D12_RESOURCE_STATES state_ = D3D12_RESOURCE_STATE_COMMON;
 };

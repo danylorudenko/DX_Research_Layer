@@ -3,32 +3,25 @@
 #include <pch.hpp>
 
 #include <map>
-
-using Microsoft::WRL::ComPtr;
-
-class GeometryMesh
-{
-    using SubmeshMap = std::map<std::string, SubgeometryInfo>;
-
-private:
-    ComPtr<ID3DBlob> verticesCPU_;
-    ComPtr<ID3DBlob> indiciesCPU_;
-
-    ComPtr<ID3D12Resource> geometryGPUHandle_;
-    ComPtr<ID3D12Resource> indexGPUHandle_;
-
-    SubmeshMap submeshMap_;
-
-}; // class GeometryMesh
+#include <Data\GPUResource.hpp>
 
 namespace
 {
-
-struct SubgeometryInfo
+struct SubmeshInfo
 {
     UINT geometryLocation;
     UINT indexLocation;
 
-}; // struct SubgeometryInfo
-
+}; // struct SubmeshInfo
 } // namespace
+
+class GeometryMesh
+{
+public:
+    using SubmeshMap = std::map<std::string, SubmeshInfo>;
+
+    GPUResource vertices;
+    GPUResource indicies;
+    SubmeshMap submeshMap_;
+
+}; // class GeometryMesh

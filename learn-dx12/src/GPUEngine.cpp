@@ -39,11 +39,20 @@ GPUEngine& GPUEngine::operator=(GPUEngine&& rhs)
     return *this;
 }
 
-void GPUEngine::Reset()
+void GPUEngine::Flush()
 {
     commandList_.Close();
     commandList_.Execute(commandQueue_);
+}
 
+void GPUEngine::Reset()
+{
     GPUCommandAllocator& allocContext = commandQueue_.ProvideNextAlloc();
     commandList_.Reset(allocContext);
+}
+
+void GPUEngine::FlushReset()
+{
+    Flush();
+    Reset();
 }
