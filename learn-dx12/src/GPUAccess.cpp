@@ -15,8 +15,6 @@ GPUAccess::GPUAccess(Application& application)
 
     CreateDefaultDescriptorHeaps();
     CreateFrameResources();
-    CreateDepthStencilBuffer();
-    CreateDepthStencilBufferView();
 
     // Set default viewport and scissor values.
     SetViewportScissor();
@@ -77,56 +75,10 @@ void GPUAccess::CreateFrameResources()
     for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) {
         Microsoft::WRL::ComPtr<ID3D12Resource> frameBuffer = nullptr;
         swapChain_->GetBuffer(i, IID_PPV_ARGS(&frameBuffer));
-        frameResources_[i] = GPUFrameResource(*device_.Get(), rtvHeap_, i * rtvDescriptorSize, frameBuffer);
+        frameResources_[i] = GPUFrameResource { 
+            device_.Get(), frameBuffer, WIDTH, HEIGHT, rtvHeap_, static_cast<INT>(i * rtvDescriptorSize),
+            depthStencilBufferFormat, dsvHeap_, static_cast<INT>(i * dsvDescriptorSize_) };
     }
-}
-
-void GPUAccess::CreateDepthStencilBuffer()
-{
-    D3D12_RESOURCE_DESC resDesc;
-    resDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    resDesc.Alignment = 0;
-    resDesc.Width = WIDTH;
-    resDesc.Height = HEIGHT;
-    resDesc.DepthOrArraySize = 1;
-    resDesc.MipLevels = 1;
-    resDesc.Format = depthStencilBufferFormat;
-
-    resDesc.SampleDesc.Count = 1;
-    resDesc.SampleDesc.Quality = 0;
-
-    resDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    resDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-    //=================
-
-    D3D12_CLEAR_VALUE clearVal;
-    clearVal.Format = depthStencilBufferFormat;
-    clearVal.DepthStencil.Depth = 1.0f;
-    clearVal.DepthStencil.Stencil = 0;
-
-    HRESULT result = device_->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-        D3D12_HEAP_FLAG_NONE,
-        &resDesc,
-        D3D12_RESOURCE_STATE_COMMON,
-        &clearVal,
-        IID_PPV_ARGS(&depthStencilBuffer_));
-    ThrowIfFailed(result);
-
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
-    Engine<GPU_ENGINE_TYPE_DIRECT>().FlushReset();
-}
-
-void GPUAccess::CreateDepthStencilBufferView()
-{
-    D3D12_DEPTH_STENCIL_VIEW_DESC depthStencDesc;
-    depthStencDesc.Flags = D3D12_DSV_FLAG_NONE;
-    depthStencDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-    depthStencDesc.Format = depthStencilBufferFormat;
-    depthStencDesc.Texture2D.MipSlice = 0;
-
-    device_->CreateDepthStencilView(depthStencilBuffer_.Get(), &depthStencDesc, dsvHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()
@@ -141,7 +93,7 @@ void GPUAccess::CreateDefaultDescriptorHeaps()
     ThrowIfFailed(result);
 
     D3D12_DESCRIPTOR_HEAP_DESC dsvD;
-    dsvD.NumDescriptors = 1;
+    dsvD.NumDescriptors = SWAP_CHAIN_BUFFER_COUNT;
     dsvD.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
     dsvD.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     dsvD.NodeMask = 0;
@@ -199,51 +151,26 @@ void GPUAccess::CreateGPUEngines()
 {
     // Engines are being reset automatically on creation.
 
-    engines_[0] = GPUEngine(device_.Get(), GPU_ENGINE_TYPE_DIRECT);
+    engines_[0] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_DIRECT, SWAP_CHAIN_BUFFER_COUNT };
     //workers_[0]->FlushReset();
 
-    engines_[1] = GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COPY);
+    engines_[1] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_COPY, SWAP_CHAIN_BUFFER_COUNT };
     //workers_[1]->FlushReset();
 
-    engines_[2] = GPUEngine(device_.Get(), GPU_ENGINE_TYPE_COMPUTE);
+    engines_[2] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_COMPUTE, SWAP_CHAIN_BUFFER_COUNT };
     //workers_[2]->FlushReset();
 }
 
 void GPUAccess::ResetAll()
 {
-    Engine<GPU_ENGINE_TYPE_DIRECT>().FlushReset();
-    Engine<GPU_ENGINE_TYPE_COPY>().FlushReset();
-    Engine<GPU_ENGINE_TYPE_COMPUTE>().FlushReset();
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
+    Engine<GPU_ENGINE_TYPE_COPY>().Reset();
+    Engine<GPU_ENGINE_TYPE_COMPUTE>().Reset();
 }
 
-ID3D12Resource* GPUAccess::DepthStencilBuffer() const
+GPUFrameResource & GPUAccess::CurrentFrameResource()
 {
-    return depthStencilBuffer_.Get();
-}
-
-ID3D12Resource* GPUAccess::CurrentFramebuffer() const
-{
-    return frameResources_[currentFrame_].FrameBuffer();
-}
-
-D3D12_GPU_VIRTUAL_ADDRESS GPUAccess::CurrentFramebufferGPUVirtualAddress() const
-{
-    return frameResources_[currentFrame_].FrameBuffer()->GetGPUVirtualAddress();
-}
-
-D3D12_GPU_VIRTUAL_ADDRESS GPUAccess::DepthStencilBufferGPUVirtualAddress() const
-{
-    return depthStencilBuffer_->GetGPUVirtualAddress();
-}
-
-D3D12_CPU_DESCRIPTOR_HANDLE GPUAccess::CurrentRtvHandle() const
-{
-    return frameResources_[currentFrame_].CPUDescriptorHandle();
-}
-
-D3D12_CPU_DESCRIPTOR_HANDLE GPUAccess::DepthStencilHandle() const
-{
-    return dsvHeap_->GetCPUDescriptorHandleForHeapStart();
+    return frameResources_[currentFrame_];
 }
 
 void GPUAccess::CommitDefaultViewportScissorRects()

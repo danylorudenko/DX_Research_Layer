@@ -169,7 +169,7 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
-    <ClCompile Include="src\FrameResource.cpp" />
+    <ClCompile Include="src\GPUFrameResource.cpp" />
     <ClCompile Include="src\GPUAccess.cpp" />
     <ClCompile Include="src\GPUCommandAllocator.cpp" />
     <ClCompile Include="src\GPUCommandList.cpp" />
@@ -184,7 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\d3dx12.h" />
-    <ClInclude Include="include\Data\FrameResource.hpp" />
+    <ClInclude Include="include\Data\GPUFrameResource.hpp" />
     <ClInclude Include="include\Data\GeometryMesh.hpp" />
     <ClInclude Include="include\Data\GPUResource.hpp" />
     <ClInclude Include="include\Data\GPUUploadHeap.hpp" />

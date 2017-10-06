@@ -4,7 +4,6 @@
 
 #include <Utility\Application.hpp>
 #include <Utility\PerformanceTimer.hpp>
-#include <Data\FrameResource.hpp>
 #include <Rendering\GPUAccess.hpp>
 
 class DirectAppDelegate : public Application::Delegate

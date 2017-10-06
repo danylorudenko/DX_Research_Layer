@@ -4,7 +4,7 @@
 
 #include <Utility\Application.hpp>
 #include <Rendering\GPUEngine.hpp>
-#include <Data\FrameResource.hpp>
+#include <Data\GPUFrameResource.hpp>
 #include <Data\GPUResource.hpp>
 #include <Data\GPUUploadHeap.hpp>
 
@@ -37,14 +37,7 @@ public:
 
     ID3D12Device* Device() const { return device_.Get(); }
 
-    ID3D12Resource* DepthStencilBuffer() const;
-    ID3D12Resource* CurrentFramebuffer() const;
-
-    D3D12_GPU_VIRTUAL_ADDRESS CurrentFramebufferGPUVirtualAddress() const;
-    D3D12_GPU_VIRTUAL_ADDRESS DepthStencilBufferGPUVirtualAddress() const;
-
-    D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const;
-    D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilHandle() const;
+    GPUFrameResource& CurrentFrameResource();
 
     UINT RtvIncrementalSize() const { return rtvDescriptorSize_; }
     UINT DsvIncrementalSize() const { return dsvDescriptorSize_; }
@@ -69,10 +62,7 @@ private:
     void CreateSwapChain(Application& application, IDXGIFactory* factory);
     void CreateFrameResources();
     void CreateDefaultDescriptorHeaps();
-    void CreateDepthStencilBuffer();
     void SetViewportScissor();
-
-    void CreateDepthStencilBufferView();
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
@@ -89,8 +79,6 @@ private:
     UINT rtvDescriptorSize_ = 0U;
     UINT dsvDescriptorSize_ = 0U;
     UINT cbv_srv_uavDescriptorSize_ = 0U;
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer_;
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;

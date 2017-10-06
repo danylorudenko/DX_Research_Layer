@@ -158,6 +158,7 @@ void DirectAppDelegate::LoadConstantBuffers()
 void DirectAppDelegate::Draw()
 {
     GPUEngine& graphicsEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+    GPUFrameResource& currentFrameResource = gpuAccess_.CurrentFrameResource();
 
     // Set general pipeline state.
     graphicsEngine.Commit().SetPipelineState(pipelineState_.Get());
@@ -174,10 +175,10 @@ void DirectAppDelegate::Draw()
     // Set the handle for the 0th descriptor table.
     graphicsEngine.Commit().SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
 
-    graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_.CurrentFramebuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+    graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(currentFrameResource.FrameBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
     
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = gpuAccess_.CurrentRtvHandle();
-    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = gpuAccess_.DepthStencilHandle();
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = currentFrameResource.CPURtvDescriptorHandle();
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = currentFrameResource.CPUDsvDescriptorHandle();
     graphicsEngine.Commit().OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
     // Drawing commands.
@@ -187,7 +188,7 @@ void DirectAppDelegate::Draw()
     graphicsEngine.Commit().IASetVertexBuffers(0, 1, &triangleVerticesView_);
     graphicsEngine.Commit().DrawInstanced(3, 1, 0, 0);
                            
-    graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(gpuAccess_.CurrentFramebuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+    graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(currentFrameResource.FrameBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
     graphicsEngine.FlushReset();
     gpuAccess_.Present();
