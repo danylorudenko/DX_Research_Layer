@@ -114,7 +114,7 @@ void GPUAccess::CreateDepthStencilBuffer()
         IID_PPV_ARGS(&depthStencilBuffer_));
     ThrowIfFailed(result);
 
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer_.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
     Engine<GPU_ENGINE_TYPE_DIRECT>().FlushReset();
 }
 
@@ -248,8 +248,8 @@ D3D12_CPU_DESCRIPTOR_HANDLE GPUAccess::DepthStencilHandle() const
 
 void GPUAccess::CommitDefaultViewportScissorRects()
 {
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit()->RSSetViewports(1, &viewportRect_);
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit()->RSSetScissorRects(1, &scissorRect_);
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetViewports(1, &viewportRect_);
+    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetScissorRects(1, &scissorRect_);
 }
 
 void GPUAccess::Present()

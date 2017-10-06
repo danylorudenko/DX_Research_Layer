@@ -35,6 +35,8 @@ public:
 
     void ResetAll();
 
+    ID3D12Device* Device() const { return device_.Get(); }
+
     ID3D12Resource* DepthStencilBuffer() const;
     ID3D12Resource* CurrentFramebuffer() const;
 

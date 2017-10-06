@@ -19,6 +19,7 @@ public:
 
     D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress() const { return gpuAddress_; }
 
+    void CreateResource(ID3D12Device* device, std::size_t size, D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COMMON);
     void UpdateData(ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUResource& src, std::size_t offsetInSrc, std::size_t numBytes);
 
     void Transition(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state);

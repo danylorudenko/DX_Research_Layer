@@ -29,7 +29,7 @@ public:
     void Reset();
     void FlushReset();
 
-    ID3D12GraphicsCommandList* Commit() { return commandList_.Get(); }
+    ID3D12GraphicsCommandList& Commit() { return *commandList_.Get(); }
 
     ID3D12CommandQueue* CommandQueue() { return commandQueue_.Get(); }
     ID3D12GraphicsCommandList* CommandList() { return commandList_.Get(); }
