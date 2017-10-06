@@ -81,7 +81,7 @@ private:
     GPUEngine engines_[3];
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
-    FrameResource frameResources_[SWAP_CHAIN_BUFFER_COUNT];
+    GPUFrameResource frameResources_[SWAP_CHAIN_BUFFER_COUNT];
     UINT64 currentFrame_ = 0U;
     D3D12_VIEWPORT viewportRect_;
     D3D12_RECT scissorRect_;

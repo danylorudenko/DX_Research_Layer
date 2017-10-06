@@ -4,21 +4,21 @@
 
 using namespace Microsoft;
 
-class FrameResource
+class GPUFrameResource
 {
 public:
-    FrameResource();
-    FrameResource(
+    GPUFrameResource();
+    GPUFrameResource(
         ID3D12Device& device,
         WRL::ComPtr<ID3D12DescriptorHeap> sharedHeap, 
         UINT offsetInHeap,
         WRL::ComPtr<ID3D12Resource> frameBuffer);
 
-    FrameResource(const FrameResource&) = delete;
-    FrameResource& operator=(const FrameResource&) = delete;
+    GPUFrameResource(const GPUFrameResource&) = delete;
+    GPUFrameResource& operator=(const GPUFrameResource&) = delete;
 
-    FrameResource(FrameResource&&);
-    FrameResource& operator=(FrameResource&&);
+    GPUFrameResource(GPUFrameResource&&);
+    GPUFrameResource& operator=(GPUFrameResource&&);
 
     D3D12_CPU_DESCRIPTOR_HANDLE CPUDescriptorHandle() const;
     D3D12_GPU_DESCRIPTOR_HANDLE GPUDescriptorHandle() const;

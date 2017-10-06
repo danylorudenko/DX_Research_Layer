@@ -77,7 +77,7 @@ void GPUAccess::CreateFrameResources()
     for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) {
         Microsoft::WRL::ComPtr<ID3D12Resource> frameBuffer = nullptr;
         swapChain_->GetBuffer(i, IID_PPV_ARGS(&frameBuffer));
-        frameResources_[i] = FrameResource(*device_.Get(), rtvHeap_, i * rtvDescriptorSize, frameBuffer);
+        frameResources_[i] = GPUFrameResource(*device_.Get(), rtvHeap_, i * rtvDescriptorSize, frameBuffer);
     }
 }
 

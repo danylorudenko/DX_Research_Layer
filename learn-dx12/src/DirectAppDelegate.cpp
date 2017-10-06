@@ -127,7 +127,6 @@ void DirectAppDelegate::LoadTriangleVertices()
         { { 0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
         { { -0.25f, -0.25f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
     };
-
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
     GPUUploadHeap uploadHeap{ gpuAccess_.Device(), verticesData, vertexDataSize };

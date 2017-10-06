@@ -1,13 +1,8 @@
 #include <Data\FrameResource.hpp>
 
-FrameResource::FrameResource() = default;
+GPUFrameResource::GPUFrameResource() = default;
 
-FrameResource::FrameResource(
-    ID3D12Device& device,
-    WRL::ComPtr<ID3D12DescriptorHeap> sharedHeap,
-    UINT offsetInHeap,
-    WRL::ComPtr<ID3D12Resource> frameBuffer) :
-
+GPUFrameResource::GPUFrameResource(ID3D12Device& device, WRL::ComPtr<ID3D12DescriptorHeap> sharedHeap, UINT offsetInHeap, WRL::ComPtr<ID3D12Resource> frameBuffer) :
     sharedRtvDescriptorHeap_(sharedHeap),
     offsetInRtvHeap_(offsetInHeap),
     frameBuffer_(frameBuffer)
@@ -15,11 +10,11 @@ FrameResource::FrameResource(
     device.CreateRenderTargetView(frameBuffer_.Get(), nullptr, CPUDescriptorHandle());
 }
 
-FrameResource::FrameResource(FrameResource&&) = default;
+GPUFrameResource::GPUFrameResource(GPUFrameResource&&) = default;
 
-FrameResource& FrameResource::operator=(FrameResource&&) = default;
+GPUFrameResource& GPUFrameResource::operator=(GPUFrameResource&&) = default;
 
-D3D12_CPU_DESCRIPTOR_HANDLE FrameResource::CPUDescriptorHandle() const
+D3D12_CPU_DESCRIPTOR_HANDLE GPUFrameResource::CPUDescriptorHandle() const
 {
     auto heapHandle = sharedRtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
     heapHandle.ptr += offsetInRtvHeap_;
@@ -27,7 +22,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE FrameResource::CPUDescriptorHandle() const
     return heapHandle;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE FrameResource::GPUDescriptorHandle() const
+D3D12_GPU_DESCRIPTOR_HANDLE GPUFrameResource::GPUDescriptorHandle() const
 {
     auto heapHandle = sharedRtvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
     heapHandle.ptr += offsetInRtvHeap_;
@@ -35,7 +30,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE FrameResource::GPUDescriptorHandle() const
     return heapHandle;
 }
 
-ID3D12Resource* FrameResource::FrameBuffer() const
+ID3D12Resource* GPUFrameResource::FrameBuffer() const
 {
     return frameBuffer_.Get();
 }
