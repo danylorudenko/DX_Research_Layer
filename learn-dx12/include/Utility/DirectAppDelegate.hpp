@@ -5,6 +5,7 @@
 #include <Utility\Application.hpp>
 #include <Utility\PerformanceTimer.hpp>
 #include <Rendering\GPUAccess.hpp>
+#include <Data\GeometryMesh.hpp>
 
 class DirectAppDelegate : public Application::Delegate
 {
@@ -46,7 +47,5 @@ private:
     GPUUploadHeap constantBuffer_;
     SceneConstantBuffer constantBufferData_;
 
-    GPUResource triangleVertices_;
-    D3D12_VERTEX_BUFFER_VIEW triangleVerticesView_;
-
+    GeometryMesh triangleMesh_;
 };

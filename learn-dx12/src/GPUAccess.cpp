@@ -149,16 +149,9 @@ void GPUAccess::CreateSwapChain(Application& application, IDXGIFactory* factory)
 
 void GPUAccess::CreateGPUEngines()
 {
-    // Engines are being reset automatically on creation.
-
     engines_[0] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_DIRECT, SWAP_CHAIN_BUFFER_COUNT };
-    //workers_[0]->FlushReset();
-
     engines_[1] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_COPY, SWAP_CHAIN_BUFFER_COUNT };
-    //workers_[1]->FlushReset();
-
     engines_[2] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_COMPUTE, SWAP_CHAIN_BUFFER_COUNT };
-    //workers_[2]->FlushReset();
 }
 
 void GPUAccess::ResetAll()

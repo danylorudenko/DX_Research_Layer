@@ -132,14 +132,14 @@ void DirectAppDelegate::LoadTriangleVertices()
     GPUUploadHeap uploadHeap{ gpuAccess_.Device(), verticesData, vertexDataSize };
     
     auto& gpuEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
-    triangleVertices_.CreateResource(gpuAccess_.Device(), vertexDataSize, D3D12_RESOURCE_STATE_COPY_DEST);
-    triangleVertices_.UpdateData(gpuEngine.CommandList(), 0, uploadHeap, 0, vertexDataSize);
-    triangleVertices_.Transition(gpuEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);
+    triangleMesh_.vertices.CreateResource(gpuAccess_.Device(), vertexDataSize, D3D12_RESOURCE_STATE_COPY_DEST);
+    triangleMesh_.vertices.UpdateData(gpuEngine.CommandList(), 0, uploadHeap, 0, vertexDataSize);
+    triangleMesh_.vertices.Transition(gpuEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);
     gpuEngine.FlushReset();
     
-    triangleVerticesView_.BufferLocation = triangleVertices_.GPUVirtualAddress();
-    triangleVerticesView_.SizeInBytes = vertexDataSize;
-    triangleVerticesView_.StrideInBytes = sizeof(Vertex);
+    triangleMesh_.verticesView.BufferLocation = triangleMesh_.indicies.GPUVirtualAddress();
+    triangleMesh_.verticesView.SizeInBytes = vertexDataSize;
+    triangleMesh_.verticesView.StrideInBytes = sizeof(Vertex);
 }
 
 void DirectAppDelegate::LoadConstantBuffers()
@@ -185,7 +185,7 @@ void DirectAppDelegate::Draw()
     static FLOAT clearColor[4] = { 0.6f, 0.2f, 0.2f, 1.0f };
     graphicsEngine.Commit().ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
     graphicsEngine.Commit().IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    graphicsEngine.Commit().IASetVertexBuffers(0, 1, &triangleVerticesView_);
+    graphicsEngine.Commit().IASetVertexBuffers(0, 1, &triangleMesh_.verticesView);
     graphicsEngine.Commit().DrawInstanced(3, 1, 0, 0);
                            
     graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(currentFrameResource.FrameBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
