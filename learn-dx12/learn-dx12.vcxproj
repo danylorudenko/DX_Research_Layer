@@ -179,6 +179,7 @@
     <ClCompile Include="src\GPUUploadHeap.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
@@ -188,6 +189,7 @@
     <ClInclude Include="include\Data\GeometryMesh.hpp" />
     <ClInclude Include="include\Data\GPUResource.hpp" />
     <ClInclude Include="include\Data\GPUUploadHeap.hpp" />
+    <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />
     <ClInclude Include="include\Rendering\GPUAccess.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />
