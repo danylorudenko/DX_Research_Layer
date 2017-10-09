@@ -137,7 +137,7 @@ void DirectAppDelegate::LoadTriangleVertices()
     triangleMesh_.vertices.Transition(gpuEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);
     gpuEngine.FlushReset();
     
-    triangleMesh_.verticesView.BufferLocation = triangleMesh_.indicies.GPUVirtualAddress();
+    triangleMesh_.verticesView.BufferLocation = triangleMesh_.vertices.GPUVirtualAddress();
     triangleMesh_.verticesView.SizeInBytes = vertexDataSize;
     triangleMesh_.verticesView.StrideInBytes = sizeof(Vertex);
 }
