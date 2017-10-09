@@ -12,17 +12,24 @@ public:
     Transform& operator=(const Transform& rhs);
     Transform& operator=(Transform&& rhs);
 
-    DirectX::XMVECTOR Position() const;
-    DirectX::XMVECTOR Orientation() const;
-    DirectX::XMVECTOR Scale() const;
+    DirectX::XMVECTOR XM_CALLCONV PositionSIMD() const;
+    DirectX::XMVECTOR XM_CALLCONV OrientationSIMD() const;
+    DirectX::XMVECTOR XM_CALLCONV ScaleSIMD() const;
 
-    void Position(DirectX::FXMVECTOR newPos);
-    void Orientation(DirectX::FXMVECTOR newOrientation);
-    void Scale(DirectX::FXMVECTOR newScale);
+    DirectX::XMFLOAT3A Position() const;
+    DirectX::XMFLOAT4A Orientation() const;
+    DirectX::XMFLOAT3A Scale() const;
 
-    void AddPosition(DirectX::FXMVECTOR newPos);
-    void AddOrientation(DirectX::FXMVECTOR newOrientation);
-    void AddScale(DirectX::FXMVECTOR newScale);
+    void XM_CALLCONV PositionSIMD(DirectX::FXMVECTOR newPos);
+    void XM_CALLCONV OrientationSIMD(DirectX::FXMVECTOR newOrientation);
+    void XM_CALLCONV ScaleSIMD(DirectX::FXMVECTOR newScale);
+
+    void Position(DirectX::XMFLOAT3A pos);
+    void Orientation(DirectX::XMFLOAT4A orientation);
+    void OrientationRollPitchYaw(DirectX::XMFLOAT3A orientation);
+    void Scale(DirectX::XMFLOAT3A scale);
+
+    DirectX::XMMATRIX XM_CALLCONV WorldMatrix() const;
 
 private:
     DirectX::XMFLOAT3A position_;
