@@ -190,6 +190,7 @@
     <ClInclude Include="include\Data\GeometryMesh.hpp" />
     <ClInclude Include="include\Data\GPUResource.hpp" />
     <ClInclude Include="include\Data\GPUUploadHeap.hpp" />
+    <ClInclude Include="include\Math\Camera.hpp" />
     <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />
     <ClInclude Include="include\Rendering\GPUAccess.hpp" />
