@@ -180,6 +180,7 @@
     <ClCompile Include="src\GPUUploadHeap.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
