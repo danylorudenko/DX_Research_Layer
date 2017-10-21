@@ -63,6 +63,9 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUGraphNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">
@@ -128,7 +131,10 @@
     <ClInclude Include="include\Data\GPUTransferObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\GPUFutureOperation.hpp">
+    <ClInclude Include="include\Data\GPUFrameGraph.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Data\GPUGraphNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
