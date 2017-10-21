@@ -3,8 +3,7 @@
 #include <pch.hpp>
 
 #include <Rendering\GPUCommandAllocator.hpp>
-
-
+#include <Rendering\GPUCommandQueue.hpp>
 
 class GPUCommandList
 {
@@ -30,5 +29,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
 
     std::vector<GPUCommandAllocator> commandAllocators_;
-    std::size_t currentAllocator_ = 0ULL;
+    int currentAllocator_ = 0ULL;
 };

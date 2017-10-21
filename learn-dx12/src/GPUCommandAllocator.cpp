@@ -1,5 +1,7 @@
 #include <Rendering\GPUCommandAllocator.hpp>
 
+GPUCommandAllocator::GPUCommandAllocator() = default;
+
 GPUCommandAllocator::GPUCommandAllocator(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type)
 {
     {
@@ -9,18 +11,16 @@ GPUCommandAllocator::GPUCommandAllocator(ID3D12Device* device, D3D12_COMMAND_LIS
 }
 
 GPUCommandAllocator::GPUCommandAllocator(GPUCommandAllocator&& rhs) :
-    fenceTargetValue_(std::move(rhs.fenceTargetValue_)),
-    commandAllocator_(std::move(rhs.commandAllocator_))
+    commandAllocator_(std::move(rhs.commandAllocator_)),
+    fenceTargetValue_(rhs.fenceTargetValue_)
 {
-    ZeroMemory(&rhs, sizeof(rhs));
+
 }
 
 GPUCommandAllocator& GPUCommandAllocator::operator=(GPUCommandAllocator&& rhs)
 {
     commandAllocator_ = std::move(rhs.commandAllocator_);
     fenceTargetValue_ = rhs.fenceTargetValue_;
-
-    ZeroMemory(&rhs, sizeof(rhs));
 
     return *this;
 }

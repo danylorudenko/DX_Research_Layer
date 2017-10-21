@@ -11,22 +11,23 @@ GPUCommandList::GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE typ
         commandAllocators_.emplace_back(device, type);
     }
 
-    device->CreateCommandList(0, type, CurrentAlloc().Get(), nullptr, IID_PPV_ARGS(commandList_.ReleaseAndGetAddressOf()));
+    device->CreateCommandList(0, type, CurrentAlloc().Get(), nullptr, IID_PPV_ARGS(&commandList_));
     Close();
 }
 
 GPUCommandList::GPUCommandList(GPUCommandList&& rhs)
 {
     commandList_ = std::move(rhs.commandList_);
-
-    ZeroMemory(&rhs, sizeof(rhs));
+    commandAllocators_ = std::move(rhs.commandAllocators_);
+    currentAllocator_ = rhs.currentAllocator_;
 }
 
 GPUCommandList& GPUCommandList::operator=(GPUCommandList&& rhs)
 {
     commandList_ = std::move(rhs.commandList_);
+    commandAllocators_ = std::move(rhs.commandAllocators_);
+    currentAllocator_ = rhs.currentAllocator_;
 
-    ZeroMemory(&rhs, sizeof(rhs));
     return *this;
 }
 

@@ -5,7 +5,7 @@ GPUEngine::GPUEngine() = default;
 GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type, UINT allocCount)
 {
     commandQueue_ = GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type) };
-    commandList_ = GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), allocCount };
+    commandList_ = GPUCommandList { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), allocCount };
     fence_ = GPUFence{ device };
 
     Reset();
@@ -15,16 +15,14 @@ GPUEngine::GPUEngine(GPUEngine&& rhs)
 {
     commandList_ = std::move(rhs.commandList_);
     commandQueue_ = std::move(rhs.commandQueue_);
-
-    ZeroMemory(&rhs, sizeof(rhs));
+    fence_ = std::move(rhs.fence_);
 }
 
 GPUEngine& GPUEngine::operator=(GPUEngine&& rhs)
 {
     commandList_ = std::move(rhs.commandList_);
     commandQueue_ = std::move(rhs.commandQueue_);
-
-    ZeroMemory(&rhs, sizeof(rhs));
+    fence_ = std::move(rhs.fence_);
 
     return *this;
 }
@@ -55,5 +53,5 @@ void GPUEngine::SendFenceGPUSignal(UINT64 signalValue)
 
 void GPUEngine::WaitForFenceValue(UINT64 value)
 {
-    WaitForFenceValue(value);
+    fence_.WaitForValue(value);
 }
