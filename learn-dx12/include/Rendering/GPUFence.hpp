@@ -2,12 +2,10 @@
 
 #include <pch.hpp>
 
-class GPUCommandQueue;
-class GPUCommandAllocator;
-
 class GPUFence
 {
 public:
+    GPUFence();
     GPUFence(ID3D12Device* device);
     GPUFence(const GPUFence&) = delete;
     GPUFence(GPUFence&& rhs);

@@ -1,6 +1,8 @@
 #include <Rendering\GPUFence.hpp>
 #include <Rendering\GPUCommandAllocator.hpp>
 
+GPUFence::GPUFence() = default;
+
 GPUFence::GPUFence(ID3D12Device* device)
 {
     ThrowIfFailed(device->CreateFence(0U, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_)));

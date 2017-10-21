@@ -34,8 +34,13 @@ public:
     ID3D12CommandQueue* CommandQueue() { return commandQueue_.Get(); }
     ID3D12GraphicsCommandList* CommandList() { return commandList_.Get(); }
 
+    GPUFence& Fence() { return fence_; }
+    UINT64 FenceCompletedValue() const { return fence_.CompletedValue(); }
+    void SendFenceGPUSignal(UINT64 signalValue);
+    void WaitForFenceValue(UINT64 value);
 
 private:
     GPUCommandList commandList_;
     GPUCommandQueue commandQueue_;
+    GPUFence fence_;
 };

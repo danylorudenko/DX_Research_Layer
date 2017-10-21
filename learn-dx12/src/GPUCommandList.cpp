@@ -3,13 +3,15 @@
 
 GPUCommandList::GPUCommandList() = default;
 
-GPUCommandList::GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator* allocatorContext)
+GPUCommandList::GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type, std::size_t allocatorCount)
 {
-    if (!allocatorContext) {
-        OutputDebugString(L"AllocatoContext isn't inited\n");
+    // Create backing allocators
+    for (size_t i = 0; i < allocatorCount; i++)
+    {
+        commandAllocators_.emplace_back(device, type);
     }
 
-    device->CreateCommandList(0, type, allocatorContext, nullptr, IID_PPV_ARGS(commandList_.ReleaseAndGetAddressOf()));
+    device->CreateCommandList(0, type, CurrentAlloc().Get(), nullptr, IID_PPV_ARGS(commandList_.ReleaseAndGetAddressOf()));
     Close();
 }
 
@@ -23,15 +25,25 @@ GPUCommandList::GPUCommandList(GPUCommandList&& rhs)
 GPUCommandList& GPUCommandList::operator=(GPUCommandList&& rhs)
 {
     commandList_ = std::move(rhs.commandList_);
-    closed_ = rhs.closed_;
 
     ZeroMemory(&rhs, sizeof(rhs));
     return *this;
 }
 
-void GPUCommandList::Reset(GPUCommandAllocator& allocContext)
+GPUCommandAllocator& GPUCommandList::CurrentAlloc()
 {
-    allocContext.WaitForFence();
+    return commandAllocators_[currentAllocator_];
+}
+
+GPUCommandAllocator& GPUCommandList::ProvideNextAlloc()
+{
+    currentAllocator_ = (currentAllocator_ + 1) % commandAllocators_.size();
+    return commandAllocators_[currentAllocator_];
+}
+
+void GPUCommandList::Reset()
+{
+    auto& allocContext = ProvideNextAlloc();
     allocContext.Reset();
     commandList_->Reset(allocContext.Get(), nullptr);
 }
@@ -39,10 +51,10 @@ void GPUCommandList::Reset(GPUCommandAllocator& allocContext)
 void GPUCommandList::Execute(GPUCommandQueue& queueContext)
 {
     queueContext.ExecuteCommandLists(commandList_.Get(), 1);
+    CurrentAlloc().SetFenceTargetValue(CurrentAlloc().FenceTargetValue() + 1);
 }
 
 void GPUCommandList::Close()
 {
-    commandList_->Close(); 
-    closed_ = true;
+    commandList_->Close();
 }
