@@ -192,6 +192,7 @@
     <ClInclude Include="include\Data\GPUFrameResource.hpp" />
     <ClInclude Include="include\Data\GeometryMesh.hpp" />
     <ClInclude Include="include\Data\GPUResource.hpp" />
+    <ClInclude Include="include\Data\GPURootSignature.hpp" />
     <ClInclude Include="include\Data\GPUTransferObject.hpp" />
     <ClInclude Include="include\Data\GPUUploadHeap.hpp" />
     <ClInclude Include="include\Math\Camera.hpp" />
