@@ -2,6 +2,8 @@
 
 #include <pch.hpp>
 
+#include <Data\GPUDescriptorReference.hpp>
+
 class GPURootSignature
 {
     GPURootSignature();
@@ -12,6 +14,10 @@ class GPURootSignature
     GPURootSignature& operator=(GPURootSignature const&) = delete;
     GPURootSignature& operator=(GPURootSignature&& rhs);
 
+    ID3D12RootSignature* Get() const { return rootSignature_.Get(); }
+
 private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+
+    std::map<std::string, GPUDescriptorReference> rootParamValues_;
 };

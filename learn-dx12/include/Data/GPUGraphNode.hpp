@@ -3,20 +3,32 @@
 #include <pch.hpp>
 
 #include <Rendering\GPUEngine.hpp>
+#include <Data\GPURootSignature.hpp>
+#include <Data\GPUPipelineState.hpp>
+#include <Data\GPUGraphResourceProxy.hpp>
 
 class GPUGraphNode
 {
 public:
-    GPUGraphNode(GPUEngine* engine, Microsoft::WRL::ComPtr<ID3D12PipelineState>& pipelineState, std::vector<char*>&& input, std::vector<char*>&& output);
+    GPUGraphNode();
+    GPUGraphNode(GPUEngine* engine, Microsoft::WRL::ComPtr<ID3D12PipelineState>& pipelineState);
+    GPUGraphNode(GPUGraphNode const&) = delete;
+    GPUGraphNode(GPUGraphNode&& rhs);
 
-    void Input(GPUGraphNode* inputNode);
+    GPUGraphNode& operator=(GPUGraphNode const&) = delete;
+    GPUGraphNode& operator=(GPUGraphNode&& rhs);
+
+    void ImportInputs();
     void Process();
-    void Output(GPUGraphNode* outputNode);
+    void Wait();
 
 private:
+    std::vector<GPUGraphResourceProxy*> parents_;
+    std::vector<GPUGraphResourceProxy*> children_;
+
     GPUEngine* executionEngine_;
 
-    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
-    std::vector<char*> inputSemantics_;
-    std::vector<char*> outputSemantics_;
+    GPURootSignature rootSignature_;
+    GPUPipelineState pipelineState_;
+
 };

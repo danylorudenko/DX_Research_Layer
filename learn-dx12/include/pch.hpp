@@ -3,6 +3,7 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <map>
 
 #include <Windows.h>
 #include <wrl.h>
