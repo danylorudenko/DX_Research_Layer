@@ -11,24 +11,26 @@ class GPUGraphNode
 {
 public:
     GPUGraphNode();
-    GPUGraphNode(GPUEngine* engine, Microsoft::WRL::ComPtr<ID3D12PipelineState>& pipelineState);
+    GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState);
     GPUGraphNode(GPUGraphNode const&) = delete;
     GPUGraphNode(GPUGraphNode&& rhs);
 
     GPUGraphNode& operator=(GPUGraphNode const&) = delete;
     GPUGraphNode& operator=(GPUGraphNode&& rhs);
 
-    void ImportInputs();
+    void AddChild(GPUGraphResourceProxy* parent);
+    void ClearChildren();
+
+    void SetRootParams();
     void Process();
-    void Wait();
 
 private:
-    std::vector<GPUGraphResourceProxy*> parents_;
+    //std::vector<GPUGraphResourceProxy*> parents_;
     std::vector<GPUGraphResourceProxy*> children_;
 
     GPUEngine* executionEngine_;
 
-    GPURootSignature rootSignature_;
-    GPUPipelineState pipelineState_;
+    GPURootSignature* rootSignature_;
+    GPUPipelineState* pipelineState_;
 
 };

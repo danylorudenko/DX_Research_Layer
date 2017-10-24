@@ -7,7 +7,7 @@ class GPUDescriptorReference
 public:
     GPUDescriptorReference();
     GPUDescriptorReference(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, int descriptorSize, int offsetInHeap);
-    GPUDescriptorReference(GPUDescriptorReference const&& rhs);
+    GPUDescriptorReference(GPUDescriptorReference const& rhs);
     GPUDescriptorReference(GPUDescriptorReference&& rhs);
 
     GPUDescriptorReference& operator=(GPUDescriptorReference const& rhs);

@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
+    <ClCompile Include="src\GPUDescriptorReference.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
     <ClCompile Include="src\GPUAccess.cpp" />
     <ClCompile Include="src\GPUCommandAllocator.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="src\GPUGraphNode.cpp" />
     <ClCompile Include="src\GPUGraphResourceProxy.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
+    <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUUploadHeap.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />

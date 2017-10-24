@@ -2,10 +2,14 @@
 
 #include <pch.hpp>
 
+#include <Rendering\GPUEngine.hpp>
 #include <Data\GPUDescriptorReference.hpp>
 
 class GPURootSignature
 {
+public:
+    using OrderedNamedList = std::vector<std::pair<std::string, GPUDescriptorReference>>;
+
     GPURootSignature();
     GPURootSignature(Microsoft::WRL::ComPtr<ID3D12RootSignature>& signature);
     GPURootSignature(GPURootSignature const&) = delete;
@@ -16,8 +20,13 @@ class GPURootSignature
 
     ID3D12RootSignature* Get() const { return rootSignature_.Get(); }
 
+    void AppendRootParameterValue(char const* semantics, GPUDescriptorReference& descriptor);
+    void ClearRootParameterValues();
+
+    void SetRootSignature(GPUEngine* executionEngine);
+    void SetRootSignatureParams(GPUEngine* executionEngine);
+
 private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
-
-    std::map<std::string, GPUDescriptorReference> rootParamValues_;
+    OrderedNamedList rootParamValues_;
 };
