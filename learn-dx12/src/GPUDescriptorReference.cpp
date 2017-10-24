@@ -2,10 +2,12 @@
 
 GPUDescriptorReference::GPUDescriptorReference() = default;
 
-GPUDescriptorReference::GPUDescriptorReference(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, int descriptorSize, int offsetInHeap) :
+GPUDescriptorReference::GPUDescriptorReference(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, 
+                                               int descriptorSize, int offsetInHeap, D3D12_RESOURCE_STATES preferableState) :
     descriptorHeap_(heap),
     descriptorSize_(descriptorSize),
-    descriptorOffset_(offsetInHeap)
+    descriptorOffset_(offsetInHeap),
+    preferableState_(preferableState)
 {
 
 }

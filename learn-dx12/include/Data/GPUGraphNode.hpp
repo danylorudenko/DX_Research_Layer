@@ -25,6 +25,8 @@ public:
     void Process();
 
 private:
+    void TransitionResources();
+
     //std::vector<GPUGraphResourceProxy*> parents_;
     std::vector<GPUGraphResourceProxy*> children_;
 
