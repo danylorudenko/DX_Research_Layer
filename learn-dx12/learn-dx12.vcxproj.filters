@@ -66,6 +66,9 @@
     <ClCompile Include="src\GPUGraphNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUGraphResourceProxy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">
@@ -128,9 +131,6 @@
     <ClInclude Include="include\Math\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\GPUTransferObject.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Data\GPUFrameGraph.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -138,6 +138,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Data\GPURootSignature.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Data\GPUPipelineState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Data\GPUGraphResourceProxy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Data\GPUDescriptorReference.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
