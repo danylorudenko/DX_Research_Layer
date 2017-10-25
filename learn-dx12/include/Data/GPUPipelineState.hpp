@@ -2,6 +2,8 @@
 
 #include <pch.hpp>
 
+#include <Data\GPUResource.hpp>
+
 class GPUPipelineState
 {
 public:
@@ -13,6 +15,11 @@ public:
     GPUPipelineState& operator=(GPUPipelineState const&) = delete;
     GPUPipelineState& operator=(GPUPipelineState&& rhs);
 
+    
+    void SetOutputResources(char const** semantics, GPUResource* resources, UINT const num);
+
 private:
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
+
+    std::map<std::string, GPUResource*> outputMap_;
 };

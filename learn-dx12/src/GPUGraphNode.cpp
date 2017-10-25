@@ -14,39 +14,46 @@ GPUGraphNode::GPUGraphNode(GPUGraphNode&&) = default;
 
 GPUGraphNode& GPUGraphNode::operator=(GPUGraphNode&&) = default;
 
-void GPUGraphNode::SetOutputProxy(GPUGraphResourceProxy* outputProxy)
+void GPUGraphNode::SetOutputNode(GPUGraphNode* outputProxy)
 {
     output_ = outputProxy;
 }
 
-void GPUGraphNode::SetOutputSemantics(char const** semantics, UINT const semanticsNum)
+void GPUGraphNode::SetOutputResources(char const** semantics, GPUResource* resources, UINT const num)
 {
-    for (size_t i = 0; i < semanticsNum; i++) {
-        outputSemantics_.push_back(semantics[i]);
+    for (size_t i = 0; i < num; i++) {
+        outputMap_[semantics[i]] = resources;
     }
 }
 
-void GPUGraphNode::ImportResources(GPUGraphResourceProxy const& input)
+GPUResource* GPUGraphNode::RequestResource(std::string const& semantics) const
 {
-    rootSignature_->ImportRootResources(input);
+    return outputMap_.at(semantics);
 }
 
-void GPUGraphNode::Preprocess()
+void GPUGraphNode::ImportResources(GPUGraphNode const& input)
 {
-    OutputResourceReferences();
+    rootSignature_->ImportRootResources(input);
 }
 
 void GPUGraphNode::Process()
 {
     TransitionResources();
     SubmitProcessing();
+
+    TriggerChildren();
+}
+
+void GPUGraphNode::TriggerChildren()
+{
+    output_->ImportResources(*this);
+    output_->Process();
 }
 
 void GPUGraphNode::SetRootSignature()
 {
     rootSignature_->SetRootSignature(executionEngine_);
     rootSignature_->SetRootSignatureDescriptorBindings(executionEngine_);
-
 }
 
 void GPUGraphNode::TransitionResources()
@@ -54,10 +61,3 @@ void GPUGraphNode::TransitionResources()
     rootSignature_->TransitionRootResources(executionEngine_);
 }
 
-void GPUGraphNode::OutputResourceReferences()
-{
-    /*std::size_t const outputNum = outputSemantics_.size();
-    for (size_t i = 0; i < outputNum; i++) {
-        output_->Insert(outputSemantics_[i].c_str(), )
-    }*/
-}

@@ -20,11 +20,11 @@ void GPURootSignature::ImportResourcesSemantics(char const** semantics, UINT con
     }
 }
 
-void GPURootSignature::ImportRootResources(GPUGraphResourceProxy const& resourceProxy)
+void GPURootSignature::ImportRootResources(GPUGraphNode const& inputNode)
 {
     std::size_t const resourceNum = rootParamsSemantics_.size();
     for (size_t i = 0; i < resourceNum; i++) {
-        auto* resource = resourceProxy.Request(rootParamsSemantics_[i].c_str());
+        auto* resource = inputNode.RequestResource(rootParamsSemantics_[i]);
         assert(resource != nullptr && "Root signature can't import requested resource.");
 
         rootResources_.push_back(resource);

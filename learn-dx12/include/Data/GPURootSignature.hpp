@@ -5,7 +5,7 @@
 #include <Rendering\GPUEngine.hpp>
 #include <Data\GPUResource.hpp>
 #include <Data\GPUDescriptorReference.hpp>
-#include <Data\GPUGraphResourceProxy.hpp>
+#include <Data\GPUGraphNode.hpp>
 
 class GPURootSignature
 {
@@ -21,7 +21,7 @@ public:
     ID3D12RootSignature* Get() const { return rootSignature_.Get(); }
 
     void ImportResourcesSemantics(char const** semantics, UINT const semanticsNum);
-    void ImportRootResources(GPUGraphResourceProxy const& resourceProxy);
+    void ImportRootResources(GPUGraphNode const& resourceProxy);
     void ImportRootResourceStates(D3D12_RESOURCE_STATES const* states, UINT const statesNum);
 
     void ImportRootDescriptorBindings(GPUDescriptorReference const* descriptors, UINT const descriptorsNum);
