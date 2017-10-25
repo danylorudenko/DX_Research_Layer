@@ -27,7 +27,7 @@ public:
     void ImportRootDescriptorBindings(GPUDescriptorReference const* descriptors, UINT const descriptorsNum);
 
     void SetRootSignature(GPUEngine* executionEngine);
-    void SetRootSignatureDescriptors(GPUEngine* executionEngine);
+    void SetRootSignatureDescriptorBindings(GPUEngine* executionEngine);
     void TransitionRootResources(GPUEngine* executionEngine);
 
 private:

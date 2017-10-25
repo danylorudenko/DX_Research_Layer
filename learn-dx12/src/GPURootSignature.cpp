@@ -50,7 +50,7 @@ void GPURootSignature::SetRootSignature(GPUEngine* executionEngine)
     executionEngine->Commit().SetGraphicsRootSignature(rootSignature_.Get());
 }
 
-void GPURootSignature::SetRootSignatureDescriptors(GPUEngine* executionEngine)
+void GPURootSignature::SetRootSignatureDescriptorBindings(GPUEngine* executionEngine)
 {
     std::size_t const paramNum = rootDescritors_.size();
     for (size_t i = 0; i < paramNum; i++) {

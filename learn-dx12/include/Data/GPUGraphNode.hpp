@@ -18,17 +18,21 @@ public:
     GPUGraphNode& operator=(GPUGraphNode const&) = delete;
     GPUGraphNode& operator=(GPUGraphNode&& rhs);
 
-    void AddChild(GPUGraphResourceProxy* parent);
-    void ClearChildren();
+    void SetOutputProxy(GPUGraphResourceProxy* outputProxy);
+    void SetOutputSemantics(char const** semantics, UINT const semanticsNum);
 
-    void SetRootParams();
+    void ImportResources(GPUGraphResourceProxy const& resourceProxy);
+    void Preprocess();
     void Process();
 
 private:
+    void SetRootSignature();
     void TransitionResources();
+    void SubmitProcessing();
+    void OutputResourceReferences();
 
-    //std::vector<GPUGraphResourceProxy*> parents_;
-    std::vector<GPUGraphResourceProxy*> children_;
+    GPUGraphResourceProxy* output_;
+    std::vector<std::string> outputSemantics_;
 
     GPUEngine* executionEngine_;
 
