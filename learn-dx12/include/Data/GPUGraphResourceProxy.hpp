@@ -15,7 +15,7 @@ public:
     GPUGraphResourceProxy& operator=(GPUGraphResourceProxy&& rhs) = delete;
 
     void Insert(char const* semantics, GPUResource* resource);
-    GPUResource* Request(char const* semantics);
+    GPUResource* Request(char const* semantics) const;
 
     void Clear() { resourceMap_.clear(); }
 

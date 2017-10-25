@@ -20,10 +20,11 @@ public:
 
     ID3D12RootSignature* Get() const { return rootSignature_.Get(); }
 
-    void ImportResourcesSemantics(char const** semantics, UINT semanticsNum);
-    void ImportRootResources(GPUGraphResourceProxy& resourceProxy);
-    void ImportRootDescriptors(GPUDescriptorReference* descriptors, UINT descriptorsNum);
-    void ImportRootResourceStates(D3D12_RESOURCE_STATES states, UINT statesNum);
+    void ImportResourcesSemantics(char const** semantics, UINT const semanticsNum);
+    void ImportRootResources(GPUGraphResourceProxy const& resourceProxy);
+    void ImportRootResourceStates(D3D12_RESOURCE_STATES const* states, UINT const statesNum);
+
+    void ImportRootDescriptorBindings(GPUDescriptorReference const* descriptors, UINT const descriptorsNum);
 
     void SetRootSignature(GPUEngine* executionEngine);
     void SetRootSignatureDescriptors(GPUEngine* executionEngine);
