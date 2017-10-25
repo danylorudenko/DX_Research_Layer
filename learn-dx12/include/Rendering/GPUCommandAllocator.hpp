@@ -9,10 +9,10 @@ class GPUCommandAllocator
 public:
     GPUCommandAllocator();
     GPUCommandAllocator(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type);
-    GPUCommandAllocator(const GPUCommandAllocator&) = delete;
+    GPUCommandAllocator(GPUCommandAllocator const&) = delete;
     GPUCommandAllocator(GPUCommandAllocator&& rhs);
 
-    GPUCommandAllocator& operator=(const GPUCommandAllocator&) = delete;
+    GPUCommandAllocator& operator=(GPUCommandAllocator const&) = delete;
     GPUCommandAllocator& operator=(GPUCommandAllocator&& rhs);
 
     ID3D12CommandAllocator* Get() const { return commandAllocator_.Get(); }

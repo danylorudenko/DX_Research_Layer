@@ -7,10 +7,10 @@ class Camera
 {
 public:
     Camera(float fow, float aspectRatio, float nearPlane, float farPlane);
-    Camera(const Camera&);
+    Camera(Camera const&);
     Camera(Camera&&);
 
-    Camera& operator=(const Camera&);
+    Camera& operator=(Camera const&);
     Camera& operator=(Camera&&);
 
     float Fow() const { return fow_; }

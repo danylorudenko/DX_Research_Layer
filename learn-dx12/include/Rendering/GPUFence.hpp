@@ -7,10 +7,10 @@ class GPUFence
 public:
     GPUFence();
     GPUFence(ID3D12Device* device);
-    GPUFence(const GPUFence&) = delete;
+    GPUFence(GPUFence const&) = delete;
     GPUFence(GPUFence&& rhs);
 
-    GPUFence& operator=(const GPUFence&) = delete;
+    GPUFence& operator=(GPUFence const&) = delete;
     GPUFence& operator=(GPUFence&& rhs);
 
     ~GPUFence();

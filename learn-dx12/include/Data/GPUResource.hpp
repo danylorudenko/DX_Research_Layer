@@ -7,10 +7,10 @@ class GPUResource
 public:
     GPUResource();
     GPUResource(ID3D12Device* device, UINT64 size, D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON);
-    GPUResource(const GPUResource&) = delete;
+    GPUResource(GPUResource const&) = delete;
     GPUResource(GPUResource&& rhs);
 
-    GPUResource& operator=(const GPUResource&) = delete;
+    GPUResource& operator=(GPUResource const&) = delete;
     GPUResource& operator=(GPUResource&& rhs);
     
     ID3D12Resource* Get() const { return resource_.Get(); }

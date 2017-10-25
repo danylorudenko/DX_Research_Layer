@@ -9,10 +9,10 @@ class GPUUploadHeap : public GPUResource
 public:
     GPUUploadHeap();
     GPUUploadHeap(ID3D12Device* device, void const* data, std::size_t size, bool isConstBuffer = false);
-    GPUUploadHeap(const GPUUploadHeap&) = delete;
+    GPUUploadHeap(GPUUploadHeap const&) = delete;
     GPUUploadHeap(GPUUploadHeap&& rhs);
 
-    GPUUploadHeap& operator=(const GPUUploadHeap&) = delete;
+    GPUUploadHeap& operator=(GPUUploadHeap const&) = delete;
     GPUUploadHeap& operator=(GPUUploadHeap&& rhs);
 
     void Map(void** dest, D3D12_RANGE* range) { ThrowIfFailed(resource_->Map(0, range, dest)); }

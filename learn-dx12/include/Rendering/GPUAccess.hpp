@@ -13,10 +13,10 @@ class GPUAccess
 public:
     GPUAccess();
     GPUAccess(Application& application);
-    GPUAccess(const ID3D12Device&) = delete;
+    GPUAccess(ID3D12Device const&) = delete;
     GPUAccess(GPUAccess&& rhs);
 
-    GPUAccess& operator=(const GPUAccess&) = delete;
+    GPUAccess& operator=(GPUAccess const&) = delete;
     GPUAccess& operator=(GPUAccess&&);
 
     static constexpr UINT WIDTH = 800;

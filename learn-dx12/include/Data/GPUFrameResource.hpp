@@ -14,8 +14,8 @@ public:
         DXGI_FORMAT depthStencilFormat,
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvSharedHeap, INT offsetInDsvHeap);
 
-    GPUFrameResource(const GPUFrameResource&) = delete;
-    GPUFrameResource& operator=(const GPUFrameResource&) = delete;
+    GPUFrameResource(GPUFrameResource const&) = delete;
+    GPUFrameResource& operator=(GPUFrameResource const&) = delete;
 
     GPUFrameResource(GPUFrameResource&&);
     GPUFrameResource& operator=(GPUFrameResource&&);

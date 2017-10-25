@@ -9,11 +9,11 @@ Camera::Camera(float fow, float aspectRatio, float nearPlane, float farPlane) :
 
 }
 
-Camera::Camera(const Camera&) = default;
+Camera::Camera(Camera const&) = default;
 
 Camera::Camera(Camera&&) = default;
 
-Camera& Camera::operator=(const Camera&) = default;
+Camera& Camera::operator=(Camera const&) = default;
 
 Camera& Camera::operator=(Camera&&) = default;
 

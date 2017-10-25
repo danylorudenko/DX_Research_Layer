@@ -9,10 +9,10 @@ class GPUCommandQueue
 public:
     GPUCommandQueue();
     GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type);
-    GPUCommandQueue(const GPUCommandQueue&) = delete;
+    GPUCommandQueue(GPUCommandQueue const&) = delete;
     GPUCommandQueue(GPUCommandQueue&& rhs);
 
-    GPUCommandQueue& operator=(const GPUCommandQueue&) = delete;
+    GPUCommandQueue& operator=(GPUCommandQueue const&) = delete;
     GPUCommandQueue& operator=(GPUCommandQueue&& rhs);
 
     ID3D12CommandQueue* Get() { return commandQueue_.Get(); }

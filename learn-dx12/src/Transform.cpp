@@ -8,11 +8,11 @@ Transform::Transform() :
     scale_(1.0f, 1.0f, 1.0f)
 { }
 
-Transform::Transform(const Transform& rhs) = default;
+Transform::Transform(Transform const& rhs) = default;
 
 Transform::Transform(Transform&& rhs) = default;
 
-Transform& Transform::operator=(const Transform& rhs) = default;
+Transform& Transform::operator=(Transform const& rhs) = default;
 
 Transform& Transform::operator=(Transform&& rhs) = default;
 
@@ -71,26 +71,26 @@ void Transform::Scale(DirectX::FXMVECTOR src)
     worldMatrixDirty_ = true;
 }
 
-void Transform::Position(const DirectX::XMFLOAT3A& pos)
+void Transform::Position(DirectX::XMFLOAT3A const& pos)
 {
     position_ = pos;
     worldMatrixDirty_ = true;
 }
 
-void Transform::Rotation(const DirectX::XMFLOAT4A& orientation)
+void Transform::Rotation(DirectX::XMFLOAT4A const& orientation)
 {
     rotation_ = orientation;
     worldMatrixDirty_ = true;
 }
 
-void Transform::RotationRollPitchYaw(const DirectX::XMFLOAT3A& eulerAngles)
+void Transform::RotationRollPitchYaw(DirectX::XMFLOAT3A const& eulerAngles)
 {
     DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYawFromVector(DirectX::XMLoadFloat3A(&eulerAngles));
     DirectX::XMStoreFloat4A(&rotation_, quat);
     worldMatrixDirty_ = true;
 }
 
-void Transform::Scale(const DirectX::XMFLOAT3A& scale)
+void Transform::Scale(DirectX::XMFLOAT3A const& scale)
 {
     scale_ = scale;
     worldMatrixDirty_ = true;

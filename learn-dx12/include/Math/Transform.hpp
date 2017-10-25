@@ -6,10 +6,10 @@ class Transform
 {
 public:
     Transform();
-    Transform(const Transform& rhs);
+    Transform(Transform const& rhs);
     Transform(Transform&& rhs);
     
-    Transform& operator=(const Transform& rhs);
+    Transform& operator=(Transform const& rhs);
     Transform& operator=(Transform&& rhs);
 
     DirectX::XMVECTOR XM_CALLCONV PositionSIMD() const;
@@ -25,10 +25,10 @@ public:
     void XM_CALLCONV RotationRollPitchYaw(DirectX::FXMVECTOR eulerAngles);
     void XM_CALLCONV Scale(DirectX::FXMVECTOR newScale);
 
-    void Position(const DirectX::XMFLOAT3A& pos);
-    void Rotation(const DirectX::XMFLOAT4A& orientation);
-    void RotationRollPitchYaw(const DirectX::XMFLOAT3A& eulerAngles);
-    void Scale(const DirectX::XMFLOAT3A& scale);
+    void Position(DirectX::XMFLOAT3A const& pos);
+    void Rotation(DirectX::XMFLOAT4A const& orientation);
+    void RotationRollPitchYaw(DirectX::XMFLOAT3A const& eulerAngles);
+    void Scale(DirectX::XMFLOAT3A const& scale);
 
     DirectX::XMFLOAT3A Forward() const;
     DirectX::XMFLOAT3A Right() const;

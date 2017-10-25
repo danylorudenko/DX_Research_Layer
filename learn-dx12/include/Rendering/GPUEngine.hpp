@@ -19,10 +19,10 @@ class GPUEngine
 public:
     GPUEngine();
     GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type, UINT allocCount);
-    GPUEngine(const GPUEngine&) = delete;
+    GPUEngine(GPUEngine const&) = delete;
     GPUEngine(GPUEngine&& rhs);
 
-    GPUEngine& operator=(const GPUEngine&) = delete;
+    GPUEngine& operator=(GPUEngine const&) = delete;
     GPUEngine& operator=(GPUEngine&& rhs);
 
     void Flush();
