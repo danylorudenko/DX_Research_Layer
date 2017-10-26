@@ -5,7 +5,7 @@
 #include <Rendering\GPUEngine.hpp>
 #include <Data\GPURootSignature.hpp>
 #include <Data\GPUPipelineState.hpp>
-#include <Data\GPUGraphResourceProxy.hpp>
+#include <Data\GPUResourceDescriptor.hpp>
 
 class GPUGraphNode
 {
@@ -19,7 +19,7 @@ public:
     GPUGraphNode& operator=(GPUGraphNode&& rhs);
 
     void SetOutputNode(GPUGraphNode* outputProxy);
-    GPUResource* RequestResource(std::string const& semantics) const;
+    GPUResourceDescriptor* RequestOutputResource(std::string const& semantics) const;
 
     void ImportResources(GPUGraphNode const& input);
     void Process();

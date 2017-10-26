@@ -19,14 +19,7 @@ void GPUGraphNode::SetOutputNode(GPUGraphNode* outputProxy)
     output_ = outputProxy;
 }
 
-void GPUGraphNode::SetOutputResources(char const** semantics, GPUResource* resources, UINT const num)
-{
-    for (size_t i = 0; i < num; i++) {
-        outputMap_[semantics[i]] = resources;
-    }
-}
-
-GPUResource* GPUGraphNode::RequestResource(std::string const& semantics) const
+GPUResource* GPUGraphNode::RequestOutputResource(std::string const& semantics) const
 {
     return outputMap_.at(semantics);
 }

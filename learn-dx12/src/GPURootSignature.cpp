@@ -14,34 +14,27 @@ GPURootSignature& GPURootSignature::operator=(GPURootSignature&&) = default;
 
 void GPURootSignature::ImportResourcesSemantics(char const** semantics, UINT const semanticsNum)
 {
-    rootParamsSemantics_.clear();
+    rootResourcesSemantics_.clear();
     for (size_t i = 0; i < semanticsNum; i++) {
-        rootParamsSemantics_.push_back(*(semantics + i));
+        rootResourcesSemantics_.push_back(*(semantics + i));
     }
 }
 
 void GPURootSignature::ImportRootResources(GPUGraphNode const& inputNode)
 {
-    std::size_t const resourceNum = rootParamsSemantics_.size();
+    std::size_t const resourceNum = rootResourcesSemantics_.size();
     for (size_t i = 0; i < resourceNum; i++) {
-        auto* resource = inputNode.RequestResource(rootParamsSemantics_[i]);
+        auto* resource = inputNode.RequestOutputResource(rootResourcesSemantics_[i]);
         assert(resource != nullptr && "Root signature can't import requested resource.");
 
-        rootResources_.push_back(resource);
+        rootTablesMap_.push_back(resource);
     }
 }
 
-void GPURootSignature::ImportRootDescriptorBindings(GPUDescriptorReference const* descriptors, UINT const descriptorNum)
+void GPURootSignature::ImportRootDescriptorBindings(GPUResourceDescriptor const* descriptors, UINT const descriptorNum)
 {
     for (size_t i = 0; i < descriptorNum; i++) {
         rootDescritors_.push_back(descriptors[i]);
-    }
-}
-
-void GPURootSignature::ImportRootResourceStates(D3D12_RESOURCE_STATES const* states, UINT const statesNum)
-{
-    for (size_t i = 0; i < statesNum; i++) {
-        rootResourceStates_.push_back(states[i]);
     }
 }
 
@@ -60,14 +53,14 @@ void GPURootSignature::SetRootSignatureDescriptorBindings(GPUEngine* executionEn
 
 void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine)
 {
-    std::size_t const resourceNum = rootResources_.size();
+    std::size_t const resourceNum = rootTablesMap_.size();
     assert(resourceNum == rootResourceStates_.size() && "Resource count and states count aren't equal");
     assert(resourceNum < 10 && "Resource count reached static limit.");
 
     D3D12_RESOURCE_BARRIER barriers[10];
     for (size_t i = 0; i < resourceNum; i++) {
         barriers[i] = CD3DX12_RESOURCE_BARRIER::Transition(
-            rootResources_[i]->Get(), rootResources_[i]->State(),
+            rootTablesMap_[i]->Get(), rootTablesMap_[i]->State(),
             rootResourceStates_[i]);
     }
 

@@ -72,7 +72,10 @@
     <ClCompile Include="src\GPURootSignature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUDescriptorReference.cpp">
+    <ClCompile Include="src\GPUResourceDescriptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPURootTablesMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,7 +155,10 @@
     <ClInclude Include="include\Data\GPUGraphResourceProxy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\GPUDescriptorReference.hpp">
+    <ClInclude Include="include\Data\GPUResourceDescriptor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Data\GPURootTablesMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
