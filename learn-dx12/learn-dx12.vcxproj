@@ -171,6 +171,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
     <ClCompile Include="src\GPUFrameResourceDescriptor.cpp" />
+    <ClCompile Include="src\GPUFrameRootTablesMap.cpp" />
     <ClCompile Include="src\GPUResourceDescriptor.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
     <ClCompile Include="src\GPUAccess.cpp" />
@@ -193,6 +194,7 @@
   <ItemGroup>
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Data\GPUFrameResourceDescriptor.hpp" />
+    <ClInclude Include="include\Data\GPUFrameRootTablesMap.hpp" />
     <ClInclude Include="include\Data\GPUResourceDescriptor.hpp" />
     <ClInclude Include="include\Data\GPUFrameGraph.hpp" />
     <ClInclude Include="include\Data\GPUFrameResource.hpp" />

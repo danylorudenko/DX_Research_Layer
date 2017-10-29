@@ -25,8 +25,8 @@ public:
     void ImportRootDescriptorTables(GPURootTablesMap descriptorTables);
 
     void SetRootSignature(GPUEngine* executionEngine);
-    void SetRootSignatureDescriptorTables(GPUEngine* executionEngine);
-    void TransitionRootResources(GPUEngine* executionEngine);
+    void SetRootSignatureDescriptorTables(GPUEngine* executionEngine, UINT frameIndex);
+    void TransitionRootResources(GPUEngine* executionEngine, UINT frameIndex);
 
 private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;

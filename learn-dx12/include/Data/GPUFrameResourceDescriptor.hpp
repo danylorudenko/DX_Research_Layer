@@ -8,8 +8,8 @@ class GPUFrameResourceDescriptor
 {
     GPUFrameResourceDescriptor();
     GPUFrameResourceDescriptor(UINT frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, 
-                               int descriptorSize, int* offsetInHeap, 
-                               D3D12_RESOURCE_STATES state, char const* semantics, GPUResource** resource);
+                               int descriptorSize, std::vector<int> offsetInHeap, 
+                               D3D12_RESOURCE_STATES state, char const* semantics, std::vector<GPUResource*> resource);
     GPUFrameResourceDescriptor(GPUFrameResourceDescriptor const&);
     GPUFrameResourceDescriptor(GPUFrameResourceDescriptor&&);
 
@@ -24,10 +24,10 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
     int descriptorSize_;
-    int* descriptorOffsets_;
+    std::vector<int> descriptorOffsets_;
 
     D3D12_RESOURCE_STATES state_;
     std::string semantics_;
 
-    GPUResource** describedResources_;
+    std::vector<GPUResource*> describedResources_;
 };

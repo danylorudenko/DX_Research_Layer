@@ -78,6 +78,9 @@
     <ClCompile Include="src\GPUFrameResourceDescriptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUFrameRootTablesMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">
@@ -159,6 +162,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Data\GPUFrameResourceDescriptor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Data\GPUFrameRootTablesMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

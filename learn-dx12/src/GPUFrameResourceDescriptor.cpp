@@ -3,19 +3,20 @@
 GPUFrameResourceDescriptor::GPUFrameResourceDescriptor() = default;
 
 GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(UINT frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap,
-                                                       int descriptorSize, int* offsetInHeap,
-                                                       D3D12_RESOURCE_STATES state, char const* semantics, GPUResource** resource) :
+                                                       int descriptorSize, std::vector<int> offsetsInHeap,
+                                                       D3D12_RESOURCE_STATES state, char const* semantics, std::vector<GPUResource*> describedResources) :
     frameCount_(frameCount), descriptorHeap_(heap),
     descriptorSize_(descriptorSize), state_(state), semantics_(semantics)
 {
-    descriptorOffsets_ = new int[frameCount_];
+    assert(frameCount == offsetsInHeap.size() && "Passed data count does not respond to the passed frame count.");
+    assert(frameCount == describedResources.size() && "Passed data count does not respond to the passed frame count.");
+
     for (int i = 0; i < frameCount_; i++) {
-        descriptorOffsets_[i] = offsetInHeap[i];
+        descriptorOffsets_.push_back(offsetsInHeap[i]);
     }
 
-    describedResources_ = new GPUResource*[frameCount_];
     for (int i = 0; i < frameCount_; i++) {
-        describedResources_[i] = resource[i];
+        describedResources_.push_back(describedResources[i]);
     }
 }
 
@@ -23,30 +24,16 @@ GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(GPUFrameResourceDescripto
     frameCount_(rhs.frameCount_), descriptorHeap_(rhs.descriptorHeap_),
     descriptorSize_(rhs.descriptorSize_), state_(rhs.state_), semantics_(rhs.semantics_)
 {
-    descriptorOffsets_ = new int[frameCount_];
-    for (int i = 0; i < frameCount_; i++) {
-        descriptorOffsets_[i] = rhs.descriptorOffsets_[i];
-    }
-
-    /////////////////////////////////////////////////////////////////////////
-
-    describedResources_ = new GPUResource*[frameCount_];
-    for (int i = 0; i < frameCount_; i++) {
-        describedResources_[i] = rhs.describedResources_[i];
-    }
+    descriptorOffsets_ = rhs.descriptorOffsets_;
+    describedResources_ = rhs.describedResources_;
 }
 
 GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(GPUFrameResourceDescriptor&& rhs) :
     frameCount_(std::move(rhs.frameCount_)), descriptorHeap_(std::move(rhs.descriptorHeap_)),
     descriptorSize_(std::move(rhs.descriptorSize_)), state_(std::move(rhs.state_)), semantics_(std::move(rhs.semantics_))
 {
-    descriptorOffsets_ = rhs.descriptorOffsets_;
-    rhs.descriptorOffsets_ = nullptr;
-
-    /////////////////////////////////////////////////////////////////////////
-    
-    describedResources_ = rhs.describedResources_;
-    rhs.describedResources_ = nullptr;
+    descriptorOffsets_ = std::move(rhs.descriptorOffsets_);
+    describedResources_ = std::move(rhs.describedResources_);
 }
 
 GPUFrameResourceDescriptor& GPUFrameResourceDescriptor::operator=(GPUFrameResourceDescriptor const& rhs)
@@ -77,11 +64,8 @@ GPUFrameResourceDescriptor& GPUFrameResourceDescriptor::operator=(GPUFrameResour
     state_ = std::move(rhs.state_);
     semantics_ = std::move(rhs.semantics_);
 
-    descriptorOffsets_ = rhs.descriptorOffsets_;
-    rhs.descriptorOffsets_ = nullptr;
-
-    describedResources_ = rhs.describedResources_;
-    rhs.describedResources_ = nullptr;
+    descriptorOffsets_ = std::move(rhs.descriptorOffsets_);
+    describedResources_ = std::move(rhs.describedResources_);
 
     return *this;
 }

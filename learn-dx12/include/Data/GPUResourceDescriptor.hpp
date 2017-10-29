@@ -28,5 +28,5 @@ private:
     D3D12_RESOURCE_STATES state_;
     std::string semantics_;
 
-    GPUResource* describedResource_;
+    GPUResource* describedResource_ = nullptr;
 };

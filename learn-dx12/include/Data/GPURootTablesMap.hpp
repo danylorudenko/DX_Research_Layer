@@ -8,10 +8,11 @@ class GPURootTablesMap
 {
 public:
     using BindPointRootDescriptorPair = std::pair<UINT, GPUResourceDescriptor>;
+    using StateAndResource = std::pair<D3D12_RESOURCE_STATES, GPUResource*>;
 
     GPURootTablesMap();
-    GPURootTablesMap(std::vector<BindPointRootDescriptorPair> const& map);
-    GPURootTablesMap(std::vector<BindPointRootDescriptorPair>&& map);
+    GPURootTablesMap(std::vector<BindPointRootDescriptorPair> const& map, std::vector<StateAndResource> const& describedResources);
+    GPURootTablesMap(std::vector<BindPointRootDescriptorPair>&& map, std::vector<StateAndResource>&& describedResources);
     GPURootTablesMap(GPURootTablesMap const&);
     GPURootTablesMap(GPURootTablesMap&&);
 
@@ -21,7 +22,10 @@ public:
     D3D12_CPU_DESCRIPTOR_HANDLE DescriptorTableCPUHandle(UINT bindingPoint) const;
     D3D12_GPU_DESCRIPTOR_HANDLE DescirptorTableGPUHandle(UINT bindingPoint) const;
 
-    UINT Size() const;
+    UINT TableSize() const;
+    UINT DescribedResourceCount() const;
+    GPUResource* DescribedResource(UINT index);
+    D3D12_RESOURCE_STATES DescribedResourceState(UINT index) const;
 
 private:
     // Descriptor tables are binded separately with binding points.
@@ -31,4 +35,5 @@ private:
     // dependant on this continuity.
     // Example: https://habrahabr.ru/company/intel/blog/277121/
     std::vector<BindPointRootDescriptorPair> descriptorTable_;
+    std::vector<StateAndResource> describedResources_;
 };
