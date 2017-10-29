@@ -20,9 +20,9 @@ public:
     ID3D12RootSignature* Get() const { return rootSignature_.Get(); }
 
     void ImportResourcesSemantics(char const** semantics, UINT const semanticsNum);
-    void ImportRootResources(GPUGraphNode const& resourceProxy);
 
-    void ImportRootDescriptorTables(std::vector<GPURootTablesMap>&& descriptorTables);
+    // This is done during graph setup.
+    void ImportRootDescriptorTables(GPURootTablesMap descriptorTables);
 
     void SetRootSignature(GPUEngine* executionEngine);
     void SetRootSignatureDescriptorTables(GPUEngine* executionEngine);
@@ -31,8 +31,9 @@ public:
 private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 
-    std::vector<std::string> rootResourcesSemantics_;
-    std::vector<GPUResourceDescriptor> rootResourseDescriptors_;
-    std::vector<GPURootTablesMap> rootDescriptorTablesMap_;
+    // Actually, collection of descriptors on the start of the table.
+    GPURootTablesMap rootDescriptorTablesMap_;
+
+    std::vector<GPUResourceDescriptor> renderTargets_;
     //bool descriptorsLoaded_;
 };

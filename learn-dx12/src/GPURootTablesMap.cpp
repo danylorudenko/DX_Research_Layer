@@ -4,14 +4,13 @@
 
 GPURootTablesMap::GPURootTablesMap() = default;
 
-GPURootTablesMap::GPURootTablesMap(std::vector<BindPointAndTableHandlePair>&& table) :
+GPURootTablesMap::GPURootTablesMap(std::vector<BindPointRootDescriptorPair> const& rhs) :
+    descriptorTable_(rhs)
+{ }
+
+GPURootTablesMap::GPURootTablesMap(std::vector<BindPointRootDescriptorPair>&& table) :
     descriptorTable_(std::move(table))
-{
-    std::sort(descriptorTable_.begin(), descriptorTable_.end(), 
-              [](BindPointAndTableHandlePair const& lhs, BindPointAndTableHandlePair const& rhs) {
-        return lhs.second.CPUViewHandle().ptr < rhs.second.CPUViewHandle().ptr;
-    });
-}
+{ }
 
 GPURootTablesMap::GPURootTablesMap(GPURootTablesMap const&) = default;
 
@@ -21,14 +20,14 @@ GPURootTablesMap& GPURootTablesMap::operator=(GPURootTablesMap const&) = default
 
 GPURootTablesMap& GPURootTablesMap::operator=(GPURootTablesMap&&) = default;
 
-D3D12_GPU_DESCRIPTOR_HANDLE GPURootTablesMap::TableStartGPUHandle() const
+D3D12_GPU_DESCRIPTOR_HANDLE GPURootTablesMap::DescirptorTableGPUHandle(UINT bindingPoint) const
 {
-    return CD3DX12_GPU_DESCRIPTOR_HANDLE::CD3DX12_GPU_DESCRIPTOR_HANDLE(descriptorTable_[0].second.GPUViewHandle());
+    return CD3DX12_GPU_DESCRIPTOR_HANDLE::CD3DX12_GPU_DESCRIPTOR_HANDLE(descriptorTable_[bindingPoint].second.GPUViewHandle());
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE GPURootTablesMap::TableStartCPUHandle() const
+D3D12_CPU_DESCRIPTOR_HANDLE GPURootTablesMap::DescriptorTableCPUHandle(UINT bindingPoint) const
 {
-    return CD3DX12_CPU_DESCRIPTOR_HANDLE::CD3DX12_CPU_DESCRIPTOR_HANDLE(descriptorTable_[0].second.CPUViewHandle());
+    return CD3DX12_CPU_DESCRIPTOR_HANDLE::CD3DX12_CPU_DESCRIPTOR_HANDLE(descriptorTable_[bindingPoint].second.CPUViewHandle());
 }
 
 UINT GPURootTablesMap::Size() const

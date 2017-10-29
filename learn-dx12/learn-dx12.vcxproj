@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
+    <ClCompile Include="src\GPUFrameResourceDescriptor.cpp" />
     <ClCompile Include="src\GPUResourceDescriptor.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
     <ClCompile Include="src\GPUAccess.cpp" />
@@ -178,7 +179,6 @@
     <ClCompile Include="src\GPUCommandQueue.cpp" />
     <ClCompile Include="src\GPUFence.cpp" />
     <ClCompile Include="src\GPUGraphNode.cpp" />
-    <ClCompile Include="src\GPUGraphResourceProxy.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPURootTablesMap.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
@@ -192,11 +192,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\d3dx12.h" />
+    <ClInclude Include="include\Data\GPUFrameResourceDescriptor.hpp" />
     <ClInclude Include="include\Data\GPUResourceDescriptor.hpp" />
     <ClInclude Include="include\Data\GPUFrameGraph.hpp" />
     <ClInclude Include="include\Data\GPUFrameResource.hpp" />
     <ClInclude Include="include\Data\GeometryMesh.hpp" />
-    <ClInclude Include="include\Data\GPUGraphResourceProxy.hpp" />
     <ClInclude Include="include\Data\GPUPipelineState.hpp" />
     <ClInclude Include="include\Data\GPUResource.hpp" />
     <ClInclude Include="include\Data\GPURootTablesMap.hpp" />

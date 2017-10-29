@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Data\GPUResource.hpp>
+#include <Data\GPUResourceDescriptor.hpp>
 
 class GPUPipelineState
 {
@@ -21,5 +21,6 @@ public:
 private:
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
 
-    std::map<std::string, GPUResource*> outputMap_;
+    std::vector<GPUResourceDescriptor> renderTargets_;
+    GPUResourceDescriptor depthStencilTarget_;
 };
