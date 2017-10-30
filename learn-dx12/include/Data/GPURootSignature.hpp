@@ -3,7 +3,8 @@
 #include <pch.hpp>
 
 #include <Rendering\GPUEngine.hpp>
-#include <Data\GPURootTablesMap.hpp>
+#include <Data\GPUFrameResourceDescriptor.hpp>
+#include <Data\GPUFrameRootTablesMap.hpp>
 #include <Data\GPUGraphNode.hpp>
 
 class GPURootSignature
@@ -19,11 +20,9 @@ public:
 
     ID3D12RootSignature* Get() const { return rootSignature_.Get(); }
 
-    void ImportResourcesSemantics(char const** semantics, UINT const semanticsNum);
-
     // This is done during graph setup.
-    void ImportRootDescriptorTables(GPURootTablesMap descriptorTables);
-
+    void ImportFrameRootDescriptorTables(GPUFrameRootTablesMap descriptorTables);
+    
     void SetRootSignature(GPUEngine* executionEngine);
     void SetRootSignatureDescriptorTables(GPUEngine* executionEngine, UINT frameIndex);
     void TransitionRootResources(GPUEngine* executionEngine, UINT frameIndex);
@@ -31,9 +30,8 @@ public:
 private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 
-    // Actually, collection of descriptors on the start of the table.
-    GPURootTablesMap rootDescriptorTablesMap_;
+    // Actually, collection of descriptors on the start of the table and resources these tables describe.
+    GPUFrameRootTablesMap rootDescriptorTablesMap_;
 
-    std::vector<GPUResourceDescriptor> renderTargets_;
-    //bool descriptorsLoaded_;
+    std::vector<GPUFrameResourceDescriptor> renderTargets_;
 };
