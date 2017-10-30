@@ -20,7 +20,7 @@ void GPURootSignature::SetRootSignature(GPUEngine* executionEngine)
 
 void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, UINT frameIndex)
 {
-    std::size_t const resourceNum = rootDescriptorTablesMap_.DescribedResourceCount();
+    std::size_t const resourceNum = rootDescriptorTablesMap_.DescribedResourceCount(frameIndex);
     assert(resourceNum < 10 && "Resource count reached static limit.");
 
     D3D12_RESOURCE_BARRIER barriers[10];

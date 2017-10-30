@@ -6,6 +6,7 @@
 
 class GPUFrameResourceDescriptor
 {
+public:
     GPUFrameResourceDescriptor();
     GPUFrameResourceDescriptor(UINT frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, 
                                int descriptorSize, std::vector<int> offsetInHeap, 
