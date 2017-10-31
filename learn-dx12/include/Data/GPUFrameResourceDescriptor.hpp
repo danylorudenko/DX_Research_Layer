@@ -21,7 +21,7 @@ public:
     D3D12_CPU_DESCRIPTOR_HANDLE CPUViewHandle(UINT frameIndex) const;
 
 private:
-    UINT frameCount_;
+    UINT frameCount_ = 0U;
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
     int descriptorSize_;

@@ -21,7 +21,7 @@ public:
     ID3D12RootSignature* Get() const { return rootSignature_.Get(); }
 
     // This is done during graph setup.
-    void ImportFrameRootDescriptorTables(GPUFrameRootTablesMap descriptorTables);
+    void ImportFrameRootDescriptorTable(GPUFrameRootTablesMap const& descriptorTable);
     
     void SetRootSignature(GPUEngine* executionEngine);
     void SetRootSignatureDescriptorTables(GPUEngine* executionEngine, UINT frameIndex);
@@ -32,6 +32,4 @@ private:
 
     // Actually, collection of descriptors on the start of the table and resources these tables describe.
     GPUFrameRootTablesMap rootDescriptorTablesMap_;
-
-    std::vector<GPUFrameResourceDescriptor> renderTargets_;
 };

@@ -5,11 +5,13 @@
 #include <Rendering\GPUEngine.hpp>
 #include <Data\GPURootSignature.hpp>
 #include <Data\GPUPipelineState.hpp>
-#include <Data\GPUResourceDescriptor.hpp>
 
 class GPUGraphNode
 {
 public:
+    template<typename T>
+    using FrameCollection = std::vector<T>;
+
     GPUGraphNode();
     GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState);
     GPUGraphNode(GPUGraphNode const&) = delete;
@@ -18,10 +20,12 @@ public:
     GPUGraphNode& operator=(GPUGraphNode const&) = delete;
     GPUGraphNode& operator=(GPUGraphNode&& rhs);
 
-    void SetOutputNode(GPUGraphNode* outputProxy);
-    GPUResourceDescriptor* RequestOutputResource(std::string const& semantics) const;
+    void ImportRootSignature(GPURootSignature const& rootSignature);
+    void ImportPipelineState(GPUPipelineState const& pipelineState);
 
-    void ImportResources(GPUGraphNode const& input);
+    // For now, only one child is available.
+    void ImportChildNode(GPUGraphNode* outputNode);
+
     void Process();
 
 private:
@@ -30,11 +34,12 @@ private:
     void SubmitProcessing();
     void TriggerChildren();
 
-    GPUEngine* executionEngine_;
+    GPUEngine* executionEngine_ = nullptr;
 
-    GPURootSignature* rootSignature_;
-    GPUPipelineState* pipelineState_;
+    GPURootSignature* rootSignature_ = nullptr;
+    GPUPipelineState* pipelineState_ = nullptr;
 
-    GPUGraphNode* output_;
+    GPUGraphNode* childNode_ = nullptr;
 
+    UINT64 frameIndex_ = 0ULL;
 };

@@ -8,10 +8,13 @@ class GPUFrameRootTablesMap
 {
 public:
     using StateAndResource = std::pair<D3D12_RESOURCE_STATES, GPUResource*>;
+    
+    template<typename T>
+    using FramesCollection = std::vector<T>;
 
     GPUFrameRootTablesMap();
-    GPUFrameRootTablesMap(UINT frameCount, std::vector<std::vector<GPUFrameResourceDescriptor>> const& map, std::vector<std::vector<StateAndResource>> const& describedResources);
-    GPUFrameRootTablesMap(UINT frameCount, std::vector<std::vector<GPUFrameResourceDescriptor>>&& map, std::vector<std::vector<StateAndResource>>&& describedResources);
+    GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor> const& map, FramesCollection<std::vector<StateAndResource>> const& describedResources);
+    GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor>&& map, FramesCollection<std::vector<StateAndResource>>&& describedResources);
     GPUFrameRootTablesMap(GPUFrameRootTablesMap const&);
     GPUFrameRootTablesMap(GPUFrameRootTablesMap&&);
 
@@ -24,10 +27,11 @@ public:
     UINT TableSize() const;
     UINT DescribedResourceCount(UINT frameIndex) const;
     GPUResource* DescribedResource(UINT frameIndex, UINT resourceIndex);
-    D3D12_RESOURCE_STATES DescribedResourceState(UINT frameIndex, UINT resourceIndex) const;
+    D3D12_RESOURCE_STATES DescribedResourceTargetState(UINT frameIndex, UINT resourceIndex) const;
+    D3D12_RESOURCE_STATES DescribedResourceCurrentState(UINT frameIndex, UINT resourceIndex) const;
 
 private:
-    UINT frameCount_;
+    UINT frameCount_ = 0U;
 
     // Descriptor tables are binded separately with binding points.
     // If root signature id described with more than one table, so they are binded
@@ -35,8 +39,10 @@ private:
     // Other parts of root signature (such as solo root descriptors and root constants) are also
     // dependant on this continuity.
     // Example: https://habrahabr.ru/company/intel/blog/277121/
-    std::vector<std::vector<GPUFrameResourceDescriptor>> descriptorTable_;
+    std::vector<GPUFrameResourceDescriptor> descriptorTable_;
 
     // vector of vectors: first level is about frame buffering.
-    std::vector<std::vector<StateAndResource>> describedResources_;
+    // First item in pair describes target state for the resouce.
+    // Current state lies inside of the second pair item.
+    FramesCollection<std::vector<StateAndResource>> describedResources_;
 };
