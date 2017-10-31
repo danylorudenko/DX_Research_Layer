@@ -155,6 +155,9 @@
     <ClInclude Include="include\Data\GPUFrameRootTablesMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Data\GPURenderItem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\triangle_shader.hlsl" />

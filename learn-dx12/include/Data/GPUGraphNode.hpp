@@ -6,6 +6,12 @@
 #include <Data\GPURootSignature.hpp>
 #include <Data\GPUPipelineState.hpp>
 
+enum GRAPH_NODE_TYPE
+{
+    GPAPH_NODE_TYPE_GRAPHICS,
+    GRAPH_NODE_TYPE_COMPUTE
+};
+
 class GPUGraphNode
 {
 public:
@@ -13,7 +19,7 @@ public:
     using FrameCollection = std::vector<T>;
 
     GPUGraphNode();
-    GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState);
+    GPUGraphNode(GRAPH_NODE_TYPE type, GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState);
     GPUGraphNode(GPUGraphNode const&) = delete;
     GPUGraphNode(GPUGraphNode&& rhs);
 
@@ -31,8 +37,11 @@ public:
 private:
     void SetRootSignature();
     void TransitionResources();
-    void SubmitProcessing();
+    void SubmitComputeProcessing(UINT dimentionX, UINT dimentionY, UINT dimentionZ);
+    void SubmitGraphicsProcessing();
     void TriggerChildren();
+
+    GRAPH_NODE_TYPE nodeType_;
 
     GPUEngine* executionEngine_ = nullptr;
 

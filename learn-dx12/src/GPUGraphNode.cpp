@@ -2,7 +2,8 @@
 
 GPUGraphNode::GPUGraphNode() = default;
 
-GPUGraphNode::GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState) :
+GPUGraphNode::GPUGraphNode(GRAPH_NODE_TYPE type, GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState) :
+    nodeType_(type),
     executionEngine_(engine),
     rootSignature_(rootSignature),
     pipelineState_(pipelineState)
@@ -23,7 +24,17 @@ void GPUGraphNode::Process()
 {
     SetRootSignature();
     TransitionResources();
-    SubmitProcessing();
+
+    switch (nodeType_) {
+    case GPAPH_NODE_TYPE_GRAPHICS:
+        // Regular rendering.
+
+        break;
+    case GRAPH_NODE_TYPE_COMPUTE:
+        // Compute dispatching.
+
+        break;
+    }
 
     TriggerChildren();
 }
@@ -36,7 +47,7 @@ void GPUGraphNode::TriggerChildren()
 void GPUGraphNode::SetRootSignature()
 {
     rootSignature_->SetRootSignature(executionEngine_);
-    rootSignature_->SetRootSignatureDescriptorTables(executionEngine_, frameIndex_);
+    rootSignature_->SetPassRootSignatureDescriptorTables(executionEngine_, frameIndex_);
 }
 
 void GPUGraphNode::TransitionResources()

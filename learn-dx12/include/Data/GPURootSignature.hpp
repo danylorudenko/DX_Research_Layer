@@ -21,15 +21,15 @@ public:
     ID3D12RootSignature* Get() const { return rootSignature_.Get(); }
 
     // This is done during graph setup.
-    void ImportFrameRootDescriptorTable(GPUFrameRootTablesMap const& descriptorTable);
+    void ImportPassFrameRootDescriptorTable(GPUFrameRootTablesMap const& descriptorTable);
     
     void SetRootSignature(GPUEngine* executionEngine);
-    void SetRootSignatureDescriptorTables(GPUEngine* executionEngine, UINT frameIndex);
+    void SetPassRootSignatureDescriptorTables(GPUEngine* executionEngine, UINT frameIndex);
     void TransitionRootResources(GPUEngine* executionEngine, UINT frameIndex);
 
 private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
 
     // Actually, collection of descriptors on the start of the table and resources these tables describe.
-    GPUFrameRootTablesMap rootDescriptorTablesMap_;
+    GPUFrameRootTablesMap passRootDescriptorTablesMap_;
 };
