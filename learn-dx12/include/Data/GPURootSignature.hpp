@@ -23,7 +23,7 @@ public:
     // This is done during graph setup.
     void ImportPassFrameRootDescriptorTable(GPUFrameRootTablesMap const& descriptorTable);
     
-    void SetRootSignature(GPUEngine* executionEngine);
+    void SetPassRootSignature(GPUEngine* executionEngine);
     void SetPassRootSignatureDescriptorTables(GPUEngine* executionEngine, UINT frameIndex);
     void TransitionRootResources(GPUEngine* executionEngine, UINT frameIndex);
 

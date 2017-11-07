@@ -178,6 +178,7 @@
     <ClCompile Include="src\GPUCommandList.cpp" />
     <ClCompile Include="src\GPUCommandQueue.cpp" />
     <ClCompile Include="src\GPUFence.cpp" />
+    <ClCompile Include="src\GPUGraphicsGraphNode.cpp" />
     <ClCompile Include="src\GPUGraphNode.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />

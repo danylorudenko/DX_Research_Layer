@@ -75,6 +75,9 @@
     <ClCompile Include="src\GPUFrameRootTablesMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUGraphicsGraphNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">

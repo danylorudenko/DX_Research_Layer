@@ -29,13 +29,13 @@ void GPUGraphNode::ImportPipelineState(GPUPipelineState* pipelineState)
     pipelineState_ = pipelineState;
 }
 
-void GPUGraphNode::SetRootSignature()
+void GPUGraphNode::SetPassRootSignature()
 {
-    rootSignature_->SetRootSignature(executionEngine_);
+    rootSignature_->SetPassRootSignature(executionEngine_);
     rootSignature_->SetPassRootSignatureDescriptorTables(executionEngine_, frameIndex_);
 }
 
-void GPUGraphNode::TransitionResources()
+void GPUGraphNode::TransitionPassResources()
 {
     rootSignature_->TransitionRootResources(executionEngine_, frameIndex_);
 }

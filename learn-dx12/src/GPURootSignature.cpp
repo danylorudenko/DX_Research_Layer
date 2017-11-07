@@ -17,7 +17,7 @@ void GPURootSignature::ImportPassFrameRootDescriptorTable(GPUFrameRootTablesMap 
     passRootDescriptorTablesMap_ = descriptorTable;
 }
 
-void GPURootSignature::SetRootSignature(GPUEngine* executionEngine)
+void GPURootSignature::SetPassRootSignature(GPUEngine* executionEngine)
 {
     executionEngine->Commit().SetGraphicsRootSignature(rootSignature_.Get());
 }

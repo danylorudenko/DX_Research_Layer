@@ -25,9 +25,9 @@ public:
 
     virtual void Process() = 0;
 
-private:
-    void SetRootSignature();
-    void TransitionResources();
+protected:
+    void SetPassRootSignature();
+    void TransitionPassResources();
 
     GPUEngine* executionEngine_ = nullptr;
 
