@@ -6,42 +6,28 @@
 #include <Data\GPURootSignature.hpp>
 #include <Data\GPUPipelineState.hpp>
 
-enum GRAPH_NODE_TYPE
-{
-    GPAPH_NODE_TYPE_GRAPHICS,
-    GRAPH_NODE_TYPE_COMPUTE
-};
-
 class GPUGraphNode
 {
 public:
-    template<typename T>
-    using FrameCollection = std::vector<T>;
-
     GPUGraphNode();
-    GPUGraphNode(GRAPH_NODE_TYPE type, GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState);
+    GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState);
     GPUGraphNode(GPUGraphNode const&) = delete;
     GPUGraphNode(GPUGraphNode&& rhs);
 
     GPUGraphNode& operator=(GPUGraphNode const&) = delete;
     GPUGraphNode& operator=(GPUGraphNode&& rhs);
 
-    void ImportRootSignature(GPURootSignature const& rootSignature);
-    void ImportPipelineState(GPUPipelineState const& pipelineState);
+    void ImportRootSignature(GPURootSignature* rootSignature);
+    void ImportPipelineState(GPUPipelineState* pipelineState);
 
     // For now, only one child is available.
     void ImportChildNode(GPUGraphNode* outputNode);
 
-    void Process();
+    virtual void Process() = 0;
 
 private:
     void SetRootSignature();
     void TransitionResources();
-    void SubmitComputeProcessing(UINT dimentionX, UINT dimentionY, UINT dimentionZ);
-    void SubmitGraphicsProcessing();
-    void TriggerChildren();
-
-    GRAPH_NODE_TYPE nodeType_;
 
     GPUEngine* executionEngine_ = nullptr;
 

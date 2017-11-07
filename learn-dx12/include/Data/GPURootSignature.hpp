@@ -5,7 +5,7 @@
 #include <Rendering\GPUEngine.hpp>
 #include <Data\GPUFrameResourceDescriptor.hpp>
 #include <Data\GPUFrameRootTablesMap.hpp>
-#include <Data\GPUGraphNode.hpp>
+#include <Data\FrameGraph\GPUGraphNode.hpp>
 
 class GPURootSignature
 {

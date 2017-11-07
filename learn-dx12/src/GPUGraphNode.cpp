@@ -1,9 +1,8 @@
-#include <Data\GPUGraphNode.hpp>
+#include <Data\FrameGraph\GPUGraphNode.hpp>
 
 GPUGraphNode::GPUGraphNode() = default;
 
-GPUGraphNode::GPUGraphNode(GRAPH_NODE_TYPE type, GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState) :
-    nodeType_(type),
+GPUGraphNode::GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState) :
     executionEngine_(engine),
     rootSignature_(rootSignature),
     pipelineState_(pipelineState)
@@ -20,28 +19,14 @@ void GPUGraphNode::ImportChildNode(GPUGraphNode* outputProxy)
     childNode_ = outputProxy;
 }
 
-void GPUGraphNode::Process()
+void GPUGraphNode::ImportRootSignature(GPURootSignature* rootSignature)
 {
-    SetRootSignature();
-    TransitionResources();
-
-    switch (nodeType_) {
-    case GPAPH_NODE_TYPE_GRAPHICS:
-        // Regular rendering.
-
-        break;
-    case GRAPH_NODE_TYPE_COMPUTE:
-        // Compute dispatching.
-
-        break;
-    }
-
-    TriggerChildren();
+    rootSignature_ = rootSignature;
 }
 
-void GPUGraphNode::TriggerChildren()
+void GPUGraphNode::ImportPipelineState(GPUPipelineState* pipelineState)
 {
-    childNode_->Process();
+    pipelineState_ = pipelineState;
 }
 
 void GPUGraphNode::SetRootSignature()
