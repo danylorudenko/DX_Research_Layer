@@ -21,5 +21,14 @@ void GPUGraphicsGraphNode::Process()
     SetPassRootSignature();
     TransitionPassResources();
 
-    // LALALALAL
+    IterateRenderItems();
+}
+
+void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item)
+{
+    auto const resCount = item.perItemResourceDescriptors_.size();
+    for (size_t i = 0; i < resCount; i++) {
+
+    }
+    
 }

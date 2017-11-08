@@ -21,6 +21,11 @@ public:
 private:
     void IterateRenderItems();
 
+    void BindRenderItemRootResources(GPURenderItem& item);
+    void BindRenderItemVertexBuffer(GPURenderItem& item);
+    void BindRenderItemIndexBuffer(GPURenderItem& item);
+
+
     std::vector<GPURenderItem> renderItems_;
     
 };
