@@ -7,10 +7,10 @@
 class GPURenderItem
 {
 public:
-    GPUFrameResourceDescriptor vertexBufferDescriptor_;
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferDescriptor_;
     UINT vertexCount_;
 
-    GPUFrameResourceDescriptor indexBufferDescriptor_;
+    D3D12_INDEX_BUFFER_VIEW indexBufferDescriptor_;
     UINT indexCount_;
 
     using BindPointDescriptorPair = std::pair<UINT, GPUFrameResourceDescriptor>;

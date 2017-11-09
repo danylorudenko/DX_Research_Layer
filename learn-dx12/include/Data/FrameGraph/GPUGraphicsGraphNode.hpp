@@ -25,7 +25,6 @@ private:
     void BindRenderItemVertexBuffer(GPURenderItem& item);
     void BindRenderItemIndexBuffer(GPURenderItem& item);
 
-
     std::vector<GPURenderItem> renderItems_;
     
 };

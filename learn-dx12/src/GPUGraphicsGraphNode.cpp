@@ -24,11 +24,33 @@ void GPUGraphicsGraphNode::Process()
     IterateRenderItems();
 }
 
+void GPUGraphicsGraphNode::IterateRenderItems()
+{
+    auto const itemCount = renderItems_.size();
+    for (size_t i = 0; i < itemCount; i++) {
+        auto item = renderItems_[i];
+        BindRenderItemIndexBuffer(item);
+        BindRenderItemVertexBuffer(item);
+        BindRenderItemRootResources(item);
+    }
+}
+
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item)
 {
     auto const resCount = item.perItemResourceDescriptors_.size();
     for (size_t i = 0; i < resCount; i++) {
-
+        //item.perItemResourceDescriptors_[i].second
+        auto resDesc = item.perItemResourceDescriptors_[i];
+        executionEngine_->Commit().SetGraphicsRootDescriptorTable(resDesc.first, resDesc.second.GPUViewHandle(frameIndex_));
     }
-    
+}
+
+void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)
+{
+    executionEngine_->Commit().IASetVertexBuffers(0, 1, &item.vertexBufferDescriptor_);
+}
+
+void GPUGraphicsGraphNode::BindRenderItemIndexBuffer(GPURenderItem& item)
+{
+    executionEngine_->Commit().IASetIndexBuffer(&item.indexBufferDescriptor_);
 }
