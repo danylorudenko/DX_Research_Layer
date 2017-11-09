@@ -29,14 +29,23 @@ void GPUGraphNode::ImportPipelineState(GPUPipelineState* pipelineState)
     pipelineState_ = pipelineState;
 }
 
+bool GPUGraphNode::SynchronizeFrames(UINT64 frameIndex) {
+    if (frameIndex < lastFrameIndex_) {
+        lastFrameIndex_ = frameIndex;
+        return true;
+    }
+    
+    return false;
+}
+
 void GPUGraphNode::SetPassRootSignature()
 {
     rootSignature_->SetPassRootSignature(executionEngine_);
-    rootSignature_->SetPassRootSignatureDescriptorTables(executionEngine_, frameIndex_);
+    rootSignature_->SetPassRootSignatureDescriptorTables(executionEngine_, lastFrameIndex_);
 }
 
 void GPUGraphNode::TransitionPassResources()
 {
-    rootSignature_->TransitionRootResources(executionEngine_, frameIndex_);
+    rootSignature_->TransitionRootResources(executionEngine_, lastFrameIndex_);
 }
 

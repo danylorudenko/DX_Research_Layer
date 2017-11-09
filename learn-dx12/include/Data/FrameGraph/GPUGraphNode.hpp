@@ -23,9 +23,11 @@ public:
     // For now, only one child is available.
     void ImportChildNode(GPUGraphNode* outputNode);
 
-    virtual void Process() = 0;
+    virtual void Process(UINT64 frameIndex) = 0;
 
 protected:
+    bool SynchronizeFrames(UINT64 frameIndex);
+
     void SetPassRootSignature();
     void TransitionPassResources();
 
@@ -36,5 +38,5 @@ protected:
 
     GPUGraphNode* childNode_ = nullptr;
 
-    UINT64 frameIndex_ = 0ULL;
+    UINT64 lastFrameIndex_ = 0ULL;
 };

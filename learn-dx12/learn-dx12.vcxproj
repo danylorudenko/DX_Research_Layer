@@ -194,7 +194,7 @@
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Data\FrameGraph\GPUComputeGraphNode.hpp" />
     <ClInclude Include="include\Data\FrameGraph\GPUGraphicsGraphNode.hpp" />
-    <ClInclude Include="include\Data\FrameGraph\GPUPresentNode.hpp" />
+    <ClInclude Include="include\Data\FrameGraph\GPUPresentGraphNode.hpp" />
     <ClInclude Include="include\Data\GPUFrameResourceDescriptor.hpp" />
     <ClInclude Include="include\Data\GPUFrameRootTablesMap.hpp" />
     <ClInclude Include="include\Data\FrameGraph\GPUFrameGraph.hpp" />

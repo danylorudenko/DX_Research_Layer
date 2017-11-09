@@ -16,7 +16,7 @@ public:
     GPUGraphicsGraphNode& operator=(GPUGraphicsGraphNode const&) = delete;
     GPUGraphicsGraphNode& operator=(GPUGraphicsGraphNode&& rhs);
 
-    virtual void Process() override;
+    virtual void Process(UINT64 frameIndex) override;
 
 private:
     void IterateRenderItems();

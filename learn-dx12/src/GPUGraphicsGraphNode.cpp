@@ -16,12 +16,14 @@ GPUGraphicsGraphNode& GPUGraphicsGraphNode::operator=(GPUGraphicsGraphNode&& rhs
     return *this;
 }
 
-void GPUGraphicsGraphNode::Process()
+void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
 {
-    SetPassRootSignature();
-    TransitionPassResources();
+    if (SynchronizeFrames(frameIndex)) {
+        SetPassRootSignature();
+        TransitionPassResources();
 
-    IterateRenderItems();
+        IterateRenderItems();
+    }
 }
 
 void GPUGraphicsGraphNode::IterateRenderItems()
@@ -39,9 +41,8 @@ void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item)
 {
     auto const resCount = item.perItemResourceDescriptors_.size();
     for (size_t i = 0; i < resCount; i++) {
-        //item.perItemResourceDescriptors_[i].second
         auto resDesc = item.perItemResourceDescriptors_[i];
-        executionEngine_->Commit().SetGraphicsRootDescriptorTable(resDesc.first, resDesc.second.GPUViewHandle(frameIndex_));
+        executionEngine_->Commit().SetGraphicsRootDescriptorTable(resDesc.first, resDesc.second.GPUViewHandle(lastFrameIndex_));
     }
 }
 

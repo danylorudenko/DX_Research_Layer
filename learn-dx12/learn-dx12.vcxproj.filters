@@ -167,7 +167,7 @@
     <ClInclude Include="include\Data\FrameGraph\GPUComputeGraphNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\FrameGraph\GPUPresentNode.hpp">
+    <ClInclude Include="include\Data\FrameGraph\GPUPresentGraphNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
