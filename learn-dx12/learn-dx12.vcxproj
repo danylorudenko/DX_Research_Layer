@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
+    <ClCompile Include="src\GPUFrameGraph.cpp" />
     <ClCompile Include="src\GPUFrameResourceDescriptor.cpp" />
     <ClCompile Include="src\GPUFrameRootTablesMap.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
@@ -180,6 +181,8 @@
     <ClCompile Include="src\GPUFence.cpp" />
     <ClCompile Include="src\GPUGraphicsGraphNode.cpp" />
     <ClCompile Include="src\GPUGraphNode.cpp" />
+    <ClCompile Include="src\GPUPipelineState.cpp" />
+    <ClCompile Include="src\GPUPresentGraphNode.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUUploadHeap.cpp" />
@@ -192,19 +195,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\d3dx12.h" />
-    <ClInclude Include="include\Data\FrameGraph\GPUComputeGraphNode.hpp" />
-    <ClInclude Include="include\Data\FrameGraph\GPUGraphicsGraphNode.hpp" />
-    <ClInclude Include="include\Data\FrameGraph\GPUPresentGraphNode.hpp" />
-    <ClInclude Include="include\Data\GPUFrameResourceDescriptor.hpp" />
-    <ClInclude Include="include\Data\GPUFrameRootTablesMap.hpp" />
-    <ClInclude Include="include\Data\FrameGraph\GPUFrameGraph.hpp" />
-    <ClInclude Include="include\Data\GPUFrameResource.hpp" />
-    <ClInclude Include="include\Data\GeometryMesh.hpp" />
-    <ClInclude Include="include\Data\GPUPipelineState.hpp" />
-    <ClInclude Include="include\Data\GPURenderItem.hpp" />
-    <ClInclude Include="include\Data\GPUResource.hpp" />
-    <ClInclude Include="include\Data\GPURootSignature.hpp" />
-    <ClInclude Include="include\Data\GPUUploadHeap.hpp" />
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp" />
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp" />
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUFrameResourceDescriptor.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUFrameRootTablesMap.hpp" />
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUFrameGraph.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUFrameResource.hpp" />
+    <ClInclude Include="include\Rendering\Data\GeometryMesh.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUPipelineState.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPURenderItem.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUResource.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPURootSignature.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUUploadHeap.hpp" />
     <ClInclude Include="include\Math\Camera.hpp" />
     <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />
@@ -214,12 +217,12 @@
     <ClInclude Include="include\Rendering\GPUCommandQueue.hpp" />
     <ClInclude Include="include\Rendering\GPUFence.hpp" />
     <ClInclude Include="include\Rendering\GPUEngine.hpp" />
-    <ClInclude Include="include\Data\FrameGraph\GPUGraphNode.hpp" />
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphNode.hpp" />
     <ClInclude Include="include\Utility\Application.hpp" />
     <ClInclude Include="include\Utility\DirectAppDelegate.hpp" />
     <ClInclude Include="include\Utility\PerformanceTimer.hpp" />
-    <ClInclude Include="include\Data\SceneConstantBuffer.hpp" />
-    <ClInclude Include="include\Data\Vertex.hpp" />
+    <ClInclude Include="include\Rendering\Data\SceneConstantBuffer.hpp" />
+    <ClInclude Include="include\Rendering\Data\Vertex.hpp" />
     <ClInclude Include="include\Utility\Window.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -78,6 +78,15 @@
     <ClCompile Include="src\GPUGraphicsGraphNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUPresentGraphNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUPipelineState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUFrameGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">
@@ -95,19 +104,7 @@
     <ClInclude Include="include\d3dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\Vertex.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Data\SceneConstantBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Utility\PerformanceTimer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Data\GPUResource.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Data\GPUUploadHeap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\GPUCommandQueue.hpp">
@@ -128,46 +125,58 @@
     <ClInclude Include="include\Rendering\GPUEngine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\GeometryMesh.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Data\GPUFrameResource.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Math\Transform.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Math\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\GPURootSignature.hpp">
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\GPUPipelineState.hpp">
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUFrameGraph.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\GPUFrameResourceDescriptor.hpp">
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\GPUFrameRootTablesMap.hpp">
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\GPURenderItem.hpp">
+    <ClInclude Include="include\Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\FrameGraph\GPUFrameGraph.hpp">
+    <ClInclude Include="include\Rendering\Data\GeometryMesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\FrameGraph\GPUGraphNode.hpp">
+    <ClInclude Include="include\Rendering\Data\GPUFrameResource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\FrameGraph\GPUGraphicsGraphNode.hpp">
+    <ClInclude Include="include\Rendering\Data\GPUFrameResourceDescriptor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\FrameGraph\GPUComputeGraphNode.hpp">
+    <ClInclude Include="include\Rendering\Data\GPUFrameRootTablesMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Data\FrameGraph\GPUPresentGraphNode.hpp">
+    <ClInclude Include="include\Rendering\Data\GPUPipelineState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\GPURenderItem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\GPUResource.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\GPURootSignature.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\GPUUploadHeap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\SceneConstantBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\Vertex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

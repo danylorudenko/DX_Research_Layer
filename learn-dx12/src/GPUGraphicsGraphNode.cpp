@@ -37,6 +37,21 @@ void GPUGraphicsGraphNode::IterateRenderItems()
     }
 }
 
+void GPUGraphicsGraphNode::SetRenderTargets(std::vector<GPUFrameResourceDescriptor> const& renderTargets)
+{
+    renderTargets_ = renderTargets;
+}
+
+void GPUGraphicsGraphNode::SetRenderTargets(std::vector<GPUFrameResourceDescriptor>&& renderTargets)
+{
+    renderTargets_ = std::move(renderTargets);
+}
+
+void GPUGraphicsGraphNode::SetDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor)
+{
+    depthStencilTarget_ = depthStencilDescriptor;
+}
+
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item)
 {
     auto const resCount = item.perItemResourceDescriptors_.size();

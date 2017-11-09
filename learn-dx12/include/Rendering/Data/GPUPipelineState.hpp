@@ -2,8 +2,6 @@
 
 #include <pch.hpp>
 
-#include <Data\GPUResourceDescriptor.hpp>
-
 class GPUPipelineState
 {
 public:
@@ -15,12 +13,6 @@ public:
     GPUPipelineState& operator=(GPUPipelineState const&) = delete;
     GPUPipelineState& operator=(GPUPipelineState&& rhs);
 
-    
-    void SetOutputResources(char const** semantics, GPUResource* resources, UINT const num);
-
 private:
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
-
-    std::vector<GPUResourceDescriptor> renderTargets_;
-    GPUResourceDescriptor depthStencilTarget_;
 };

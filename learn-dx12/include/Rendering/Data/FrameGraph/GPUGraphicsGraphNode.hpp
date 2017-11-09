@@ -16,6 +16,10 @@ public:
     GPUGraphicsGraphNode& operator=(GPUGraphicsGraphNode const&) = delete;
     GPUGraphicsGraphNode& operator=(GPUGraphicsGraphNode&& rhs);
 
+    void SetRenderTargets(std::vector<GPUFrameResourceDescriptor> const& renderTargets);
+    void SetRenderTargets(std::vector<GPUFrameResourceDescriptor>&& renderTargets);
+    void SetDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor);
+
     virtual void Process(UINT64 frameIndex) override;
 
 private:
@@ -26,5 +30,7 @@ private:
     void BindRenderItemIndexBuffer(GPURenderItem& item);
 
     std::vector<GPURenderItem> renderItems_;
-    
+
+    std::vector<GPUFrameResourceDescriptor> renderTargets_;
+    GPUFrameResourceDescriptor depthStencilTarget_;
 };
