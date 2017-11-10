@@ -1,4 +1,4 @@
-#include <Data\GPUResource.hpp>
+#include <Rendering\Data\GPUResource.hpp>
 
 GPUResource::GPUResource() = default;
 

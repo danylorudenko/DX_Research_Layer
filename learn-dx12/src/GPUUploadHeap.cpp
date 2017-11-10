@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Data\GPUUploadHeap.hpp>
+#include <Rendering\Data\GPUUploadHeap.hpp>
 
 GPUUploadHeap::GPUUploadHeap() = default;
 

@@ -3,9 +3,9 @@
 #include <pch.hpp>
 
 #include <Rendering\GPUEngine.hpp>
-#include <Data\GPUFrameResourceDescriptor.hpp>
-#include <Data\GPUFrameRootTablesMap.hpp>
-#include <Data\FrameGraph\GPUGraphNode.hpp>
+#include <Rendering\Data\GPUFrameResourceDescriptor.hpp>
+#include <Rendering\Data\GPUFrameRootTablesMap.hpp>
+#include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
 
 class GPURootSignature
 {

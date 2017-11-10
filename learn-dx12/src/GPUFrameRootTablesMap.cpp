@@ -1,4 +1,4 @@
-#include <Data\GPUFrameRootTablesMap.hpp>
+#include <Rendering\Data\GPUFrameRootTablesMap.hpp>
 
 GPUFrameRootTablesMap::GPUFrameRootTablesMap() = default;
 

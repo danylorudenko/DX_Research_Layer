@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Data\GPUResource.hpp>
+#include <Rendering\Data\GPUResource.hpp>
 
 class GPUFrameResource : public GPUResource
 {

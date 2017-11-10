@@ -5,7 +5,9 @@
 #include <Utility\Application.hpp>
 #include <Utility\PerformanceTimer.hpp>
 #include <Rendering\GPUAccess.hpp>
-#include <Data\GeometryMesh.hpp>
+#include <Rendering\Data\GeometryMesh.hpp>
+#include <Rendering\Data\GPUUploadHeap.hpp>
+#include <Rendering\Data\SceneConstantBuffer.hpp>
 
 class DirectAppDelegate : public Application::Delegate
 {

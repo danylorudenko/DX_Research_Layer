@@ -1,4 +1,4 @@
-#include <Data\FrameGraph\GPUGraphNode.hpp>
+#include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
 
 GPUGraphNode::GPUGraphNode() = default;
 
@@ -16,7 +16,7 @@ GPUGraphNode& GPUGraphNode::operator=(GPUGraphNode&&) = default;
 
 void GPUGraphNode::ImportChildNode(GPUGraphNode* outputProxy)
 {
-    childNode_ = outputProxy;
+    childNodes_.push_back(outputProxy);
 }
 
 void GPUGraphNode::ImportRootSignature(GPURootSignature* rootSignature)
@@ -27,6 +27,16 @@ void GPUGraphNode::ImportRootSignature(GPURootSignature* rootSignature)
 void GPUGraphNode::ImportPipelineState(GPUPipelineState* pipelineState)
 {
     pipelineState_ = pipelineState;
+}
+
+GPUGraphNode* GPUGraphNode::GetChild(int childIndex)
+{
+    return childNodes_[childIndex];
+}
+
+int GPUGraphNode::ChildCount() const
+{
+    return childNodes_.size();
 }
 
 bool GPUGraphNode::SynchronizeFrames(UINT64 frameIndex) {

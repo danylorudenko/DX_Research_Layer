@@ -1,4 +1,4 @@
-#include <Data\FrameGraph\GPUFrameGraph.hpp>
+#include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
 
 GPUFrameGraph::GPUFrameGraph() = default;
 
@@ -13,12 +13,3 @@ void GPUFrameGraph::AddParentNode(GPUGraphNode* parentNode)
     parentNodes_.push_back(parentNode);
 }
 
-void GPUFrameGraph::StartFrame()
-{
-    
-}
-
-void GPUFrameGraph::EndFrame()
-{
-    ++frameIndex_;
-}

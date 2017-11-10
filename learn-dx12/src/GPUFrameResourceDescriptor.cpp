@@ -1,4 +1,4 @@
-#include <Data\GPUFrameResourceDescriptor.hpp>
+#include <Rendering\Data\GPUFrameResourceDescriptor.hpp>
 
 GPUFrameResourceDescriptor::GPUFrameResourceDescriptor() = default;
 

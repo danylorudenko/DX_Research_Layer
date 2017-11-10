@@ -1,4 +1,4 @@
-#include <Data\GPUFrameResource.hpp>
+#include <Rendering\Data\GPUFrameResource.hpp>
 
 GPUFrameResource::GPUFrameResource() = default;
 

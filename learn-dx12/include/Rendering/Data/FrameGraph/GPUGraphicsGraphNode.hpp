@@ -2,8 +2,8 @@
 
 #include <pch.hpp>
 
-#include <Data\FrameGraph\GPUGraphNode.hpp>
-#include <Data\GPURenderItem.hpp>
+#include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
+#include <Rendering\Data\GPURenderItem.hpp>
 
 class GPUGraphicsGraphNode : public GPUGraphNode
 {

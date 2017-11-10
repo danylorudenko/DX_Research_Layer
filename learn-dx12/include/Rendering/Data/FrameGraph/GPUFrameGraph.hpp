@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Data\FrameGraph\GPUGraphNode.hpp>
+#include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
 
 class GPUFrameGraph
 {
@@ -18,9 +18,13 @@ public:
     void AddParentNode(GPUGraphNode* parentNode);
 
 private:
-    void StartFrame();
-    void EndFrame();
+    void SynchronizeFrames();
+    void CommitGraph();
+    void FinishFrame();
+
+    void ParseGraphToQueue();
 
     std::vector<GPUGraphNode*> parentNodes_;
     UINT64 frameIndex_ = 0ULL;
+    std::vector<GPUGraphNode*> parsedGraphList_;
 };

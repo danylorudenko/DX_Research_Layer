@@ -3,8 +3,8 @@
 #include <pch.hpp>
 
 #include <Rendering\GPUEngine.hpp>
-#include <Data\GPURootSignature.hpp>
-#include <Data\GPUPipelineState.hpp>
+#include <Rendering\Data\GPURootSignature.hpp>
+#include <Rendering\Data\GPUPipelineState.hpp>
 
 class GPUGraphNode
 {
@@ -23,6 +23,9 @@ public:
     // For now, only one child is available.
     void ImportChildNode(GPUGraphNode* outputNode);
 
+    GPUGraphNode* GetChild(int childIndex);
+    int ChildCount() const;
+
     virtual void Process(UINT64 frameIndex) = 0;
 
 protected:
@@ -36,7 +39,7 @@ protected:
     GPURootSignature* rootSignature_ = nullptr;
     GPUPipelineState* pipelineState_ = nullptr;
 
-    GPUGraphNode* childNode_ = nullptr;
+    std::vector<GPUGraphNode*> childNodes_;
 
     UINT64 lastFrameIndex_ = 0ULL;
 };

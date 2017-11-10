@@ -1,4 +1,4 @@
-#include <Data\FrameGraph\GPUGraphicsGraphNode.hpp>
+#include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 
 GPUGraphicsGraphNode::GPUGraphicsGraphNode() = default;
 

@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Data\GPUFrameResourceDescriptor.hpp>
+#include <Rendering\Data\GPUFrameResourceDescriptor.hpp>
 
 class GPURenderItem
 {
