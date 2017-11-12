@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
+#include <stack>
 
 #include <Windows.h>
 #include <wrl.h>
@@ -18,8 +20,8 @@
 
 #include <d3dcompiler.h>
 
-#include <Data\Vertex.hpp>
-#include <Data\SceneConstantBuffer.hpp>
+#include <Rendering\Data\Vertex.hpp>
+#include <Rendering\Data\SceneConstantBuffer.hpp>
 
 #ifndef ThrowIfFailed
 

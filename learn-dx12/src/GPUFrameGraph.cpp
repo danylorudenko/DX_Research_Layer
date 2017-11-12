@@ -13,3 +13,7 @@ void GPUFrameGraph::AddParentNode(GPUGraphNode* parentNode)
     parentNodes_.push_back(parentNode);
 }
 
+void GPUFrameGraph::ParseGraphToQueue()
+{
+    std::set<GPUGraphNode*> visitedNodes;
+}
