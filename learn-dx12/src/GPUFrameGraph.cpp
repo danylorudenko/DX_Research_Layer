@@ -17,14 +17,23 @@ void GPUFrameGraph::ParseGraphToQueue()
 {
     // Clear obsolete parsed graph
     parsedGraphList_.clear();
-    
     std::set<GPUGraphNode*> visitedNodes;
-    auto const parentNodesCount = parentNodes_.size();
-    for (size_t i = 0; i < parentNodesCount; i++) {
-        visitedNodes.insert(parentNodes_[i]);
-        parsedGraphList_.push_back(parentNodes_[i]);
+
+    auto const parentsCount = parentNodes_.size();
+    for (size_t i = 0; i < parentsCount; i++) {
+        RecursiveNodeParserService(parentNodes_[i], visitedNodes);
     }
 
     // TODO
     // NOT COMPLETE
+}
+
+void GPUFrameGraph::RecursiveNodeParserService(GPUGraphNode* node, std::set<GPUGraphNode*>& visitedNodes)
+{
+    auto const nodeChildCount = node->ChildCount();
+    for (size_t i = 0; i < nodeChildCount; i++) {
+        RecursiveNodeParserService(node->GetChild(i), visitedNodes);
+    }
+
+
 }

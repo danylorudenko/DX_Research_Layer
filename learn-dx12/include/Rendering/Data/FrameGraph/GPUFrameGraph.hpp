@@ -24,6 +24,8 @@ private:
 
     void ParseGraphToQueue();
 
+    void RecursiveNodeParserService(GPUGraphNode* node, std::set<GPUGraphNode*>& visitedNodes);
+
     std::vector<GPUGraphNode*> parentNodes_;
     UINT64 frameIndex_ = 0ULL;
     std::vector<GPUGraphNode*> parsedGraphList_;
