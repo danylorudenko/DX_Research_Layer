@@ -28,6 +28,16 @@ void GPUFrameGraph::ParseGraphToQueue()
     std::reverse(parsedGraphList_.begin(), parsedGraphList_.end());
 }
 
+GPUFrameGraph::GraphIterator GPUFrameGraph::GraphQueueStart()
+{
+    return parsedGraphList_.begin();
+}
+
+GPUFrameGraph::GraphIterator GPUFrameGraph::GraphQueueEnd()
+{
+    return parsedGraphList_.end();
+}
+
 void GPUFrameGraph::RecursiveNodeParserService(GPUGraphNode* node, std::set<GPUGraphNode*>& visitedNodes)
 {
     visitedNodes.emplace(node);
