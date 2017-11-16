@@ -198,6 +198,7 @@
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUFrameDescriptorHeap.hpp" />
     <ClInclude Include="include\Rendering\Data\GPUFrameResourceDescriptor.hpp" />
     <ClInclude Include="include\Rendering\Data\GPUFrameRootTablesMap.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUFrameGraph.hpp" />
