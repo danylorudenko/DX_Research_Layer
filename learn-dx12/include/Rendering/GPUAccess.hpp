@@ -4,9 +4,9 @@
 
 #include <Utility\Application.hpp>
 #include <Rendering\GPUEngine.hpp>
-#include <Data\GPUFrameResource.hpp>
-#include <Data\GPUResource.hpp>
-#include <Data\GPUUploadHeap.hpp>
+#include <Rendering\Data\GPUFrameResource.hpp>
+#include <Rendering\Data\GPUResource.hpp>
+#include <Rendering\Data\GPUUploadHeap.hpp>
 
 class GPUAccess
 {
