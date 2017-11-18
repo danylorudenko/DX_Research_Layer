@@ -87,6 +87,9 @@
     <ClCompile Include="src\GPUFrameGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUDescriptorHeap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">
@@ -179,7 +182,7 @@
     <ClInclude Include="include\Rendering\Data\Vertex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\GPUFrameDescriptorHeap.hpp">
+    <ClInclude Include="include\Rendering\Data\GPUDescriptorHeap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

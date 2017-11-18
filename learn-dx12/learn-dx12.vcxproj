@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
+    <ClCompile Include="src\GPUDescriptorHeap.cpp" />
     <ClCompile Include="src\GPUFrameGraph.cpp" />
     <ClCompile Include="src\GPUFrameResourceDescriptor.cpp" />
     <ClCompile Include="src\GPUFrameRootTablesMap.cpp" />
@@ -198,7 +199,7 @@
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp" />
-    <ClInclude Include="include\Rendering\Data\GPUFrameDescriptorHeap.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUDescriptorHeap.hpp" />
     <ClInclude Include="include\Rendering\Data\GPUFrameResourceDescriptor.hpp" />
     <ClInclude Include="include\Rendering\Data\GPUFrameRootTablesMap.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUFrameGraph.hpp" />
