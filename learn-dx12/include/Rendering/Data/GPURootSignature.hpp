@@ -2,10 +2,10 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUEngine.hpp>
 #include <Rendering\Data\GPUFrameResourceDescriptor.hpp>
 #include <Rendering\Data\GPUFrameRootTablesMap.hpp>
-#include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
+
+class GPUEngine;
 
 class GPURootSignature
 {

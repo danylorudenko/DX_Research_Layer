@@ -67,9 +67,9 @@ void GPUDescriptorHeap::Reset()
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(std::vector<GPUResource*> resources,
                                                              D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
-                                                             D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
-                                                             char const* semantics = "default",
-                                                             int frameCount = 1U)
+                                                             D3D12_RESOURCE_STATES state,
+                                                             char const* semantics,
+                                                             int frameCount)
 {
     assert(frameCount <= 3 && "More frames for descriptors is not currently allowed.");
     
@@ -86,9 +86,9 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(std::vector<GPUReso
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(std::vector<GPUResource*> resources,
                                                              D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
-                                                             D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
-                                                             char const* semantics = "default",
-                                                             int frameCount = 1U)
+                                                             D3D12_RESOURCE_STATES state,
+                                                             char const* semantics,
+                                                             int frameCount)
 {
     assert(frameCount <= 3 && "More frames for descriptors is not currently allowed.");
 
@@ -105,9 +105,9 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(std::vector<GPUReso
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(std::vector<GPUResource*> resources,
                                                              D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
-                                                             D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
-                                                             char const* semantics = "default",
-                                                             int frameCount = 1U)
+                                                             D3D12_RESOURCE_STATES state,
+                                                             char const* semantics,
+                                                             int frameCount)
 {
     assert(frameCount <= 3 && "More frames for descriptors is not currently allowed.");
 
@@ -124,9 +124,9 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(std::vector<GPUReso
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(std::vector<GPUResource*> resources,
                                                              D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
-                                                             D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
-                                                             char const* semantics = "default",
-                                                             int frameCount = 1U)
+                                                             D3D12_RESOURCE_STATES state,
+                                                             char const* semantics,
+                                                             int frameCount)
 {
     assert(frameCount <= 3 && "More frames for descriptors is not currently allowed.");
 
@@ -143,9 +143,9 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(std::vector<GPUReso
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(std::vector<GPUResource*> resources,
                                                              D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
-                                                             D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
-                                                             char const* semantics = "default",
-                                                             int frameCount = 1U)
+                                                             D3D12_RESOURCE_STATES state,
+                                                             char const* semantics,
+                                                             int frameCount)
 {
     assert(frameCount <= 3 && "More frames for descriptors in not currently allowed.");
 

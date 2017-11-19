@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Data\FrameGraph\GPUGraphNode.hpp>
+#include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
 
 class GPUPresentGraphNode : public GPUGraphNode
 {

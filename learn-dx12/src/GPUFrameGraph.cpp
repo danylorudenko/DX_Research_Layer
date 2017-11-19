@@ -2,8 +2,6 @@
 
 GPUFrameGraph::GPUFrameGraph() = default;
 
-GPUFrameGraph::GPUFrameGraph(GPUFrameGraph const& rhs) = default;
-
 GPUFrameGraph::GPUFrameGraph(GPUFrameGraph&& rhs) = default;
 
 GPUFrameGraph& GPUFrameGraph::operator=(GPUFrameGraph&& rhs) = default;
@@ -44,7 +42,7 @@ void GPUFrameGraph::RecursiveNodeParserService(GPUGraphNode* node, std::set<GPUG
 
     int nonVisitedChildren = 0;
     auto const nodeChildCount = node->ChildCount();
-    for (size_t i = 0; i < nodeChildCount; i++) {
+    for (int i = 0; i < nodeChildCount; i++) {
         auto nodeIterator = visitedNodes.find(node);
         // If node is not found == not visited.
         if (nodeIterator != visitedNodes.end()) {

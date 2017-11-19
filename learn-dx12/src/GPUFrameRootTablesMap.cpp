@@ -30,12 +30,12 @@ D3D12_GPU_DESCRIPTOR_HANDLE GPUFrameRootTablesMap::DescirptorTableGPUHandle(UINT
 
 UINT GPUFrameRootTablesMap::TableSize() const
 {
-    return descriptorTable_.size();
+    return static_cast<UINT>(descriptorTable_.size());
 }
 
 UINT GPUFrameRootTablesMap::DescribedResourceCount(UINT frameIndex) const
 {
-    return describedResources_[frameIndex].size();
+    return static_cast<UINT>(describedResources_[frameIndex].size());
 }
 
 GPUResource* GPUFrameRootTablesMap::DescribedResource(UINT frameIndex, UINT resourceIndex)

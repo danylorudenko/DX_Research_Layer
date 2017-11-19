@@ -1,4 +1,4 @@
-#include <Data\GPUPipelineState.hpp>
+#include <Rendering\Data\GPUPipelineState.hpp>
 
 GPUPipelineState::GPUPipelineState() = default;
 

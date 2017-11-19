@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include <Utility\DirectAppDelegate.hpp>
-#include <Data\GPUUploadHeap.hpp>
+#include <Rendering\Data\GPUUploadHeap.hpp>
 
 void DirectAppDelegate::start(Application& application)
 {

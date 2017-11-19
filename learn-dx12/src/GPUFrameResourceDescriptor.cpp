@@ -3,7 +3,7 @@
 GPUFrameResourceDescriptor::GPUFrameResourceDescriptor() = default;
 
 GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap,
-                                                       int descriptorSize, int* offsetsInHeap,
+                                                       UINT descriptorSize, int* offsetsInHeap,
                                                        D3D12_RESOURCE_STATES state, char const* semantics, std::vector<GPUResource*> describedResources) :
     frameCount_(frameCount), descriptorHeap_(heap),
     descriptorSize_(descriptorSize), state_(state), semantics_(semantics)

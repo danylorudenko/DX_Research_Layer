@@ -57,7 +57,7 @@ void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item)
     auto const resCount = item.perItemResourceDescriptors_.size();
     for (size_t i = 0; i < resCount; i++) {
         auto resDesc = item.perItemResourceDescriptors_[i];
-        executionEngine_->Commit().SetGraphicsRootDescriptorTable(resDesc.first, resDesc.second.GPUViewHandle(lastFrameIndex_));
+        executionEngine_->Commit().SetGraphicsRootDescriptorTable(resDesc.first, resDesc.second.GPUViewHandle(static_cast<int>(lastFrameIndex_)));
     }
 }
 

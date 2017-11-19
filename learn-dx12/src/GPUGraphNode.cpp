@@ -36,7 +36,7 @@ GPUGraphNode* GPUGraphNode::GetChild(int childIndex)
 
 int GPUGraphNode::ChildCount() const
 {
-    return childNodes_.size();
+    return static_cast<int>(childNodes_.size());
 }
 
 bool GPUGraphNode::SynchronizeFrames(UINT64 frameIndex) {
@@ -51,11 +51,11 @@ bool GPUGraphNode::SynchronizeFrames(UINT64 frameIndex) {
 void GPUGraphNode::SetPassRootSignature()
 {
     rootSignature_->SetPassRootSignature(executionEngine_);
-    rootSignature_->SetPassRootSignatureDescriptorTables(executionEngine_, lastFrameIndex_);
+    rootSignature_->SetPassRootSignatureDescriptorTables(executionEngine_, static_cast<UINT>(lastFrameIndex_));
 }
 
 void GPUGraphNode::TransitionPassResources()
 {
-    rootSignature_->TransitionRootResources(executionEngine_, lastFrameIndex_);
+    rootSignature_->TransitionRootResources(executionEngine_, static_cast<UINT>(lastFrameIndex_));
 }
 
