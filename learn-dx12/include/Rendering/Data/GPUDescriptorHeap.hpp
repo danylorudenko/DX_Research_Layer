@@ -16,6 +16,8 @@ public:
     GPUDescriptorHeap& operator=(GPUDescriptorHeap const&) = delete;
     GPUDescriptorHeap& operator=(GPUDescriptorHeap&& rhs);
 
+    void Reset();
+
     GPUFrameResourceDescriptor AllocRtvLinear(std::vector<GPUResource*> resources,
                                               D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
@@ -28,11 +30,24 @@ public:
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocCbvSrvUavLinear(std::vector<GPUResource*> resources,
-                                                    D3D12_DEPTH_STENCIL_DESC* viewDesc,
-                                                    D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
-                                                    char const* semantics = "default",
-                                                    int frameCount = 1U);
+    GPUFrameResourceDescriptor AllocCbvLinear(std::vector<GPUResource*> resources,
+                                              D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
+                                              D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
+                                              char const* semantics = "default",
+                                              int frameCount = 1U);
+
+    GPUFrameResourceDescriptor AllocSrvLinear(std::vector<GPUResource*> resources,
+                                              D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
+                                              D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
+                                              char const* semantics = "default",
+                                              int frameCount = 1U);
+
+    GPUFrameResourceDescriptor AllocUavLinear(std::vector<GPUResource*> resources,
+                                              D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
+                                              D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
+                                              char const* semantics = "default",
+                                              int frameCount = 1U);
+
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;

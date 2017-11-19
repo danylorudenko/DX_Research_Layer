@@ -58,6 +58,13 @@ GPUDescriptorHeap::GPUDescriptorHeap(GPUDescriptorHeap&& rhs) = default;
 
 GPUDescriptorHeap& GPUDescriptorHeap::operator=(GPUDescriptorHeap&& rhs) = default;
 
+void GPUDescriptorHeap::Reset()
+{
+    heapRtvLastDescriptorOffset_ = 0;
+    heapDsvLastDescriptorOffset_ = 0;
+    heapCbvSrvUavLastDescriptorOffset_ = 0;
+}
+
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(std::vector<GPUResource*> resources,
                                                              D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
@@ -93,4 +100,62 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(std::vector<GPUReso
     }
 
     GPUFrameResourceDescriptor dsvDescriptor{ frameCount, heapDsv_, heapDsvIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    return dsvDescriptor;
+}
+
+GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(std::vector<GPUResource*> resources,
+                                                             D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
+                                                             D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
+                                                             char const* semantics = "default",
+                                                             int frameCount = 1U)
+{
+    assert(frameCount <= 3 && "More frames for descriptors is not currently allowed.");
+
+    int descriptorOffsets[3];
+    for (int i = 0; i < frameCount; i++) {
+        CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle{ heapCbvSrvUav_->GetCPUDescriptorHandleForHeapStart(), heapCbvSrvUavLastDescriptorOffset_, heapCbvSrvUavIncrementalSize_ };
+        device_->CreateConstantBufferView(viewDesc, cpuDescriptorHandle);
+        descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
+    }
+
+    GPUFrameResourceDescriptor cbvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    return cbvDescriptor;
+}
+
+GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(std::vector<GPUResource*> resources,
+                                                             D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
+                                                             D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
+                                                             char const* semantics = "default",
+                                                             int frameCount = 1U)
+{
+    assert(frameCount <= 3 && "More frames for descriptors is not currently allowed.");
+
+    int descriptorOffsets[3];
+    for (int i = 0; i < frameCount; i++) {
+        CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle{ heapCbvSrvUav_->GetCPUDescriptorHandleForHeapStart(), heapCbvSrvUavLastDescriptorOffset_, heapCbvSrvUavIncrementalSize_ };
+        device_->CreateShaderResourceView(resources[i]->Get(), viewDesc, cpuDescriptorHandle);
+        descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
+    }
+
+    GPUFrameResourceDescriptor srvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    return srvDescriptor;
+}
+
+GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(std::vector<GPUResource*> resources,
+                                                             D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
+                                                             D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
+                                                             char const* semantics = "default",
+                                                             int frameCount = 1U)
+{
+    assert(frameCount <= 3 && "More frames for descriptors in not currently allowed.");
+
+    int descriptorOffsets[3];
+    for (int i = 0; i < frameCount; i++) {
+        CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle{ heapCbvSrvUav_->GetCPUDescriptorHandleForHeapStart(), heapCbvSrvUavLastDescriptorOffset_, heapCbvSrvUavIncrementalSize_ };
+        device_->CreateUnorderedAccessView(resources[i]->Get(), nullptr, viewDesc, cpuDescriptorHandle);
+        descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
+    }
+
+    GPUFrameResourceDescriptor uavDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    return uavDescriptor;
 }
