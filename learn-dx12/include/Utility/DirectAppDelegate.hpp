@@ -20,8 +20,8 @@ public:
     PerformanceTimer& Timer();
     void DisplayFrameTime(Application& application, float drawTime);
 
-    void CreateRootSignature();
-    void CreatePipelineState();
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRootSignature();
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature);
 
     void LoadTriangleVertices();
     void LoadConstantBuffers();

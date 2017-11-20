@@ -13,7 +13,6 @@ void DirectAppDelegate::start(Application& application)
     CreatePipelineState();
     
     LoadTriangleVertices();
-    CreateConstantBufferDescriptorHeap();
     LoadConstantBuffers();
 
     gameTimer_.Reset();
@@ -51,18 +50,7 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
     SetWindowText(windowHandle, windowText_.c_str());
 }
 
-void DirectAppDelegate::CreateConstantBufferDescriptorHeap()
-{
-    D3D12_DESCRIPTOR_HEAP_DESC cbvDescr = {};
-    cbvDescr.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    cbvDescr.NumDescriptors = 1;
-    cbvDescr.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    cbvDescr.NodeMask = 0;
-    
-    gpuAccess_.CreateDescriptorHeap(&cbvDescr, cbvHeap_);
-}
-
-void DirectAppDelegate::CreateRootSignature()
+Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignature()
 {
     CD3DX12_ROOT_PARAMETER rootParameters[1];
     CD3DX12_DESCRIPTOR_RANGE ranges[1];
@@ -83,10 +71,12 @@ void DirectAppDelegate::CreateRootSignature()
         ThrowIfFailed(result);
     }
     
-    gpuAccess_.CreateRootSignature(signature, rootSignature_);
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+    gpuAccess_.CreateRootSignature(signature, rootSignature);
+    return rootSignature;
 }
 
-void DirectAppDelegate::CreatePipelineState()
+Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature)
 {
     Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
     Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
@@ -104,7 +94,7 @@ void DirectAppDelegate::CreatePipelineState()
     // Setup pipeline state, which inludes setting shaders.
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
     psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
-    psoDesc.pRootSignature = rootSignature_.Get();
+    psoDesc.pRootSignature = rootSignature.Get();
     psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
@@ -117,11 +107,15 @@ void DirectAppDelegate::CreatePipelineState()
     psoDesc.RTVFormats[0] = GPUAccess::backBufferFormat_;
     psoDesc.SampleDesc.Count = 1;
 
-    gpuAccess_.CreatePSO(pipelineState_, &psoDesc);
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
+    gpuAccess_.CreatePSO(pipelineState, &psoDesc);
+    return pipelineState;
 }
 
 void DirectAppDelegate::LoadTriangleVertices()
 {
+    int const framesCount = static_cast<int>(gpuAccess_.SWAP_CHAIN_BUFFER_COUNT);
+    
     Vertex verticesData[] = {
         { { 0.0f, 0.25f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
         { { 0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
@@ -129,12 +123,16 @@ void DirectAppDelegate::LoadTriangleVertices()
     };
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
-    GPUUploadHeap uploadHeap{ gpuAccess_.Device(), verticesData, vertexDataSize };
+    GPUUploadHeap uploadHeap{ framesCount, gpuAccess_.Device(), verticesData, vertexDataSize, &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize), true };
     
     auto& gpuEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
-    triangleMesh_.vertices.CreateResource(gpuAccess_.Device(), vertexDataSize, D3D12_RESOURCE_STATE_COPY_DEST);
-    triangleMesh_.vertices.UpdateData(gpuEngine.CommandList(), 0, uploadHeap, 0, vertexDataSize);
-    triangleMesh_.vertices.Transition(gpuEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);
+
+    triangleMesh_.vertices.CreateResources(framesCount, gpuAccess_.Device(), vertexDataSize, &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
+    for (int i = 0; i < framesCount; i++) {
+        triangleMesh_.vertices.UpdateData(i, gpuEngine.CommandList(), 0, uploadHeap, i, 0, vertexDataSize);
+        triangleMesh_.vertices.Transition(i, gpuEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);
+    }
+
     gpuEngine.FlushReset();
     
     triangleMesh_.verticesView.BufferLocation = triangleMesh_.vertices.GPUVirtualAddress();
