@@ -41,9 +41,9 @@ void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, UINT 
     D3D12_RESOURCE_BARRIER barriers[10];
     for (int i = 0; i < resourceNum; i++) {
         barriers[i] = CD3DX12_RESOURCE_BARRIER::Transition(
-            passRootDescriptorTablesMap_.DescribedResource(frameIndex, static_cast<UINT>(i))->Get(), 
-            passRootDescriptorTablesMap_.DescribedResource(frameIndex, static_cast<UINT>(i))->State(),
-            passRootDescriptorTablesMap_.DescribedResourceTargetState(frameIndex, static_cast<UINT>(i)));
+            passRootDescriptorTablesMap_.DescribedResource(i)->Get(frameIndex),
+            passRootDescriptorTablesMap_.DescribedResource(i)->State(frameIndex),
+            passRootDescriptorTablesMap_.DescribedResourceTargetState(i));
     }
 
     executionEngine->Commit().ResourceBarrier(resourceNum, barriers);

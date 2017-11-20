@@ -29,5 +29,5 @@ private:
     void RecursiveNodeParserService(GPUGraphNode* node, std::set<GPUGraphNode*>& visitedNodes);
 
     std::vector<GPUGraphNode*> parentNodes_;
-    std::vector<GPUGraphNode*> parsedGraphList_;
+    GraphQueue parsedGraphList_;
 };
