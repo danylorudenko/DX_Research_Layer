@@ -70,15 +70,31 @@ void GPUAccess::InitializeD3D12()
 
 void GPUAccess::CreateFrameResources()
 {
-    UINT rtvDescriptorSize = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-    
+    // Render targets fetch and view creation.
+    std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> renderBuffers{};
     for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) {
-        Microsoft::WRL::ComPtr<ID3D12Resource> frameBuffer = nullptr;
-        swapChain_->GetBuffer(i, IID_PPV_ARGS(&frameBuffer));
-        frameResources_[i] = GPUFrameResource { 
-            device_.Get(), frameBuffer, WIDTH, HEIGHT, rtvHeap_, static_cast<INT>(i * rtvDescriptorSize),
-            depthStencilBufferFormat, dsvHeap_, static_cast<INT>(i * dsvDescriptorSize_) };
+        Microsoft::WRL::ComPtr<ID3D12Resource> renderBuffer{};
+        swapChain_->GetBuffer(i, IID_PPV_ARGS(&renderBuffer));
+        renderBuffers.push_back(renderBuffer);
     }
+
+    GPUFrameResource renderFrameResource{ SWAP_CHAIN_BUFFER_COUNT, HEIGHT * WIDTH, renderBuffers.data(), D3D12_RESOURCE_STATE_RENDER_TARGET };
+    finalRenderTargetViews_ = descriptorHeap_.AllocRtvLinear(&renderFrameResource, nullptr, D3D12_RESOURCE_STATE_RENDER_TARGET, "renderBuffer", SWAP_CHAIN_BUFFER_COUNT);
+
+    // Creation of depth-stencil buffers, creation of views.
+    D3D12_RESOURCE_DESC depthStencilDesc{};
+    depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    depthStencilDesc.Format = depthStencilBufferFormat;
+    depthStencilDesc.Width = WIDTH;
+    depthStencilDesc.Height = HEIGHT;
+    depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    depthStencilDesc.SampleDesc.Count = 1;
+    depthStencilDesc.SampleDesc.Quality = 0;
+    depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+    depthStencilDesc.MipLevels = 1;
+
+    depthStencilBuffers_ = GPUFrameResource{ SWAP_CHAIN_BUFFER_COUNT, device_.Get(), WIDTH * HEIGHT, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_READ };
+    depthStencilViews_ = descriptorHeap_.AllocDsvLinear(&depthStencilBuffers_, nullptr, D3D12_RESOURCE_STATE_DEPTH_READ, "depthStencil", SWAP_CHAIN_BUFFER_COUNT);
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()
@@ -141,37 +157,15 @@ void GPUAccess::ResetAll()
     Engine<GPU_ENGINE_TYPE_COMPUTE>().Reset();
 }
 
-GPUFrameResource & GPUAccess::CurrentFrameResource()
-{
-    return frameResources_[currentFrame_];
-}
-
 void GPUAccess::CommitDefaultViewportScissorRects()
 {
     Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetViewports(1, &viewportRect_);
     Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetScissorRects(1, &scissorRect_);
 }
 
-void GPUAccess::Present()
-{
-    swapChain_->Present(0, 0);
-    currentFrame_ = (currentFrame_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
-}
-
 void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
 {
     auto const result = device_->CreateRootSignature(0, serializedRootSignature->GetBufferPointer(), serializedRootSignature->GetBufferSize(), IID_PPV_ARGS(&dest));
-    ThrowIfFailed(result);
-}
-
-void GPUAccess::CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle)
-{
-    device_->CreateConstantBufferView(desc, heapHandle);
-}
-
-void GPUAccess::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& dest)
-{
-    auto const result = device_->CreateDescriptorHeap(desc, IID_PPV_ARGS(&dest));
     ThrowIfFailed(result);
 }
 

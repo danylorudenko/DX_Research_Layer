@@ -23,6 +23,19 @@ GPUFrameResource::GPUFrameResource(int framesCount, ID3D12Device* device, std::s
     }
 }
 
+GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state) :
+    framesCount_(framesCount),
+    states_(framesCount, state),
+    size_(resourceSize),
+    capacity_(resourceSize)
+    
+{
+    for (int i = 0; i < framesCount_; i++) {
+        resources_[i] = resources[i];
+        gpuAddresses_[i] = resources_[i]->GetGPUVirtualAddress();
+    }
+}
+
 GPUFrameResource::GPUFrameResource(GPUFrameResource&& rhs) = default;
 
 GPUFrameResource& GPUFrameResource::operator=(GPUFrameResource&& rhs) = default;

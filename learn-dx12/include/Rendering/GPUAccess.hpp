@@ -7,6 +7,7 @@
 #include <Rendering\Data\GPUFrameResource.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>
 #include <Rendering\Data\GPUDescriptorHeap.hpp>
+#include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
 
 class GPUAccess
 {
@@ -40,7 +41,6 @@ public:
     void CommitDefaultViewportScissorRects();
 
     void CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest);
-    void CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& dest);
     void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
 
     static void CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type);
@@ -61,10 +61,14 @@ private:
 
     GPUEngine engines_[3];
 
+    GPUFrameGraph frameGraph_;
+
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
     UINT64 currentFrame_ = 0U;
 
     GPUFrameResource depthStencilBuffers_;
+    GPUFrameResourceDescriptor depthStencilViews_;
+    GPUFrameResourceDescriptor finalRenderTargetViews_;
 
     // Default surface description.
     D3D12_VIEWPORT viewportRect_;
@@ -72,7 +76,7 @@ private:
 
 
     GPUDescriptorHeap descriptorHeap_;
-    int static constexpr RTV_HEAP_CAPACITY = 20;
-    int static constexpr DSV_HEAP_CAPACITY = 20;
-    int static constexpr CBV_SRV_UAV_CAPACITY = 20;
+    int static constexpr RTV_HEAP_CAPACITY = 30;
+    int static constexpr DSV_HEAP_CAPACITY = 30;
+    int static constexpr CBV_SRV_UAV_CAPACITY = 30;
 };

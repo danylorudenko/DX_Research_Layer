@@ -3,7 +3,7 @@
 #include <pch.hpp>
 
 #include <map>
-#include <Rendering\Data\GPUResource.hpp>
+#include <Rendering\Data\GPUFrameResource.hpp>
 
 namespace
 {
