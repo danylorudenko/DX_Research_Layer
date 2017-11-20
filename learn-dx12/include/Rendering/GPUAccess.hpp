@@ -5,8 +5,8 @@
 #include <Utility\Application.hpp>
 #include <Rendering\GPUEngine.hpp>
 #include <Rendering\Data\GPUFrameResource.hpp>
-#include <Rendering\Data\GPUResource.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>
+#include <Rendering\Data\GPUDescriptorHeap.hpp>
 
 class GPUAccess
 {
@@ -37,18 +37,9 @@ public:
 
     ID3D12Device* Device() const { return device_.Get(); }
 
-    GPUFrameResource& CurrentFrameResource();
-
-    UINT RtvIncrementalSize() const { return rtvDescriptorSize_; }
-    UINT DsvIncrementalSize() const { return dsvDescriptorSize_; }
-    UINT CbvSrvUavIncrementalSize() const { return cbv_srv_uavDescriptorSize_; }
-
     void CommitDefaultViewportScissorRects();
 
-    void Present();
-
     void CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest);
-    void CreateConstantBufferView(D3D12_CONSTANT_BUFFER_VIEW_DESC* desc, D3D12_CPU_DESCRIPTOR_HANDLE heapHandle);
     void CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_DESC* desc, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& dest);
     void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
 
@@ -71,15 +62,17 @@ private:
     GPUEngine engines_[3];
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
-    GPUFrameResource frameResources_[SWAP_CHAIN_BUFFER_COUNT];
     UINT64 currentFrame_ = 0U;
+
+    GPUFrameResource depthStencilBuffers_;
+
+    // Default surface description.
     D3D12_VIEWPORT viewportRect_;
     D3D12_RECT scissorRect_;
 
-    UINT rtvDescriptorSize_ = 0U;
-    UINT dsvDescriptorSize_ = 0U;
-    UINT cbv_srv_uavDescriptorSize_ = 0U;
 
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_;
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
+    GPUDescriptorHeap descriptorHeap_;
+    int static constexpr RTV_HEAP_CAPACITY = 20;
+    int static constexpr DSV_HEAP_CAPACITY = 20;
+    int static constexpr CBV_SRV_UAV_CAPACITY = 20;
 };

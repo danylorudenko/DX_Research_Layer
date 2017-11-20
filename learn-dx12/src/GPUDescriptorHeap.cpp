@@ -65,7 +65,7 @@ void GPUDescriptorHeap::Reset()
     heapCbvSrvUavLastDescriptorOffset_ = 0;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(std::vector<GPUResource*> resources,
+GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(std::vector<GPUFrameResource*> resources,
                                                              D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -84,7 +84,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(std::vector<GPUReso
     return rtvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(std::vector<GPUResource*> resources,
+GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(std::vector<GPUFrameResource*> resources,
                                                              D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -103,7 +103,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(std::vector<GPUReso
     return dsvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(std::vector<GPUResource*> resources,
+GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(std::vector<GPUFrameResource*> resources,
                                                              D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -122,7 +122,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(std::vector<GPUReso
     return cbvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(std::vector<GPUResource*> resources,
+GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(std::vector<GPUFrameResource*> resources,
                                                              D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -141,7 +141,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(std::vector<GPUReso
     return srvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(std::vector<GPUResource*> resources,
+GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(std::vector<GPUFrameResource*> resources,
                                                              D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,

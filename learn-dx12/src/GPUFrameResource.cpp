@@ -2,93 +2,60 @@
 
 GPUFrameResource::GPUFrameResource() = default;
 
-GPUFrameResource::GPUFrameResource(ID3D12Device* device,
-    Microsoft::WRL::ComPtr<ID3D12Resource> renderTarget, UINT width, UINT height,
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvSharedHeap, INT offsetInRtvHeap,
-    DXGI_FORMAT depthStencilFormat,
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvSharedHeap, INT offsetInDsvHeap) :
-
-    sharedRtvDescriptorHeap_(rtvSharedHeap),
-    offsetInRtvHeap_(offsetInRtvHeap),
-    sharedDsvDescriptorHeap_(dsvSharedHeap),
-    offsetInDsvHeap_(offsetInDsvHeap)
+GPUFrameResource::GPUFrameResource(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state) :
+    framesCount_(framesCount),
+    states_(framesCount, state),
+    size_(size),
+    capacity_(size)
 {
-    // Render target resource and view.
-    resource_ = renderTarget;
-    device->CreateRenderTargetView(resource_.Get(), nullptr, CPURtvDescriptorHandle());
-
-    // Depth/Stencil resource and view creation.
-    D3D12_RESOURCE_DESC dsDesc {};
-    dsDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    dsDesc.Width = width;
-    dsDesc.Height = height;
-    dsDesc.Format = depthStencilFormat;
-    dsDesc.Alignment = 0;
-    dsDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    dsDesc.MipLevels = 1;
-    dsDesc.DepthOrArraySize = 1;
-    dsDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-    dsDesc.SampleDesc.Count = 1;
-    dsDesc.SampleDesc.Quality = 0;
-    
+    for(int i = 0; i < framesCount; i++)
     {
+        auto const result = device->CreateCommittedResource(
+            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+            D3D12_HEAP_FLAG_NONE,
+            &CD3DX12_RESOURCE_DESC::Buffer(capacity_),
+            state,
+            nullptr,
+            IID_PPV_ARGS(&resources_[i])
+        );
+        ThrowIfFailed(result);
+        gpuAddresses_[i] = resources_[i]->GetGPUVirtualAddress();
+    }
+}
+
+GPUFrameResource::GPUFrameResource(GPUFrameResource&& rhs) = default;
+
+GPUFrameResource& GPUFrameResource::operator=(GPUFrameResource&& rhs) = default;
+
+void GPUFrameResource::CreateResources(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES initialState)
+{
+    resources_.clear();
+    framesCount_ = framesCount;
+    for (int i = 0; i < framesCount_; i++) {
         auto result = device->CreateCommittedResource(
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
             D3D12_HEAP_FLAG_NONE,
-            &dsDesc,
-            D3D12_RESOURCE_STATE_DEPTH_WRITE,
+            &CD3DX12_RESOURCE_DESC::Buffer(size),
+            initialState,
             nullptr,
-            IID_PPV_ARGS(&depthStencilBuffer_));
+            IID_PPV_ARGS(&resources_[i]));
+
         ThrowIfFailed(result);
+        states_[i] = initialState;
+        gpuAddresses_[i] = resources_[i]->GetGPUVirtualAddress();
     }
-
-    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc {};
-    dsvDesc.Texture2D.MipSlice = 0;
-    dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-    dsvDesc.Format = depthStencilFormat;
-
-    device->CreateDepthStencilView(depthStencilBuffer_.Get(), &dsvDesc, CPUDsvDescriptorHandle());
+    
+    size_ = size;
+    capacity_ = size;
 }
 
-GPUFrameResource::GPUFrameResource(GPUFrameResource&&) = default;
-
-GPUFrameResource& GPUFrameResource::operator=(GPUFrameResource&&) = default;
-
-D3D12_CPU_DESCRIPTOR_HANDLE GPUFrameResource::CPURtvDescriptorHandle() const
+void GPUFrameResource::UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUFrameResource& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes)
 {
-    auto heapHandle = sharedRtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-    heapHandle.ptr += offsetInRtvHeap_;
-
-    return heapHandle;
+    commandList->CopyBufferRegion(resources_[frameIndex].Get(), offsetInDest, src.Get(srcFrameIndex), offsetInSrc, numBytes);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE GPUFrameResource::GPURtvDescriptorHandle() const
+void GPUFrameResource::Transition(int frameIndex, ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state)
 {
-    auto heapHandle = sharedRtvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-    heapHandle.ptr += offsetInRtvHeap_;
-
-    return heapHandle;
-}
-
-D3D12_CPU_DESCRIPTOR_HANDLE GPUFrameResource::CPUDsvDescriptorHandle() const
-{
-    auto heapHandle = sharedDsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-    heapHandle.ptr += offsetInDsvHeap_;
-
-    return heapHandle;
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE GPUFrameResource::GPUDsvDescriptorHandle() const
-{
-    auto heapHandle = sharedDsvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-    heapHandle.ptr += offsetInDsvHeap_;
-
-    return heapHandle;
-}
-
-ID3D12Resource* GPUFrameResource::FrameBuffer() const
-{
-    return resource_.Get();
+    commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resources_[frameIndex].Get(), states_[frameIndex], state));
+    states_[frameIndex] = state;
 }

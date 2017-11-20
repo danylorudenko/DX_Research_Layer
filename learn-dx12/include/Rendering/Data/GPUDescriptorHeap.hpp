@@ -18,31 +18,31 @@ public:
 
     void Reset();
 
-    GPUFrameResourceDescriptor AllocRtvLinear(std::vector<GPUResource*> resources,
+    GPUFrameResourceDescriptor AllocRtvLinear(std::vector<GPUFrameResource*> resources,
                                               D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocDsvLinear(std::vector<GPUResource*> resources,
+    GPUFrameResourceDescriptor AllocDsvLinear(std::vector<GPUFrameResource*> resources,
                                               D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocCbvLinear(std::vector<GPUResource*> resources,
+    GPUFrameResourceDescriptor AllocCbvLinear(std::vector<GPUFrameResource*> resources,
                                               D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocSrvLinear(std::vector<GPUResource*> resources,
+    GPUFrameResourceDescriptor AllocSrvLinear(std::vector<GPUFrameResource*> resources,
                                               D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocUavLinear(std::vector<GPUResource*> resources,
+    GPUFrameResourceDescriptor AllocUavLinear(std::vector<GPUFrameResource*> resources,
                                               D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",

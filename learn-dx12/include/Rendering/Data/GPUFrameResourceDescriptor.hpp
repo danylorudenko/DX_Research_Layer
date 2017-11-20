@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\GPUResource.hpp>
+#include <Rendering\Data\GPUFrameResource.hpp>
 
 class GPUFrameResourceDescriptor
 {
@@ -11,7 +11,7 @@ public:
     GPUFrameResourceDescriptor(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, 
                                UINT descriptorSize, int* offsetsInHeap,
                                D3D12_RESOURCE_STATES state, char const* semantics, 
-                               std::vector<GPUResource*> resource);
+                               GPUFrameResource* resource);
     GPUFrameResourceDescriptor(GPUFrameResourceDescriptor const&);
     GPUFrameResourceDescriptor(GPUFrameResourceDescriptor&&);
 
@@ -31,5 +31,5 @@ private:
     D3D12_RESOURCE_STATES state_;
     std::string semantics_;
 
-    std::vector<GPUResource*> describedResources_;
+    GPUFrameResource* describedResources_;
 };

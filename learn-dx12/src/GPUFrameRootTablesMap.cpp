@@ -2,11 +2,11 @@
 
 GPUFrameRootTablesMap::GPUFrameRootTablesMap() = default;
 
-GPUFrameRootTablesMap::GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor> const& map, FramesCollection<std::vector<StateAndResource>> const& describedResources) :
+GPUFrameRootTablesMap::GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources) :
     frameCount_(frameCount), descriptorTable_(map), describedResources_(describedResources)
 { }
 
-GPUFrameRootTablesMap::GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor>&& map, FramesCollection<std::vector<StateAndResource>>&& describedResources) :
+GPUFrameRootTablesMap::GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources) :
     frameCount_(std::move(frameCount)), descriptorTable_(std::move(map)), describedResources_(describedResources)
 { }
 
@@ -18,37 +18,37 @@ GPUFrameRootTablesMap& GPUFrameRootTablesMap::operator=(GPUFrameRootTablesMap co
 
 GPUFrameRootTablesMap& GPUFrameRootTablesMap::operator=(GPUFrameRootTablesMap&& rhs) = default;
 
-D3D12_CPU_DESCRIPTOR_HANDLE GPUFrameRootTablesMap::DescriptorTableCPUHandle(UINT frameIndex, UINT bindingPoint) const
+D3D12_CPU_DESCRIPTOR_HANDLE GPUFrameRootTablesMap::DescriptorTableCPUHandle(int frameIndex, int bindingPoint) const
 {
     return descriptorTable_[bindingPoint].CPUViewHandle(frameIndex);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE GPUFrameRootTablesMap::DescirptorTableGPUHandle(UINT frameIndex, UINT bindingPoint) const
+D3D12_GPU_DESCRIPTOR_HANDLE GPUFrameRootTablesMap::DescirptorTableGPUHandle(int frameIndex, int bindingPoint) const
 {
     return descriptorTable_[bindingPoint].GPUViewHandle(frameIndex);
 }
 
-UINT GPUFrameRootTablesMap::TableSize() const
+int GPUFrameRootTablesMap::TableSize() const
 {
-    return static_cast<UINT>(descriptorTable_.size());
+    return static_cast<int>(descriptorTable_.size());
 }
 
-UINT GPUFrameRootTablesMap::DescribedResourceCount(UINT frameIndex) const
+int GPUFrameRootTablesMap::DescribedResourceCount(int frameIndex) const
 {
-    return static_cast<UINT>(describedResources_[frameIndex].size());
+    return static_cast<int>(describedResources_.size());
 }
 
-GPUResource* GPUFrameRootTablesMap::DescribedResource(UINT frameIndex, UINT resourceIndex)
+GPUFrameResource* GPUFrameRootTablesMap::DescribedResource(int resourceIndex)
 {
-    return describedResources_[frameIndex][resourceIndex].second;
+    return describedResources_[resourceIndex].second;
 }
 
-D3D12_RESOURCE_STATES GPUFrameRootTablesMap::DescribedResourceTargetState(UINT frameIndex, UINT resourceIndex) const
+D3D12_RESOURCE_STATES GPUFrameRootTablesMap::DescribedResourceTargetState(int resourceIndex) const
 {
-    return describedResources_[frameIndex][resourceIndex].first;
+    return describedResources_[resourceIndex].first;
 }
 
-D3D12_RESOURCE_STATES GPUFrameRootTablesMap::DescribedResourceCurrentState(UINT frameIndex, UINT resourceIndex) const
+D3D12_RESOURCE_STATES GPUFrameRootTablesMap::DescribedResourceCurrentState(int frameIndex, int resourceIndex) const
 {
-    return describedResources_[frameIndex][resourceIndex].second->State();
+    return describedResources_[resourceIndex].second->State(frameIndex);
 }

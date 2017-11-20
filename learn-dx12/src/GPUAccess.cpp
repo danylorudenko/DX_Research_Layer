@@ -83,27 +83,7 @@ void GPUAccess::CreateFrameResources()
 
 void GPUAccess::CreateDefaultDescriptorHeaps()
 {
-    D3D12_DESCRIPTOR_HEAP_DESC rtvD;
-    rtvD.NumDescriptors = SWAP_CHAIN_BUFFER_COUNT;
-    rtvD.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    rtvD.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    rtvD.NodeMask = 0;
-
-    HRESULT result = device_->CreateDescriptorHeap(&rtvD, IID_PPV_ARGS(&rtvHeap_));
-    ThrowIfFailed(result);
-
-    D3D12_DESCRIPTOR_HEAP_DESC dsvD;
-    dsvD.NumDescriptors = SWAP_CHAIN_BUFFER_COUNT;
-    dsvD.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-    dsvD.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    dsvD.NodeMask = 0;
-
-    result = device_->CreateDescriptorHeap(&dsvD, IID_PPV_ARGS(&dsvHeap_));
-    ThrowIfFailed(result);
-
-    rtvDescriptorSize_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-    dsvDescriptorSize_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-    cbv_srv_uavDescriptorSize_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    descriptorHeap_ = GPUDescriptorHeap{ device_, RTV_HEAP_CAPACITY, DSV_HEAP_CAPACITY, CBV_SRV_UAV_CAPACITY };
 }
 
 void GPUAccess::SetViewportScissor()

@@ -2,39 +2,35 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\GPUResource.hpp>
-
-class GPUFrameResource : public GPUResource
+class GPUFrameResource
 {
 public:
     GPUFrameResource();
-    GPUFrameResource(ID3D12Device* device,
-        Microsoft::WRL::ComPtr<ID3D12Resource> renderTarget, UINT width, UINT height,
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvSharedHeap, INT offsetInRtvHeap,
-        DXGI_FORMAT depthStencilFormat,
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvSharedHeap, INT offsetInDsvHeap);
-
+    GPUFrameResource(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON);
     GPUFrameResource(GPUFrameResource const&) = delete;
+    GPUFrameResource(GPUFrameResource&& rhs);
+
     GPUFrameResource& operator=(GPUFrameResource const&) = delete;
+    GPUFrameResource& operator=(GPUFrameResource&& rhs);
+    
+    ID3D12Resource* Get(int frameIndex) const { return resources_[frameIndex].Get(); }
+    std::size_t Size() const { return size_; };
+    std::size_t Capacity() const { return capacity_; }
+    int FramesCount() const { return framesCount_; }
 
-    GPUFrameResource(GPUFrameResource&&);
-    GPUFrameResource& operator=(GPUFrameResource&&);
+    D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress(int frameIndex) const { return gpuAddresses_[frameIndex]; }
 
-    D3D12_CPU_DESCRIPTOR_HANDLE CPURtvDescriptorHandle() const;
-    D3D12_GPU_DESCRIPTOR_HANDLE GPURtvDescriptorHandle() const;
+    void CreateResources(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COMMON);
+    void UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUFrameResource& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes);
 
-    D3D12_CPU_DESCRIPTOR_HANDLE CPUDsvDescriptorHandle() const;
-    D3D12_GPU_DESCRIPTOR_HANDLE GPUDsvDescriptorHandle() const;
+    void Transition(int frameIndex, ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state);
+    D3D12_RESOURCE_STATES State(int frameIndex) const { return states_[frameIndex]; }
 
-    ID3D12Resource* FrameBuffer() const;
-
-private:
-    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer_;
-
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> sharedRtvDescriptorHeap_;
-    UINT offsetInRtvHeap_;
-
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> sharedDsvDescriptorHeap_;
-    UINT offsetInDsvHeap_;
-
+protected:
+    int framesCount_ = 0;
+    std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> resources_;
+    std::vector<D3D12_GPU_VIRTUAL_ADDRESS> gpuAddresses_;
+    std::vector<D3D12_RESOURCE_STATES> states_;
+    std::size_t size_ = 0;
+    std::size_t capacity_ = 0;
 };

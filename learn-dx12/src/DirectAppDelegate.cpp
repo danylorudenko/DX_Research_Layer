@@ -162,10 +162,9 @@ void DirectAppDelegate::Draw()
 
     // Set general pipeline state.
     graphicsEngine.Commit().SetPipelineState(pipelineState_.Get());
-    graphicsEngine.Commit().SetGraphicsRootSignature(rootSignature_.Get());
 
     // Set signature of incoming data.
-    //graphicsEngine.Commit().SetGraphicsRootSignature(rootSignature_.Get());
+    graphicsEngine.Commit().SetGraphicsRootSignature(rootSignature_.Get());
 
     gpuAccess_.CommitDefaultViewportScissorRects();
 
