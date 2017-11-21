@@ -9,8 +9,8 @@ void DirectAppDelegate::start(Application& application)
 {
     gpuAccess_ = GPUAccess{ application };
 
-    CreateRootSignature();
-    CreatePipelineState();
+    auto rootSignature = CreateRootSignature();
+    CreatePipelineState(rootSignature);
     
     LoadTriangleVertices();
     LoadConstantBuffers();
@@ -135,61 +135,61 @@ void DirectAppDelegate::LoadTriangleVertices()
 
     gpuEngine.FlushReset();
     
-    triangleMesh_.verticesView.BufferLocation = triangleMesh_.vertices.GPUVirtualAddress();
+    //triangleMesh_.verticesView.BufferLocation = triangleMesh_.vertices.GPUVirtualAddress();
     triangleMesh_.verticesView.SizeInBytes = vertexDataSize;
     triangleMesh_.verticesView.StrideInBytes = sizeof(Vertex);
 }
 
 void DirectAppDelegate::LoadConstantBuffers()
 {
-    constexpr UINT cbSize = sizeof(SceneConstantBuffer) + 255 & ~255;
-
-    constantBuffer_ = GPUUploadHeap{ gpuAccess_.Device(), nullptr, cbSize, true };
-    constantBuffer_.Map(reinterpret_cast<void**>(&constantBufferMappedData_), nullptr);
-
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = constantBuffer_.GPUVirtualAddress();
-    cbvDesc.SizeInBytes = cbSize;
-    gpuAccess_.CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
+    //constexpr UINT cbSize = sizeof(SceneConstantBuffer) + 255 & ~255;
+    //
+    //constantBuffer_ = GPUUploadHeap{ gpuAccess_.Device(), nullptr, cbSize, true };
+    //constantBuffer_.Map(reinterpret_cast<void**>(&constantBufferMappedData_), nullptr);
+    //
+    //D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+    //cbvDesc.BufferLocation = constantBuffer_.GPUVirtualAddress();
+    //cbvDesc.SizeInBytes = cbSize;
+    //gpuAccess_.CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void DirectAppDelegate::Draw()
 {
-    GPUEngine& graphicsEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
-    GPUFrameResource& currentFrameResource = gpuAccess_.CurrentFrameResource();
-
-    // Set general pipeline state.
-    graphicsEngine.Commit().SetPipelineState(pipelineState_.Get());
-
-    // Set signature of incoming data.
-    graphicsEngine.Commit().SetGraphicsRootSignature(rootSignature_.Get());
-
-    gpuAccess_.CommitDefaultViewportScissorRects();
-
-    // Set descriptor heaps which will the pipeline will use.
-    ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap_.Get() };
-    graphicsEngine.Commit().SetDescriptorHeaps(1, ppHeaps);
-    
-    // Set the handle for the 0th descriptor table.
-    graphicsEngine.Commit().SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
-
-    graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(currentFrameResource.FrameBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
-    
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = currentFrameResource.CPURtvDescriptorHandle();
-    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = currentFrameResource.CPUDsvDescriptorHandle();
-    graphicsEngine.Commit().OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
-
-    // Drawing commands.
-    static FLOAT clearColor[4] = { 0.6f, 0.2f, 0.2f, 1.0f };
-    graphicsEngine.Commit().ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-    graphicsEngine.Commit().IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    graphicsEngine.Commit().IASetVertexBuffers(0, 1, &triangleMesh_.verticesView);
-    graphicsEngine.Commit().DrawInstanced(3, 1, 0, 0);
-                           
-    graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(currentFrameResource.FrameBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
-
-    graphicsEngine.FlushReset();
-    gpuAccess_.Present();
+    //GPUEngine& graphicsEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+    //GPUFrameResource& currentFrameResource = gpuAccess_.CurrentFrameResource();
+    //
+    //// Set general pipeline state.
+    //graphicsEngine.Commit().SetPipelineState(pipelineState_.Get());
+    //
+    //// Set signature of incoming data.
+    //graphicsEngine.Commit().SetGraphicsRootSignature(rootSignature_.Get());
+    //
+    //gpuAccess_.CommitDefaultViewportScissorRects();
+    //
+    //// Set descriptor heaps which will the pipeline will use.
+    //ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap_.Get() };
+    //graphicsEngine.Commit().SetDescriptorHeaps(1, ppHeaps);
+    //
+    //// Set the handle for the 0th descriptor table.
+    //graphicsEngine.Commit().SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
+    //
+    //graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(currentFrameResource.FrameBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+    //
+    //D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = currentFrameResource.CPURtvDescriptorHandle();
+    //D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = currentFrameResource.CPUDsvDescriptorHandle();
+    //graphicsEngine.Commit().OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+    //
+    //// Drawing commands.
+    //static FLOAT clearColor[4] = { 0.6f, 0.2f, 0.2f, 1.0f };
+    //graphicsEngine.Commit().ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+    //graphicsEngine.Commit().IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    //graphicsEngine.Commit().IASetVertexBuffers(0, 1, &triangleMesh_.verticesView);
+    //graphicsEngine.Commit().DrawInstanced(3, 1, 0, 0);
+    //                       
+    //graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(currentFrameResource.FrameBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+    //
+    //graphicsEngine.FlushReset();
+    //gpuAccess_.Present();
 }
 
 void DirectAppDelegate::CustomAction()
@@ -203,5 +203,5 @@ void DirectAppDelegate::CustomAction()
     }
 
     // Update constant buffer uploadheap.
-    memcpy(constantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
+    //memcpy(constantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
 }
