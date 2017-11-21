@@ -3,19 +3,40 @@
 #include <chrono>
 
 #include <Utility\DirectAppDelegate.hpp>
+#include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
+#include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>
 
 void DirectAppDelegate::start(Application& application)
 {
     gpuAccess_ = GPUAccess{ application };
+    gameTimer_.Reset();
 
     auto rootSignature = CreateRootSignature();
-    CreatePipelineState(rootSignature);
+    auto pipelineState = CreatePipelineState(rootSignature);
+
+    auto* rootSignatureWrapper = new GPURootSignature{ rootSignature };
+    auto* pipelineStateWrapper = new GPUPipelineState{ pipelineState };
+
+    auto const framesCount = static_cast<int>(GPUAccess::SWAP_CHAIN_BUFFER_COUNT);
+    constantBuffer_ = GPUUploadHeap{ 
+        framesCount, gpuAccess_.Device().Get(), 
+        &constantBufferData_, sizeof(constantBufferData_), &CD3DX12_RESOURCE_DESC::Buffer(sizeof(constantBufferData_)), true 
+    };
+    constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
+
+    std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
+    std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
+    GPUFrameRootTablesMap rootTableMap{ framesCount, describedResourcesViews, describedResources };
+
+    rootSignatureWrapper->ImportPassFrameRootDescriptorTable(rootTableMap);
+
+    auto* triangleNode = new GPUGraphicsGraphNode{ &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>(), rootSignatureWrapper, pipelineStateWrapper };
+    auto* presentNode = new GPUPresentGraphNode{ gpuAccess_.SwapChain() };
     
     LoadTriangleVertices();
     LoadConstantBuffers();
 
-    gameTimer_.Reset();
 }
 
 void DirectAppDelegate::update(Application& application)
@@ -123,11 +144,11 @@ void DirectAppDelegate::LoadTriangleVertices()
     };
     constexpr UINT vertexDataSize = sizeof(verticesData);
 
-    GPUUploadHeap uploadHeap{ framesCount, gpuAccess_.Device(), verticesData, vertexDataSize, &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize), true };
+    GPUUploadHeap uploadHeap{ framesCount, gpuAccess_.Device().Get(), verticesData, vertexDataSize, &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize), true };
     
     auto& gpuEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
 
-    triangleMesh_.vertices.CreateResources(framesCount, gpuAccess_.Device(), vertexDataSize, &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
+    triangleMesh_.vertices.CreateResources(framesCount, gpuAccess_.Device().Get(), vertexDataSize, &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
     for (int i = 0; i < framesCount; i++) {
         triangleMesh_.vertices.UpdateData(i, gpuEngine.CommandList(), 0, uploadHeap, i, 0, vertexDataSize);
         triangleMesh_.vertices.Transition(i, gpuEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);

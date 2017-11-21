@@ -36,7 +36,9 @@ public:
 
     void ResetAll();
 
-    ID3D12Device* Device() const { return device_.Get(); }
+    Microsoft::WRL::ComPtr<ID3D12Device> Device() const { return device_; }
+    Microsoft::WRL::ComPtr<IDXGISwapChain> SwapChain() { return swapChain_; }
+    GPUDescriptorHeap& DescriptorHeap() { return descriptorHeap_; }
 
     void CommitDefaultViewportScissorRects();
 

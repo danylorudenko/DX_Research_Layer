@@ -11,8 +11,8 @@ public:
     using StateAndResource = std::pair<D3D12_RESOURCE_STATES, GPUFrameResource*>;
     
     GPUFrameRootTablesMap();
-    GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources);
-    GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources);
+    GPUFrameRootTablesMap(int frameCount, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources);
+    GPUFrameRootTablesMap(int frameCount, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources);
     GPUFrameRootTablesMap(GPUFrameRootTablesMap const&);
     GPUFrameRootTablesMap(GPUFrameRootTablesMap&&);
 

@@ -2,11 +2,11 @@
 
 GPUFrameRootTablesMap::GPUFrameRootTablesMap() = default;
 
-GPUFrameRootTablesMap::GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources) :
+GPUFrameRootTablesMap::GPUFrameRootTablesMap(int frameCount, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources) :
     frameCount_(frameCount), descriptorTable_(map), describedResources_(describedResources)
 { }
 
-GPUFrameRootTablesMap::GPUFrameRootTablesMap(UINT frameCount, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources) :
+GPUFrameRootTablesMap::GPUFrameRootTablesMap(int frameCount, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources) :
     frameCount_(std::move(frameCount)), descriptorTable_(std::move(map)), describedResources_(describedResources)
 { }
 

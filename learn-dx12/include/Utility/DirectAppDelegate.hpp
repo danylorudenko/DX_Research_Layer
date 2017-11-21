@@ -35,6 +35,7 @@ private:
     GPUAccess gpuAccess_;
 
     GPUUploadHeap constantBuffer_;
+    GPUFrameResourceDescriptor constantBufferView_;
     SceneConstantBuffer constantBufferData_;
 
     GeometryMesh triangleMesh_;
