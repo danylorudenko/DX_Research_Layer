@@ -20,6 +20,9 @@ public:
     void SetRenderTargets(std::vector<GPUFrameResourceDescriptor>&& renderTargets);
     void SetDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor);
 
+    void AddRenderItem(GPURenderItem const& item);
+    void AddRenderItem(GPURenderItem&& item);
+
     virtual void Process(UINT64 frameIndex) override;
 
 private:

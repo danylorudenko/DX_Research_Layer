@@ -10,6 +10,7 @@ public:
     D3D12_VERTEX_BUFFER_VIEW vertexBufferDescriptor_;
     UINT vertexCount_;
 
+    bool hasIndexBuffer_ = false;
     D3D12_INDEX_BUFFER_VIEW indexBufferDescriptor_;
     UINT indexCount_;
 
