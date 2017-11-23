@@ -72,6 +72,8 @@ void DirectAppDelegate::start(Application& application)
     presentNode_ = GPUPresentGraphNode{ gpuAccess_.SwapChain() };
     
     triangleGraphNode_.ImportChildNode(&presentNode_);
+
+    gpuAccess_.FrameGraph().ParseGraphToQueue();
 }
 
 void DirectAppDelegate::update(Application& application)

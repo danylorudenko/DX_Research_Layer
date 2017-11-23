@@ -10,20 +10,21 @@ GPUFrameResource::GPUFrameResource(int framesCount, ID3D12Device* device, std::s
 {
     for(int i = 0; i < framesCount; i++)
     {
+        resources_.push_back(Microsoft::WRL::ComPtr<ID3D12Resource>{nullptr});
         auto const result = device->CreateCommittedResource(
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
             D3D12_HEAP_FLAG_NONE,
-            &CD3DX12_RESOURCE_DESC::Buffer(capacity_),
+            resourceDesc,
             state,
             nullptr,
             IID_PPV_ARGS(&resources_[i])
         );
         ThrowIfFailed(result);
-        gpuAddresses_[i] = resources_[i]->GetGPUVirtualAddress();
+        gpuAddresses_.push_back(resources_[i]->GetGPUVirtualAddress());
     }
 }
 
-GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state) :
+GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> resources, D3D12_RESOURCE_STATES state) :
     framesCount_(framesCount),
     states_(framesCount, state),
     size_(resourceSize),
@@ -31,8 +32,8 @@ GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, Mi
     
 {
     for (int i = 0; i < framesCount_; i++) {
-        resources_[i] = resources[i];
-        gpuAddresses_[i] = resources_[i]->GetGPUVirtualAddress();
+        resources_.push_back(resources[i]);
+        gpuAddresses_.push_back(resources_[i]->GetGPUVirtualAddress());
     }
 }
 
