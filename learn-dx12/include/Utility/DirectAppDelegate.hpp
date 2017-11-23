@@ -8,6 +8,8 @@
 #include <Rendering\Data\GeometryMesh.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>
 #include <Rendering\Data\SceneConstantBuffer.hpp>
+#include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
+#include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 
 class DirectAppDelegate : public Application::Delegate
 {
@@ -16,7 +18,6 @@ public:
     virtual void update(Application& application) override;
     virtual void shutdown(Application& application) override;
 
-    //ID3D12Device& Device();
     PerformanceTimer& Timer();
     void DisplayFrameTime(Application& application, float drawTime);
 
