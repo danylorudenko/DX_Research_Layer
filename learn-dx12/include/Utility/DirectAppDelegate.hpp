@@ -23,19 +23,26 @@ public:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRootSignature();
     Microsoft::WRL::ComPtr<ID3D12PipelineState> CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature);
 
-    void LoadConstantBuffers();
-    
     void Draw();
     void CustomAction();
 
 private:
+    // FOUNDATION DATA
     PerformanceTimer gameTimer_;
     std::wstring windowText_;
     GPUAccess gpuAccess_;
 
+
+    // CUSTOM APPLICATION DATA
     GPUUploadHeap constantBuffer_;
     GPUFrameResourceDescriptor constantBufferView_;
     SceneConstantBuffer constantBufferData_;
+
+    GPURootSignature triangleRootSignature_;
+    GPUPipelineState trianglePipelineState_;
+
+    GPUGraphicsGraphNode triangleGraphNode_;
+    GPUPresentGraphNode presentNode_;
 
     GPUFrameResource triangleMesh_;
     GeometryMesh triangleMeshData_;

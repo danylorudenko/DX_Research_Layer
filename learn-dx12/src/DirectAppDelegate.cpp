@@ -33,8 +33,8 @@ void DirectAppDelegate::start(Application& application)
     auto rootSignature = CreateRootSignature();
     auto pipelineState = CreatePipelineState(rootSignature);
 
-    auto* rootSignatureWrapper = new GPURootSignature{ rootSignature };
-    auto* pipelineStateWrapper = new GPUPipelineState{ pipelineState };
+    triangleRootSignature_ = GPURootSignature{ rootSignature };
+    trianglePipelineState_ = GPUPipelineState{ pipelineState };
 
     auto const framesCount = static_cast<int>(GPUAccess::SWAP_CHAIN_BUFFER_COUNT);
     constantBuffer_ = GPUUploadHeap{ 
@@ -47,12 +47,11 @@ void DirectAppDelegate::start(Application& application)
     std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
     GPUFrameRootTablesMap rootTableMap{ framesCount, describedResourcesViews, describedResources };
 
-    rootSignatureWrapper->ImportPassFrameRootDescriptorTable(rootTableMap);
+    triangleRootSignature_.ImportPassFrameRootDescriptorTable(rootTableMap);
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // FATAL ERROR. NO SOURCE TRIANGLE DATA IN THE PROJECT!!!
     GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
     triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COPY_DEST);
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
@@ -67,14 +66,12 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
 
-    auto* triangleNode = new GPUGraphicsGraphNode{ &initializationEngine, rootSignatureWrapper, pipelineStateWrapper };
-    triangleNode->AddRenderItem(triangleRenderItem);
+    triangleGraphNode_ = GPUGraphicsGraphNode{ &initializationEngine, &triangleRootSignature_, &trianglePipelineState_ };
+    triangleGraphNode_.AddRenderItem(triangleRenderItem);
 
-    auto* presentNode = new GPUPresentGraphNode{ gpuAccess_.SwapChain() };
+    presentNode_ = GPUPresentGraphNode{ gpuAccess_.SwapChain() };
     
-    //LoadTriangleVertices();
-    LoadConstantBuffers();
-
+    triangleGraphNode_.ImportChildNode(&presentNode_);
 }
 
 void DirectAppDelegate::update(Application& application)
@@ -169,19 +166,6 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
     gpuAccess_.CreatePSO(pipelineState, &psoDesc);
     return pipelineState;
-}
-
-void DirectAppDelegate::LoadConstantBuffers()
-{
-    //constexpr UINT cbSize = sizeof(SceneConstantBuffer) + 255 & ~255;
-    //
-    //constantBuffer_ = GPUUploadHeap{ gpuAccess_.Device(), nullptr, cbSize, true };
-    //constantBuffer_.Map(reinterpret_cast<void**>(&constantBufferMappedData_), nullptr);
-    //
-    //D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    //cbvDesc.BufferLocation = constantBuffer_.GPUVirtualAddress();
-    //cbvDesc.SizeInBytes = cbSize;
-    //gpuAccess_.CreateConstantBufferView(&cbvDesc, cbvHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void DirectAppDelegate::Draw()
