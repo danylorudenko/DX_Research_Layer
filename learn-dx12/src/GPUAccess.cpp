@@ -89,6 +89,7 @@ void GPUAccess::CreateFrameResources()
     depthStencilDesc.Format = depthStencilBufferFormat;
     depthStencilDesc.Width = WIDTH;
     depthStencilDesc.Height = HEIGHT;
+    depthStencilDesc.MipLevels = 1;
     depthStencilDesc.DepthOrArraySize = 1;
     depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     depthStencilDesc.SampleDesc.Count = 1;

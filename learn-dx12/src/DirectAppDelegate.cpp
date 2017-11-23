@@ -53,7 +53,8 @@ void DirectAppDelegate::start(Application& application)
 
 
     GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
-    triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COPY_DEST);
+    triangleMesh_ = GPUFrameResource{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
+    //triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COPY_DEST);
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
     triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
@@ -73,6 +74,7 @@ void DirectAppDelegate::start(Application& application)
     
     triangleGraphNode_.ImportChildNode(&presentNode_);
 
+    gpuAccess_.FrameGraph().AddParentNode(&triangleGraphNode_);
     gpuAccess_.FrameGraph().ParseGraphToQueue();
 }
 

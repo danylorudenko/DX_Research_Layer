@@ -32,7 +32,7 @@ GPUDescriptorHeap::GPUDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device
     //////////////////////////////
     
     D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
-    dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+    dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
     dsvHeapDesc.NumDescriptors = heapCapacityDsv_;
     dsvHeapDesc.NodeMask = 0;
     dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
