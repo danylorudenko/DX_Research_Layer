@@ -6,11 +6,29 @@
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>
+#include <Rendering\Data\GPURenderItem.hpp>
 
 void DirectAppDelegate::start(Application& application)
 {
+    /////////////////////////////////////////////////////////////////////////////
+    // TESTING CONSTANT VERTEX DATA
+    /////////////////////////////////////////////////////////////////////////////
+
+    Vertex verticesData[] = {
+        { { 0.0f, 0.25f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
+        { { 0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
+        { { -0.25f, -0.25f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
+    };
+
+    auto const verticesDataSize = sizeof(verticesData);
+
+    /////////////////////////////////////////////////////////////////////////////
+    
+    
     gpuAccess_ = GPUAccess{ application };
     gameTimer_.Reset();
+
+    auto& initializationEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
 
     auto rootSignature = CreateRootSignature();
     auto pipelineState = CreatePipelineState(rootSignature);
@@ -31,10 +49,30 @@ void DirectAppDelegate::start(Application& application)
 
     rootSignatureWrapper->ImportPassFrameRootDescriptorTable(rootTableMap);
 
-    auto* triangleNode = new GPUGraphicsGraphNode{ &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>(), rootSignatureWrapper, pipelineStateWrapper };
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // FATAL ERROR. NO SOURCE TRIANGLE DATA IN THE PROJECT!!!
+    GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
+    triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COPY_DEST);
+    triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
+    triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+
+    D3D12_VERTEX_BUFFER_VIEW triangleView{};
+    triangleView.BufferLocation = triangleMesh_.GPUVirtualAddress(0);
+    triangleView.SizeInBytes = static_cast<UINT>(triangleMesh_.Size());
+    triangleView.StrideInBytes = sizeof(float) * 3;
+    
+    GPURenderItem triangleRenderItem{};
+    triangleRenderItem.vertexBufferDescriptor_ = triangleView;
+    triangleRenderItem.vertexCount_ = 3;
+
+    auto* triangleNode = new GPUGraphicsGraphNode{ &initializationEngine, rootSignatureWrapper, pipelineStateWrapper };
+    triangleNode->AddRenderItem(triangleRenderItem);
+
     auto* presentNode = new GPUPresentGraphNode{ gpuAccess_.SwapChain() };
     
-    LoadTriangleVertices();
+    //LoadTriangleVertices();
     LoadConstantBuffers();
 
 }
@@ -131,34 +169,6 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
     gpuAccess_.CreatePSO(pipelineState, &psoDesc);
     return pipelineState;
-}
-
-void DirectAppDelegate::LoadTriangleVertices()
-{
-    int const framesCount = static_cast<int>(gpuAccess_.SWAP_CHAIN_BUFFER_COUNT);
-    
-    Vertex verticesData[] = {
-        { { 0.0f, 0.25f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
-        { { 0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
-        { { -0.25f, -0.25f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
-    };
-    constexpr UINT vertexDataSize = sizeof(verticesData);
-
-    GPUUploadHeap uploadHeap{ framesCount, gpuAccess_.Device().Get(), verticesData, vertexDataSize, &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize), true };
-    
-    auto& gpuEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
-
-    triangleMesh_.vertices.CreateResources(framesCount, gpuAccess_.Device().Get(), vertexDataSize, &CD3DX12_RESOURCE_DESC::Buffer(vertexDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
-    for (int i = 0; i < framesCount; i++) {
-        triangleMesh_.vertices.UpdateData(i, gpuEngine.CommandList(), 0, uploadHeap, i, 0, vertexDataSize);
-        triangleMesh_.vertices.Transition(i, gpuEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);
-    }
-
-    gpuEngine.FlushReset();
-    
-    //triangleMesh_.verticesView.BufferLocation = triangleMesh_.vertices.GPUVirtualAddress();
-    triangleMesh_.verticesView.SizeInBytes = vertexDataSize;
-    triangleMesh_.verticesView.StrideInBytes = sizeof(Vertex);
 }
 
 void DirectAppDelegate::LoadConstantBuffers()

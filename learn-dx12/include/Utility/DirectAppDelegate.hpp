@@ -23,7 +23,6 @@ public:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRootSignature();
     Microsoft::WRL::ComPtr<ID3D12PipelineState> CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature);
 
-    void LoadTriangleVertices();
     void LoadConstantBuffers();
     
     void Draw();
@@ -38,5 +37,6 @@ private:
     GPUFrameResourceDescriptor constantBufferView_;
     SceneConstantBuffer constantBufferData_;
 
-    GeometryMesh triangleMesh_;
+    GPUFrameResource triangleMesh_;
+    GeometryMesh triangleMeshData_;
 };

@@ -52,6 +52,16 @@ void GPUGraphicsGraphNode::SetDepthStencilTarget(GPUFrameResourceDescriptor dept
     depthStencilTarget_ = depthStencilDescriptor;
 }
 
+void GPUGraphicsGraphNode::AddRenderItem(GPURenderItem const& renderItem)
+{
+    renderItems_.push_back(renderItem);
+}
+
+void GPUGraphicsGraphNode::AddRenderItem(GPURenderItem&& renderItem)
+{
+    renderItems_.push_back(std::move(renderItem));
+}
+
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item)
 {
     auto const resCount = item.perItemResourceDescriptors_.size();
