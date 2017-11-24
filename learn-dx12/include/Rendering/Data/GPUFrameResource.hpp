@@ -7,7 +7,7 @@ class GPUFrameResource
 public:
     GPUFrameResource();
     GPUFrameResource(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON);
-    GPUFrameResource(int framesCount, std::size_t resourceSize, std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> resources, D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON);
+    GPUFrameResource(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON);
     GPUFrameResource(GPUFrameResource const&) = delete;
     GPUFrameResource(GPUFrameResource&& rhs);
 

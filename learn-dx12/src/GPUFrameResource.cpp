@@ -24,7 +24,7 @@ GPUFrameResource::GPUFrameResource(int framesCount, ID3D12Device* device, std::s
     }
 }
 
-GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> resources, D3D12_RESOURCE_STATES state) :
+GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state) :
     framesCount_(framesCount),
     states_(framesCount, state),
     size_(resourceSize),

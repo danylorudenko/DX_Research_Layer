@@ -70,12 +70,12 @@ void GPUAccess::InitializeD3D12()
 
 void GPUAccess::CreateFrameResources()
 {
+    assert(SWAP_CHAIN_BUFFER_COUNT <= 3 && "More than 3 framebuffers in not currently supported.");
+    
     // Render targets fetch and view creation.
-    std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> renderBuffers{};
+    Microsoft::WRL::ComPtr<ID3D12Resource> renderBuffers[3];
     for (int i = 0; i < SWAP_CHAIN_BUFFER_COUNT; i++) {
-        Microsoft::WRL::ComPtr<ID3D12Resource> renderBuffer{};
-        swapChain_->GetBuffer(i, IID_PPV_ARGS(&renderBuffer));
-        renderBuffers.push_back(renderBuffer);
+        swapChain_->GetBuffer(i, IID_PPV_ARGS(renderBuffers[i].GetAddressOf()));
     }
 
     int const framesCount = static_cast<int>(SWAP_CHAIN_BUFFER_COUNT);
