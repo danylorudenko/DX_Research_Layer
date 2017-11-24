@@ -73,3 +73,8 @@ void GPUFrameResource::Transition(int frameIndex, ID3D12GraphicsCommandList* com
     commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resources_[frameIndex].Get(), states_[frameIndex], state));
     states_[frameIndex] = state;
 }
+
+D3D12_RESOURCE_STATES GPUFrameResource::State(int frameIndex) const
+{
+    return states_[frameIndex];
+}

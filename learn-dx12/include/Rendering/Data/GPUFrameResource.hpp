@@ -25,7 +25,7 @@ public:
     void UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUFrameResource& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes);
 
     void Transition(int frameIndex, ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state);
-    D3D12_RESOURCE_STATES State(int frameIndex) const { return states_[frameIndex]; }
+    D3D12_RESOURCE_STATES State(int frameIndex) const;
 
 protected:
     int framesCount_ = 0;
