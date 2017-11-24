@@ -80,8 +80,8 @@ void GPUAccess::CreateFrameResources()
 
     int const framesCount = static_cast<int>(SWAP_CHAIN_BUFFER_COUNT);
 
-    GPUFrameResource renderFrameResource{ framesCount, HEIGHT * WIDTH, renderBuffers, D3D12_RESOURCE_STATE_RENDER_TARGET };
-    finalRenderTargetViews_ = descriptorHeap_.AllocRtvLinear(&renderFrameResource, nullptr, D3D12_RESOURCE_STATE_RENDER_TARGET, "renderBuffer", framesCount);
+    rendetTargetBuffers_ = GPUFrameResource{ framesCount, HEIGHT * WIDTH, renderBuffers, D3D12_RESOURCE_STATE_RENDER_TARGET };
+    finalRenderTargetViews_ = descriptorHeap_.AllocRtvLinear(&rendetTargetBuffers_, nullptr, D3D12_RESOURCE_STATE_RENDER_TARGET, "renderBuffer", framesCount);
 
     // Creation of depth-stencil buffers, creation of views.
     D3D12_RESOURCE_DESC depthStencilDesc{};

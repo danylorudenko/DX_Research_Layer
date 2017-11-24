@@ -75,6 +75,7 @@ private:
 
     GPUFrameResource depthStencilBuffers_;
     GPUFrameResourceDescriptor finalDepthStencilViews_;
+    GPUFrameResource rendetTargetBuffers_;
     GPUFrameResourceDescriptor finalRenderTargetViews_;
 
     // Default surface description.
