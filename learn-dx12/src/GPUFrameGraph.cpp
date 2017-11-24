@@ -22,6 +22,8 @@ void GPUFrameGraph::ParseGraphToQueue()
         RecursiveNodeParserService(parentNodes_[i], visitedNodes);
     }
 
+
+
     // Reversing queue to simulate the stack behaviour and iterate from start to end.
     std::reverse(parsedGraphList_.begin(), parsedGraphList_.end());
 }
@@ -38,21 +40,20 @@ GPUFrameGraph::GraphIterator GPUFrameGraph::GraphQueueEnd()
 
 void GPUFrameGraph::RecursiveNodeParserService(GPUGraphNode* node, std::set<GPUGraphNode*>& visitedNodes)
 {
-    visitedNodes.emplace(node);
-
     int nonVisitedChildren = 0;
     auto const nodeChildCount = node->ChildCount();
     for (int i = 0; i < nodeChildCount; i++) {
         auto nodeIterator = visitedNodes.find(node);
         // If node is not found == not visited.
-        if (nodeIterator != visitedNodes.end()) {
+        if (nodeIterator == visitedNodes.end()) {
             RecursiveNodeParserService(node->GetChild(i), visitedNodes);
             nonVisitedChildren++;
+            visitedNodes.emplace(node);
         }
     }
 
     // so the node is the dead end.
-    if (nonVisitedChildren > 0) {
+    if (nonVisitedChildren > 0 || nodeChildCount == 0) {
         parsedGraphList_.push_back(node);
     }
 }

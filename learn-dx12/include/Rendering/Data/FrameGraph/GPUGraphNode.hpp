@@ -10,7 +10,7 @@ class GPUGraphNode
 {
 public:
     GPUGraphNode();
-    GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState);
+    GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState, int frameBufferCount);
     GPUGraphNode(GPUGraphNode const&) = delete;
     GPUGraphNode(GPUGraphNode&& rhs);
 
@@ -29,10 +29,10 @@ public:
     virtual void Process(UINT64 frameIndex) = 0;
 
 protected:
-    bool SynchronizeFrames(UINT64 frameIndex);
+    void BindPassRootSignature(int frameIndex);
+    void TransitionPassResources(int frameIndex);
 
-    void SetPassRootSignature();
-    void TransitionPassResources();
+    int frameBufferCount_;
 
     GPUEngine* executionEngine_ = nullptr;
 
@@ -40,6 +40,4 @@ protected:
     GPUPipelineState* pipelineState_ = nullptr;
 
     std::vector<GPUGraphNode*> childNodes_;
-
-    UINT64 lastFrameIndex_ = 0ULL;
 };

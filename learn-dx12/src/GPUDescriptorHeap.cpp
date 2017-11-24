@@ -47,7 +47,7 @@ GPUDescriptorHeap::GPUDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device
     srvUavCbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     srvUavCbvHeapDesc.NumDescriptors = heapCapacityCbvSrvUav_;
     srvUavCbvHeapDesc.NodeMask = 0;
-    srvUavCbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    srvUavCbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     {
         HRESULT result = device_->CreateDescriptorHeap(&srvUavCbvHeapDesc, IID_PPV_ARGS(&heapCbvSrvUav_));
         ThrowIfFailed(result);

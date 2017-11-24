@@ -11,13 +11,15 @@ public:
     using StateAndResource = std::pair<D3D12_RESOURCE_STATES, GPUFrameResource*>;
     
     GPUFrameRootTablesMap();
-    GPUFrameRootTablesMap(int frameCount, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources);
-    GPUFrameRootTablesMap(int frameCount, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources);
+    GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources);
+    GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources);
     GPUFrameRootTablesMap(GPUFrameRootTablesMap const&);
     GPUFrameRootTablesMap(GPUFrameRootTablesMap&&);
 
     GPUFrameRootTablesMap& operator=(GPUFrameRootTablesMap const&);
     GPUFrameRootTablesMap& operator=(GPUFrameRootTablesMap&&);
+
+    ID3D12DescriptorHeap* ParentHeap() { return parentHeap_.Get(); }
 
     D3D12_CPU_DESCRIPTOR_HANDLE DescriptorTableCPUHandle(int frameIndex, int bindingPoint) const;
     D3D12_GPU_DESCRIPTOR_HANDLE DescirptorTableGPUHandle(int frameIndex, int bindingPoint) const;
@@ -28,8 +30,9 @@ public:
     D3D12_RESOURCE_STATES DescribedResourceTargetState(int resourceIndex) const;
     D3D12_RESOURCE_STATES DescribedResourceCurrentState(int frameIndex, int resourceIndex) const;
 
+
 private:
-    int frameCount_ = 0U;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> parentHeap_ = nullptr;
 
     // Descriptor tables are binded separately with binding points.
     // If root signature is described with more than one table, so they are binded

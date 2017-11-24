@@ -45,7 +45,7 @@ void DirectAppDelegate::start(Application& application)
 
     std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
     std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
-    GPUFrameRootTablesMap rootTableMap{ framesCount, describedResourcesViews, describedResources };
+    GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), describedResourcesViews, describedResources };
 
     triangleRootSignature_.ImportPassFrameRootDescriptorTable(rootTableMap);
 
@@ -67,8 +67,10 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
 
-    triangleGraphNode_ = GPUGraphicsGraphNode{ &initializationEngine, &triangleRootSignature_, &trianglePipelineState_ };
-    triangleGraphNode_.AddRenderItem(triangleRenderItem);
+    triangleGraphNode_ = GPUGraphicsGraphNode{ &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>(), &triangleRootSignature_, &trianglePipelineState_, framesCount };
+    triangleGraphNode_.ImportRenderItem(triangleRenderItem);
+    triangleGraphNode_.ImportRenderTarget(gpuAccess_.FinalRenderTargetViews());
+    triangleGraphNode_.ImportDepthStencilTarget(gpuAccess_.FinalDepthSteniclViews());
 
     presentNode_ = GPUPresentGraphNode{ gpuAccess_.SwapChain() };
     
@@ -76,6 +78,8 @@ void DirectAppDelegate::start(Application& application)
 
     gpuAccess_.FrameGraph().AddParentNode(&triangleGraphNode_);
     gpuAccess_.FrameGraph().ParseGraphToQueue();
+
+    initializationEngine.FlushReset();
 }
 
 void DirectAppDelegate::update(Application& application)
@@ -174,6 +178,21 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
 
 void DirectAppDelegate::Draw()
 {
+
+    auto& graph = gpuAccess_.FrameGraph();
+    auto& graphIterator = graph.GraphQueueStart();
+    auto& graphEnd = graph.GraphQueueEnd();
+    
+    auto& directEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+
+    while (graphIterator != graphEnd) {
+        (*graphIterator)->Process(frameIndex_);
+        ++graphIterator;
+    }
+
+    directEngine.FlushReset();
+    ++frameIndex_;
+    
     //GPUEngine& graphicsEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
     //GPUFrameResource& currentFrameResource = gpuAccess_.CurrentFrameResource();
     //

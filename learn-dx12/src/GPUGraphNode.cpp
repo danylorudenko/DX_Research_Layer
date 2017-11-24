@@ -2,10 +2,11 @@
 
 GPUGraphNode::GPUGraphNode() = default;
 
-GPUGraphNode::GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState) :
+GPUGraphNode::GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState, int frameBufferCount) :
     executionEngine_(engine),
     rootSignature_(rootSignature),
-    pipelineState_(pipelineState)
+    pipelineState_(pipelineState),
+    frameBufferCount_(frameBufferCount)
 {
 
 }
@@ -39,23 +40,14 @@ int GPUGraphNode::ChildCount() const
     return static_cast<int>(childNodes_.size());
 }
 
-bool GPUGraphNode::SynchronizeFrames(UINT64 frameIndex) {
-    if (frameIndex < lastFrameIndex_) {
-        lastFrameIndex_ = frameIndex;
-        return true;
-    }
-    
-    return false;
+void GPUGraphNode::BindPassRootSignature(int frameIndex)
+{
+    rootSignature_->BindPassRootSignature(executionEngine_);
+    rootSignature_->BindPassRootSignatureDescriptorTables(executionEngine_, frameIndex);
 }
 
-void GPUGraphNode::SetPassRootSignature()
+void GPUGraphNode::TransitionPassResources(int frameIndex)
 {
-    rootSignature_->SetPassRootSignature(executionEngine_);
-    rootSignature_->SetPassRootSignatureDescriptorTables(executionEngine_, static_cast<UINT>(lastFrameIndex_));
-}
-
-void GPUGraphNode::TransitionPassResources()
-{
-    rootSignature_->TransitionRootResources(executionEngine_, static_cast<UINT>(lastFrameIndex_));
+    rootSignature_->TransitionRootResources(executionEngine_, frameIndex);
 }
 

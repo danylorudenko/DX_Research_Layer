@@ -4,17 +4,17 @@ GPUFrameResourceDescriptor::GPUFrameResourceDescriptor() = default;
 
 GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap,
                                                        UINT descriptorSize, int* offsetsInHeap,
-                                                       D3D12_RESOURCE_STATES state, char const* semantics, GPUFrameResource* describedResources) :
+                                                       D3D12_RESOURCE_STATES state, char const* semantics, GPUFrameResource* describedResource) :
     frameCount_(frameCount), descriptorHeap_(heap),
     descriptorSize_(descriptorSize), state_(state), semantics_(semantics)
 {
-    assert(frameCount == describedResources->FramesCount() && "Passed data count does not respond to the passed frame count.");
+    assert(frameCount == describedResource->FramesCount() && "Passed data count does not respond to the passed frame count.");
 
     for (int i = 0; i < frameCount_; i++) {
         descriptorOffsets_.push_back(offsetsInHeap[i]);
     }
 
-    describedResources_ = describedResources;
+    describedResource_ = describedResource;
 }
 
 GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(GPUFrameResourceDescriptor const& rhs) = default;

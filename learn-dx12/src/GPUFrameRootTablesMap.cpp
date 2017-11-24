@@ -2,12 +2,12 @@
 
 GPUFrameRootTablesMap::GPUFrameRootTablesMap() = default;
 
-GPUFrameRootTablesMap::GPUFrameRootTablesMap(int frameCount, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources) :
-    frameCount_(frameCount), descriptorTable_(map), describedResources_(describedResources)
+GPUFrameRootTablesMap::GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources) :
+    parentHeap_(parentHeap), descriptorTable_(map), describedResources_(describedResources)
 { }
 
-GPUFrameRootTablesMap::GPUFrameRootTablesMap(int frameCount, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources) :
-    frameCount_(std::move(frameCount)), descriptorTable_(std::move(map)), describedResources_(describedResources)
+GPUFrameRootTablesMap::GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources) :
+    parentHeap_(parentHeap_), descriptorTable_(std::move(map)), describedResources_(describedResources)
 { }
 
 GPUFrameRootTablesMap::GPUFrameRootTablesMap(GPUFrameRootTablesMap const& rhs) = default;

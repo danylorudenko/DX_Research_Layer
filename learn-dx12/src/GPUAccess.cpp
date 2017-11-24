@@ -104,7 +104,7 @@ void GPUAccess::CreateFrameResources()
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
     dsvDesc.Texture2D.MipSlice = 0;
     dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-    depthStencilViews_ = descriptorHeap_.AllocDsvLinear(&depthStencilBuffers_, &dsvDesc, D3D12_RESOURCE_STATE_DEPTH_READ, "depthStencil", framesCount);
+    finalDepthStencilViews_ = descriptorHeap_.AllocDsvLinear(&depthStencilBuffers_, &dsvDesc, D3D12_RESOURCE_STATE_DEPTH_READ, "depthStencil", framesCount);
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()

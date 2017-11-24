@@ -18,13 +18,16 @@ void GPURootSignature::ImportPassFrameRootDescriptorTable(GPUFrameRootTablesMap 
     passRootDescriptorTablesMap_ = descriptorTable;
 }
 
-void GPURootSignature::SetPassRootSignature(GPUEngine* executionEngine)
+void GPURootSignature::BindPassRootSignature(GPUEngine* executionEngine)
 {
     executionEngine->Commit().SetGraphicsRootSignature(rootSignature_.Get());
 }
 
-void GPURootSignature::SetPassRootSignatureDescriptorTables(GPUEngine* executionEngine, UINT frameIndex)
+void GPURootSignature::BindPassRootSignatureDescriptorTables(GPUEngine* executionEngine, int frameIndex)
 {
+    ID3D12DescriptorHeap* descriptorHeaps[] = { passRootDescriptorTablesMap_.ParentHeap() };
+    executionEngine->Commit().SetDescriptorHeaps(1, descriptorHeaps);
+    
     int const tablesCount = static_cast<int>(passRootDescriptorTablesMap_.TableSize());
     for (int i = 0; i < tablesCount; i++) {
         // Errr, I hope it should work like this.
@@ -33,7 +36,7 @@ void GPURootSignature::SetPassRootSignatureDescriptorTables(GPUEngine* execution
 }
 
 
-void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, UINT frameIndex)
+void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, int frameIndex)
 {
     int const resourceNum = static_cast<int>(passRootDescriptorTablesMap_.DescribedResourceCount(frameIndex));
     assert(resourceNum < 10 && "Resource count reached static limit.");
@@ -52,5 +55,7 @@ void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, UINT 
         }
     }
 
-    executionEngine->Commit().ResourceBarrier(barriersCounter + 1, barriers);
+    if (barriersCounter > 0) {
+        executionEngine->Commit().ResourceBarrier(barriersCounter, barriers);
+    }
 }

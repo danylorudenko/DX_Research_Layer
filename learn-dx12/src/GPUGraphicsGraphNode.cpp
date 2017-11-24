@@ -2,8 +2,8 @@
 
 GPUGraphicsGraphNode::GPUGraphicsGraphNode() = default;
 
-GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState) :
-    GPUGraphNode(engine, rootSignature, pipelineState)
+GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState, int frameBufferCount) :
+    GPUGraphNode(engine, rootSignature, pipelineState, frameBufferCount)
 { }
 
 GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUGraphicsGraphNode&& rhs) :
@@ -18,56 +18,110 @@ GPUGraphicsGraphNode& GPUGraphicsGraphNode::operator=(GPUGraphicsGraphNode&& rhs
 
 void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
 {
-    if (SynchronizeFrames(frameIndex)) {
-        SetPassRootSignature();
-        TransitionPassResources();
+    int const frameIndexLocal = frameIndex % frameBufferCount_;
+    
+    TransitionPassResources(frameIndexLocal);
+    BindPassRootSignature(frameIndexLocal);
 
-        IterateRenderItems();
-    }
+    TransitionRenderTargets(frameIndexLocal);
+    TransitionDepthStencilTarget(frameIndexLocal);
+    BindRenderDepthStencilTargets(frameIndexLocal);
+
+    IterateRenderItems(frameIndex % frameBufferCount_);
 }
 
-void GPUGraphicsGraphNode::IterateRenderItems()
+void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
 {
     auto const itemCount = renderItems_.size();
     for (size_t i = 0; i < itemCount; i++) {
         auto item = renderItems_[i];
         BindRenderItemIndexBuffer(item);
         BindRenderItemVertexBuffer(item);
-        BindRenderItemRootResources(item);
+        BindRenderItemRootResources(item, frameIndex);
+        DrawCallRenderItem(item);
     }
 }
 
-void GPUGraphicsGraphNode::SetRenderTargets(std::vector<GPUFrameResourceDescriptor> const& renderTargets)
+void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceDescriptor> const& renderTargets)
 {
     renderTargets_ = renderTargets;
 }
 
-void GPUGraphicsGraphNode::SetRenderTargets(std::vector<GPUFrameResourceDescriptor>&& renderTargets)
+void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceDescriptor>&& renderTargets)
 {
     renderTargets_ = std::move(renderTargets);
 }
 
-void GPUGraphicsGraphNode::SetDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor)
+void GPUGraphicsGraphNode::ImportRenderTarget(GPUFrameResourceDescriptor const& renderTarget)
+{
+    renderTargets_.push_back(renderTarget);
+}
+
+void GPUGraphicsGraphNode::ImportDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor)
 {
     depthStencilTarget_ = depthStencilDescriptor;
 }
 
-void GPUGraphicsGraphNode::AddRenderItem(GPURenderItem const& renderItem)
+void GPUGraphicsGraphNode::ImportRenderItem(GPURenderItem const& renderItem)
 {
     renderItems_.push_back(renderItem);
 }
 
-void GPUGraphicsGraphNode::AddRenderItem(GPURenderItem&& renderItem)
+void GPUGraphicsGraphNode::ImportRenderItem(GPURenderItem&& renderItem)
 {
     renderItems_.push_back(std::move(renderItem));
 }
 
-void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item)
+void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(int frameIndex)
+{    
+    auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
+    assert(renderTargetsCount <= 5 && "More than 5 render targets is not currently supported.");
+
+    D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[5];
+    for (int i = 0; i < renderTargetsCount; i++) {
+        renderTargetHandles[i] = renderTargets_[i].CPUViewHandle(frameIndex);
+    }
+
+    D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle = depthStencilTarget_.CPUViewHandle(frameIndex);
+    auto* depthStencilHandlePtr = depthStencilTarget_.IsValid() ? &depthStencilHandle : nullptr;
+    
+    executionEngine_->Commit().OMSetRenderTargets(renderTargetsCount, renderTargetHandles, false, depthStencilHandlePtr);
+
+}
+
+void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)
 {
-    auto const resCount = item.perItemResourceDescriptors_.size();
+    auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
+    assert(renderTargetsCount <= 5 && "More that 5 render targets is not currently supported.");
+    
+    D3D12_RESOURCE_BARRIER barriers[5];
+    for (int i = 0; i < renderTargetsCount; i++) {
+        if (renderTargets_[i].DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
+            barriers[i] = CD3DX12_RESOURCE_BARRIER::Transition(
+                renderTargets_[i].DescribedResource()->Get(frameIndex),
+                renderTargets_[i].DescribedResource()->State(frameIndex),
+                D3D12_RESOURCE_STATE_RENDER_TARGET
+            );
+        }
+    }
+}
+
+void GPUGraphicsGraphNode::TransitionDepthStencilTarget(int frameIndex)
+{
+    if (depthStencilTarget_.DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_DEPTH_WRITE) {
+        D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+            depthStencilTarget_.DescribedResource()->Get(frameIndex),
+            depthStencilTarget_.DescribedResource()->State(frameIndex),
+            D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    }
+}
+
+void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, int frameIndex)
+{
+    auto const resCount = static_cast<int>(item.perItemResourceDescriptors_.size());
     for (size_t i = 0; i < resCount; i++) {
         auto resDesc = item.perItemResourceDescriptors_[i];
-        executionEngine_->Commit().SetGraphicsRootDescriptorTable(resDesc.first, resDesc.second.GPUViewHandle(static_cast<int>(lastFrameIndex_)));
+        executionEngine_->Commit().SetGraphicsRootDescriptorTable(resDesc.first, resDesc.second.GPUViewHandle(frameIndex));
     }
 }
 
@@ -79,4 +133,9 @@ void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)
 void GPUGraphicsGraphNode::BindRenderItemIndexBuffer(GPURenderItem& item)
 {
     executionEngine_->Commit().IASetIndexBuffer(&item.indexBufferDescriptor_);
+}
+
+void GPUGraphicsGraphNode::DrawCallRenderItem(GPURenderItem& item)
+{
+    executionEngine_->Commit().DrawInstanced(item.vertexCount_, 1, 0, 0);
 }

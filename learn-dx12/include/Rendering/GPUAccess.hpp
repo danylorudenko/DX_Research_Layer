@@ -39,6 +39,9 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Device> Device() const { return device_; }
     Microsoft::WRL::ComPtr<IDXGISwapChain> SwapChain() { return swapChain_; }
 
+    GPUFrameResourceDescriptor FinalRenderTargetViews() { return finalRenderTargetViews_; }
+    GPUFrameResourceDescriptor FinalDepthSteniclViews() { return finalDepthStencilViews_; }
+
     GPUFrameGraph& FrameGraph() { return frameGraph_; }
     GPUDescriptorHeap& DescriptorHeap() { return descriptorHeap_; }
 
@@ -71,7 +74,7 @@ private:
     UINT64 currentFrame_ = 0U;
 
     GPUFrameResource depthStencilBuffers_;
-    GPUFrameResourceDescriptor depthStencilViews_;
+    GPUFrameResourceDescriptor finalDepthStencilViews_;
     GPUFrameResourceDescriptor finalRenderTargetViews_;
 
     // Default surface description.

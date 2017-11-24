@@ -33,6 +33,8 @@ private:
     std::wstring windowText_;
     GPUAccess gpuAccess_;
 
+    UINT64 frameIndex_ = 0;
+
 
     // CUSTOM APPLICATION DATA
     GPUUploadHeap constantBuffer_;

@@ -18,18 +18,22 @@ public:
     GPUFrameResourceDescriptor& operator=(GPUFrameResourceDescriptor const&);
     GPUFrameResourceDescriptor& operator=(GPUFrameResourceDescriptor&&);
 
+    bool IsValid() const { return describedResource_ != nullptr; }
+
     D3D12_GPU_DESCRIPTOR_HANDLE GPUViewHandle(int frameIndex) const;
     D3D12_CPU_DESCRIPTOR_HANDLE CPUViewHandle(int frameIndex) const;
+
+    GPUFrameResource* DescribedResource() { return describedResource_; }
 
 private:
     int frameCount_ = 0;
 
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_ = nullptr;
     std::vector<int> descriptorOffsets_;
-    UINT descriptorSize_;
+    UINT descriptorSize_ = 0;
 
     D3D12_RESOURCE_STATES state_;
     std::string semantics_;
 
-    GPUFrameResource* describedResources_;
+    GPUFrameResource* describedResource_ = nullptr;
 };

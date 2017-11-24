@@ -23,9 +23,9 @@ public:
     // This is done during graph setup.
     void ImportPassFrameRootDescriptorTable(GPUFrameRootTablesMap const& descriptorTable);
     
-    void SetPassRootSignature(GPUEngine* executionEngine);
-    void SetPassRootSignatureDescriptorTables(GPUEngine* executionEngine, UINT frameIndex);
-    void TransitionRootResources(GPUEngine* executionEngine, UINT frameIndex);
+    void BindPassRootSignature(GPUEngine* executionEngine);
+    void BindPassRootSignatureDescriptorTables(GPUEngine* executionEngine, int frameIndex);
+    void TransitionRootResources(GPUEngine* executionEngine, int frameIndex);
 
 private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;

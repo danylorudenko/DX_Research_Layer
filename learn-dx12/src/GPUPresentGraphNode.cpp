@@ -12,7 +12,5 @@ GPUPresentGraphNode& GPUPresentGraphNode::operator=(GPUPresentGraphNode&& rhs) =
 
 void GPUPresentGraphNode::Process(UINT64 frameIndex) 
 {
-    if (SynchronizeFrames(frameIndex)) {
-        swapChain_->Present(0, 0);
-    }
+    swapChain_->Present(0, 0);
 }

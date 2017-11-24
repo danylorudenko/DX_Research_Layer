@@ -49,6 +49,10 @@ public:
                                               int frameCount = 1U);
 
 
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> HeapRtv() { return heapRtv_; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> HeapDsv() { return heapDsv_; }
+    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> HeapCbvSrvUav() { return heapCbvSrvUav_; }
+
 private:
     Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
     
