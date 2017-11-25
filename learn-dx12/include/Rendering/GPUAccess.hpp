@@ -20,6 +20,8 @@ public:
     GPUAccess& operator=(GPUAccess const&) = delete;
     GPUAccess& operator=(GPUAccess&&);
 
+    ~GPUAccess();
+
     static constexpr UINT WIDTH = 800;
     static constexpr UINT HEIGHT = 600;
 
@@ -39,11 +41,11 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Device> Device() const { return device_; }
     Microsoft::WRL::ComPtr<IDXGISwapChain> SwapChain() { return swapChain_; }
 
-    GPUFrameResourceDescriptor FinalRenderTargetViews() { return finalRenderTargetViews_; }
-    GPUFrameResourceDescriptor FinalDepthSteniclViews() { return finalDepthStencilViews_; }
+    GPUFrameResourceDescriptor& FinalRenderTargetViews() { return *finalRenderTargetViews_; }
+    GPUFrameResourceDescriptor& FinalDepthSteniclViews() { return *finalDepthStencilViews_; }
 
-    GPUFrameGraph& FrameGraph() { return frameGraph_; }
-    GPUDescriptorHeap& DescriptorHeap() { return descriptorHeap_; }
+    GPUFrameGraph& FrameGraph() { return *frameGraph_; }
+    GPUDescriptorHeap& DescriptorHeap() { return *descriptorHeap_; }
 
     void CommitDefaultViewportScissorRects();
 
@@ -68,22 +70,22 @@ private:
 
     GPUEngine engines_[3];
 
-    GPUFrameGraph frameGraph_;
+    GPUFrameGraph* frameGraph_ = nullptr;
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
     UINT64 currentFrame_ = 0U;
 
-    GPUFrameResource depthStencilBuffers_;
-    GPUFrameResourceDescriptor finalDepthStencilViews_;
-    GPUFrameResource rendetTargetBuffers_;
-    GPUFrameResourceDescriptor finalRenderTargetViews_;
+    GPUFrameResource* rendetTargetBuffers_ = nullptr;
+    GPUFrameResource* depthStencilBuffers_ = nullptr;
+    GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
+    GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
 
     // Default surface description.
     D3D12_VIEWPORT viewportRect_;
     D3D12_RECT scissorRect_;
 
 
-    GPUDescriptorHeap descriptorHeap_;
+    GPUDescriptorHeap* descriptorHeap_ = nullptr;
     int static constexpr RTV_HEAP_CAPACITY = 30;
     int static constexpr DSV_HEAP_CAPACITY = 30;
     int static constexpr CBV_SRV_UAV_CAPACITY = 30;
