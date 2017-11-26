@@ -14,7 +14,7 @@ class GPUAccess
 public:
     GPUAccess();
     GPUAccess(Application& application);
-    GPUAccess(ID3D12Device const&) = delete;
+    GPUAccess(GPUAccess const&) = delete;
     GPUAccess(GPUAccess&& rhs);
 
     GPUAccess& operator=(GPUAccess const&) = delete;
@@ -75,7 +75,7 @@ private:
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
     UINT64 currentFrame_ = 0U;
 
-    GPUFrameResource* rendetTargetBuffers_ = nullptr;
+    GPUFrameResource* renderTargetBuffers_ = nullptr;
     GPUFrameResource* depthStencilBuffers_ = nullptr;
     GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
     GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
