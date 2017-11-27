@@ -20,7 +20,7 @@ void DirectAppDelegate::start(Application& application)
         { { -0.25f, -0.25f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
     };
 
-    auto const verticesDataSize = sizeof(verticesData) * sizeof(Vertex);
+    auto const verticesDataSize = sizeof(verticesData);
 
     /////////////////////////////////////////////////////////////////////////////
     
@@ -61,7 +61,7 @@ void DirectAppDelegate::start(Application& application)
     D3D12_VERTEX_BUFFER_VIEW triangleView{};
     triangleView.BufferLocation = triangleMesh_.GPUVirtualAddress(0);
     triangleView.SizeInBytes = /*static_cast<UINT>(triangleMesh_.Size()*/verticesDataSize;
-    triangleView.StrideInBytes = sizeof(float) * 3;
+    triangleView.StrideInBytes = sizeof(Vertex);
     
     GPURenderItem triangleRenderItem{};
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
@@ -201,7 +201,6 @@ void DirectAppDelegate::Draw()
         ++graphIterator;
     }
 
-    directEngine.FlushReset();
     ++frameIndex_;
     
     //GPUEngine& graphicsEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();

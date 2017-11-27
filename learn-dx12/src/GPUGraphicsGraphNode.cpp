@@ -20,12 +20,12 @@ void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
 {
     int const frameIndexLocal = frameIndex % frameBufferCount_;
     
+    TransitionRenderTargets(frameIndexLocal);
     BindPipelineState();
 
     TransitionPassResources(frameIndexLocal);
     BindPassRootSignature(frameIndexLocal);
 
-    TransitionRenderTargets(frameIndexLocal);
     TransitionDepthStencilTarget(frameIndexLocal);
     BindRenderDepthStencilTargets(frameIndexLocal);
 
@@ -111,6 +111,12 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)
             );
         }
     }
+
+    /*for (int i = 0; i < renderTargetsCount; i++) {
+        if (renderTargets_[i].DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
+            renderTargets_[i].DescribedResource()->Transition(frameIndex, executionEngine_->CommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+        }
+    }*/
 }
 
 void GPUGraphicsGraphNode::TransitionDepthStencilTarget(int frameIndex)

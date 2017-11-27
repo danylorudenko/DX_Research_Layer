@@ -138,8 +138,8 @@ void GPUAccess::CreateFrameResources()
 
     int const framesCount = static_cast<int>(SWAP_CHAIN_BUFFER_COUNT);
 
-    renderTargetBuffers_ = new GPUFrameResource{ framesCount, HEIGHT * WIDTH, renderBuffers, D3D12_RESOURCE_STATE_PRESENT };
-    auto rtv = descriptorHeap_->AllocRtvLinear(renderTargetBuffers_, nullptr, D3D12_RESOURCE_STATE_PRESENT, "renderBuffer", framesCount);
+    renderTargetBuffers_ = new GPUFrameResource{ framesCount, HEIGHT * WIDTH, renderBuffers, D3D12_RESOURCE_STATE_RENDER_TARGET };
+    auto rtv = descriptorHeap_->AllocRtvLinear(renderTargetBuffers_, nullptr, D3D12_RESOURCE_STATE_RENDER_TARGET, "renderBuffer", framesCount);
     finalRenderTargetViews_ = new GPUFrameResourceDescriptor{ rtv };
 
     // Creation of depth-stencil buffers, creation of views.
@@ -163,7 +163,7 @@ void GPUAccess::CreateFrameResources()
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
     dsvDesc.Texture2D.MipSlice = 0;
     dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-    auto dsv = descriptorHeap_->AllocDsvLinear(depthStencilBuffers_, &dsvDesc, D3D12_RESOURCE_STATE_DEPTH_READ, "depthStencil", framesCount);
+    auto dsv = descriptorHeap_->AllocDsvLinear(depthStencilBuffers_, &dsvDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, "depthStencil", framesCount);
     finalDepthStencilViews_ = new GPUFrameResourceDescriptor{ dsv };
 }
 

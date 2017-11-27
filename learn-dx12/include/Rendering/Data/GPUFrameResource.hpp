@@ -6,8 +6,8 @@ class GPUFrameResource
 {
 public:
     GPUFrameResource();
-    GPUFrameResource(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON);
-    GPUFrameResource(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON);
+    GPUFrameResource(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state);
+    GPUFrameResource(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state);
     GPUFrameResource(GPUFrameResource const&) = delete;
     GPUFrameResource(GPUFrameResource&& rhs);
 
@@ -21,7 +21,7 @@ public:
 
     D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress(int frameIndex) const { return gpuAddresses_[frameIndex]; }
 
-    void CreateResources(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COMMON);
+    void CreateResources(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES initialState);
     void UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUFrameResource& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes);
 
     void Transition(int frameIndex, ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state);
