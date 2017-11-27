@@ -27,13 +27,13 @@ public:
     virtual void Process(UINT64 frameIndex) override;
 
 private:
-    void IterateRenderItems(int frameIndex);
-
     void BindRenderDepthStencilTargets(int frameIndex);
+    void BindPipelineState();
 
     void TransitionRenderTargets(int frameIndex);
     void TransitionDepthStencilTarget(int frameIndex);
 
+    void IterateRenderItems(int frameIndex);
     void BindRenderItemRootResources(GPURenderItem& item, int frameIndex);
     void BindRenderItemVertexBuffer(GPURenderItem& item);
     void BindRenderItemIndexBuffer(GPURenderItem& item);

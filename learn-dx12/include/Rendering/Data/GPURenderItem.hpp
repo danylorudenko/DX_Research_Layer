@@ -9,6 +9,7 @@ class GPURenderItem
 public:
     D3D12_VERTEX_BUFFER_VIEW vertexBufferDescriptor_;
     UINT vertexCount_;
+    D3D_PRIMITIVE_TOPOLOGY primitiveTopology_;
 
     bool hasIndexBuffer_ = false;
     D3D12_INDEX_BUFFER_VIEW indexBufferDescriptor_;

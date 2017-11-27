@@ -18,15 +18,68 @@ GPUAccess::GPUAccess(Application& application)
 
     // Set default viewport and scissor values.
     SetViewportScissor();
+
+    frameGraph_ = new GPUFrameGraph{};
 }
 
-GPUAccess::GPUAccess(GPUAccess&& rhs) = default;
+GPUAccess::GPUAccess(GPUAccess&& rhs)
+{
+    device_ = std::move(rhs.device_);
+    dxgiFactory_ = std::move(rhs.dxgiFactory_);
 
-GPUAccess& GPUAccess::operator=(GPUAccess&& rhs) = default;
+    for (int i = 0; i < 3; i++) {
+        engines_[i] = std::move(rhs.engines_[i]);
+    }
+
+    swapChain_ = std::move(rhs.swapChain_);
+    currentFrame_ = std::move(rhs.currentFrame_);
+
+    frameGraph_ = rhs.frameGraph_; rhs.frameGraph_ = nullptr;
+
+    renderTargetBuffers_ = rhs.renderTargetBuffers_; rhs.renderTargetBuffers_ = nullptr;
+    depthStencilBuffers_ = rhs.depthStencilBuffers_; rhs.depthStencilBuffers_ = nullptr;
+    finalRenderTargetViews_ = rhs.finalRenderTargetViews_; rhs.finalRenderTargetViews_ = nullptr;
+    finalDepthStencilViews_ = rhs.finalDepthStencilViews_; rhs.finalDepthStencilViews_ = nullptr;
+
+    descriptorHeap_ = rhs.descriptorHeap_; rhs.descriptorHeap_ = nullptr;
+
+}
+
+GPUAccess& GPUAccess::operator=(GPUAccess&& rhs)
+{
+    device_ = std::move(rhs.device_);
+    dxgiFactory_ = std::move(rhs.dxgiFactory_);
+
+    for (int i = 0; i < 3; i++) {
+        engines_[i] = std::move(rhs.engines_[i]);
+    }
+
+    swapChain_ = std::move(rhs.swapChain_);
+    currentFrame_ = std::move(rhs.currentFrame_);
+
+    frameGraph_ = rhs.frameGraph_; rhs.frameGraph_ = nullptr;
+
+    renderTargetBuffers_ = rhs.renderTargetBuffers_; rhs.renderTargetBuffers_ = nullptr;
+    depthStencilBuffers_ = rhs.depthStencilBuffers_; rhs.depthStencilBuffers_ = nullptr;
+    finalRenderTargetViews_ = rhs.finalRenderTargetViews_; rhs.finalRenderTargetViews_ = nullptr;
+    finalDepthStencilViews_ = rhs.finalDepthStencilViews_; rhs.finalDepthStencilViews_ = nullptr;
+
+    descriptorHeap_ = rhs.descriptorHeap_; rhs.descriptorHeap_ = nullptr;
+
+    return *this;
+}
 
 GPUAccess::~GPUAccess()
 {
+    delete renderTargetBuffers_;
+    delete depthStencilBuffers_;
 
+    delete finalRenderTargetViews_;
+    delete finalDepthStencilViews_;
+
+    delete frameGraph_;
+
+    delete descriptorHeap_;
 }
 
 void GPUAccess::GetHardwareAdapter(IDXGIAdapter1** dest, IDXGIFactory1* factory)

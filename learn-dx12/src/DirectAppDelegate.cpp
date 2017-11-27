@@ -66,6 +66,7 @@ void DirectAppDelegate::start(Application& application)
     GPURenderItem triangleRenderItem{};
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
+    triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
     triangleGraphNode_ = GPUGraphicsGraphNode{ &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>(), &triangleRootSignature_, &trianglePipelineState_, framesCount };
     triangleGraphNode_.ImportRenderItem(triangleRenderItem);

@@ -19,5 +19,8 @@ public:
     virtual void Process(UINT64 frameIndex) override;
 
 protected:
+    void TransitionRenderTargetState(int frameIndex);
+
+    std::vector<GPUFrameResource*> renderTargets_;
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
 };

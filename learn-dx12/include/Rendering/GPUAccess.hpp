@@ -70,10 +70,10 @@ private:
 
     GPUEngine engines_[3];
 
-    GPUFrameGraph* frameGraph_ = nullptr;
-
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
     UINT64 currentFrame_ = 0U;
+
+    GPUFrameGraph* frameGraph_ = nullptr;
 
     GPUFrameResource* renderTargetBuffers_ = nullptr;
     GPUFrameResource* depthStencilBuffers_ = nullptr;

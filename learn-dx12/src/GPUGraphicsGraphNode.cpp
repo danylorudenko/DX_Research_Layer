@@ -20,6 +20,8 @@ void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
 {
     int const frameIndexLocal = frameIndex % frameBufferCount_;
     
+    BindPipelineState();
+
     TransitionPassResources(frameIndexLocal);
     BindPassRootSignature(frameIndexLocal);
 
@@ -35,8 +37,8 @@ void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
     auto const itemCount = renderItems_.size();
     for (size_t i = 0; i < itemCount; i++) {
         auto item = renderItems_[i];
-        BindRenderItemIndexBuffer(item);
         BindRenderItemVertexBuffer(item);
+        BindRenderItemIndexBuffer(item);
         BindRenderItemRootResources(item, frameIndex);
         DrawCallRenderItem(item);
     }
@@ -89,6 +91,11 @@ void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(int frameIndex)
 
 }
 
+void GPUGraphicsGraphNode::BindPipelineState()
+{
+    executionEngine_->Commit().SetPipelineState(pipelineState_->Get());
+}
+
 void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)
 {
     auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
@@ -127,6 +134,7 @@ void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, int 
 
 void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)
 {
+    executionEngine_->Commit().IASetPrimitiveTopology(item.primitiveTopology_);
     executionEngine_->Commit().IASetVertexBuffers(0, 1, &item.vertexBufferDescriptor_);
 }
 
