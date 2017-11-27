@@ -8,13 +8,15 @@ class GPUPresentGraphNode : public GPUGraphNode
 {
 public:
     GPUPresentGraphNode();
-    GPUPresentGraphNode(Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain);
+    GPUPresentGraphNode(Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain, GPUEngine* executionEngine);
 
     GPUPresentGraphNode(GPUPresentGraphNode const&) = delete;
     GPUPresentGraphNode(GPUPresentGraphNode&& rhs);
 
     GPUPresentGraphNode& operator=(GPUPresentGraphNode const&) = delete;
     GPUPresentGraphNode& operator=(GPUPresentGraphNode&& rhs);
+
+    void ImportRenderTarget(GPUFrameResource* renderTarget);
 
     virtual void Process(UINT64 frameIndex) override;
 

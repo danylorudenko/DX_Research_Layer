@@ -20,7 +20,7 @@ void DirectAppDelegate::start(Application& application)
         { { -0.25f, -0.25f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
     };
 
-    auto const verticesDataSize = sizeof(verticesData);
+    auto const verticesDataSize = sizeof(verticesData) * sizeof(Vertex);
 
     /////////////////////////////////////////////////////////////////////////////
     
@@ -60,7 +60,7 @@ void DirectAppDelegate::start(Application& application)
 
     D3D12_VERTEX_BUFFER_VIEW triangleView{};
     triangleView.BufferLocation = triangleMesh_.GPUVirtualAddress(0);
-    triangleView.SizeInBytes = static_cast<UINT>(triangleMesh_.Size());
+    triangleView.SizeInBytes = /*static_cast<UINT>(triangleMesh_.Size()*/verticesDataSize;
     triangleView.StrideInBytes = sizeof(float) * 3;
     
     GPURenderItem triangleRenderItem{};
@@ -73,7 +73,8 @@ void DirectAppDelegate::start(Application& application)
     triangleGraphNode_.ImportRenderTarget(gpuAccess_.FinalRenderTargetViews());
     triangleGraphNode_.ImportDepthStencilTarget(gpuAccess_.FinalDepthSteniclViews());
 
-    presentNode_ = GPUPresentGraphNode{ gpuAccess_.SwapChain() };
+    presentNode_ = GPUPresentGraphNode{ gpuAccess_.SwapChain(), &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>() };
+    presentNode_.ImportRenderTarget(gpuAccess_.FinalRenderTargetViews().DescribedResource());
     
     triangleGraphNode_.ImportChildNode(&presentNode_);
 
@@ -186,6 +187,15 @@ void DirectAppDelegate::Draw()
     
     auto& directEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
 
+    // Quick hack to fix the back buffers states.
+    auto* backBuffer = gpuAccess_.FinalRenderTargetViews().DescribedResource();
+    int const localFrameIndex = frameIndex_ % gpuAccess_.SWAP_CHAIN_BUFFER_COUNT;
+    if (backBuffer->State(localFrameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
+        backBuffer->Transition(localFrameIndex, directEngine.CommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+    }
+
+    float clearColor[] = { 0.1f, 0.2f, 0.3f, 1.0f };
+    directEngine.Commit().ClearRenderTargetView(gpuAccess_.FinalRenderTargetViews().CPUViewHandle(localFrameIndex), clearColor, 0, nullptr);
     while (graphIterator != graphEnd) {
         (*graphIterator)->Process(frameIndex_);
         ++graphIterator;
