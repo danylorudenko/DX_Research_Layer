@@ -87,8 +87,9 @@ void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(int frameIndex)
     D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle = depthStencilTarget_.CPUViewHandle(frameIndex);
     auto* depthStencilHandlePtr = depthStencilTarget_.IsValid() ? &depthStencilHandle : nullptr;
     
-    executionEngine_->Commit().OMSetRenderTargets(renderTargetsCount, renderTargetHandles, false, depthStencilHandlePtr);
-
+    if (renderTargetsCount > 0) {
+        executionEngine_->Commit().OMSetRenderTargets(renderTargetsCount, renderTargetHandles, false, depthStencilHandlePtr);
+    }
 }
 
 void GPUGraphicsGraphNode::BindPipelineState()
