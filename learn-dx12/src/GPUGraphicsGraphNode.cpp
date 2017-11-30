@@ -113,7 +113,9 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)
         }
     }
 
-    executionEngine_->Commit().ResourceBarrier(renderTargetsCount, barriers);
+    if (renderTargetsCount > 0) {
+        executionEngine_->Commit().ResourceBarrier(renderTargetsCount, barriers);
+    }
 
     /*for (int i = 0; i < renderTargetsCount; i++) {
         if (renderTargets_[i].DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
