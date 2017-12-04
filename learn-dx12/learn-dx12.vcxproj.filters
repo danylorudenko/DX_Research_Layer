@@ -173,9 +173,6 @@
     <ClInclude Include="include\Rendering\Data\Vertex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\GPUFrameResource.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\Data\GPUResource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -207,6 +204,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\Interfaces\IResourceSizeGetter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\GPUResourceSet.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
