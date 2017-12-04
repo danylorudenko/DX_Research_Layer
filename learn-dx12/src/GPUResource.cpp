@@ -31,12 +31,12 @@ GPUResource& GPUResource::operator=(GPUResource&& rhs)
     return *this;
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource>& GPUResource::GetHandle(IResourceHandleGetter const&)
+Microsoft::WRL::ComPtr<ID3D12Resource>& GPUResource::GetHandle(IResourceHandleEditor const&)
 {
     return resourceHandle_;
 }
 
-D3D12_RESOURCE_STATES& GPUResource::GetVirtualState(IResourceStateGetter const&)
+D3D12_RESOURCE_STATES& GPUResource::GetVirtualState(IResourceStateEditor const&)
 {
     return virtualState_;
 }
@@ -46,12 +46,12 @@ D3D12_GPU_VIRTUAL_ADDRESS GPUResource::GetGPUVirtualAddress(IResourceVirtualGPUA
     return resourceHandle_->GetGPUVirtualAddress();
 }
 
-std::size_t& GPUResource::GetSize(IResourceSizeGetter const&)
+std::size_t& GPUResource::GetSize(IResourceSizeEditor const&)
 {
     return size_;
 }
 
-std::size_t& GPUResource::GetCapacity(IResourceCapacityGetter const&)
+std::size_t& GPUResource::GetCapacity(IResourceCapacityEditor const&)
 {
     return capacity_;
 }

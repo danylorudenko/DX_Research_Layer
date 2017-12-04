@@ -11,7 +11,7 @@ public:
     GPUFrameResourceView(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, 
                                UINT descriptorSize, int* offsetsInHeap,
                                D3D12_RESOURCE_STATES state, char const* semantics, 
-                               GPUFrameResource* resource);
+                               GPUResourceSet* resource);
     GPUFrameResourceView(GPUFrameResourceView const&);
     GPUFrameResourceView(GPUFrameResourceView&&);
 
@@ -23,7 +23,7 @@ public:
     D3D12_GPU_DESCRIPTOR_HANDLE GPUViewHandle(int frameIndex) const;
     D3D12_CPU_DESCRIPTOR_HANDLE CPUViewHandle(int frameIndex) const;
 
-    GPUFrameResource* DescribedResource() { return describedResource_; }
+    GPUResourceSet* DescribedResource() { return describedResource_; }
 
 private:
     int frameCount_ = 0;
@@ -35,5 +35,5 @@ private:
     D3D12_RESOURCE_STATES state_;
     std::string semantics_;
 
-    GPUFrameResource* describedResource_ = nullptr;
+    GPUResourceSet* describedResource_ = nullptr;
 };

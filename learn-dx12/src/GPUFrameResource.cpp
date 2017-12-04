@@ -1,8 +1,8 @@
 #include <Rendering\Data\GPUFrameResource.hpp>
 
-GPUFrameResource::GPUFrameResource() = default;
+GPUResourceSet::GPUResourceSet() = default;
 
-GPUFrameResource::GPUFrameResource(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state) :
+GPUResourceSet::GPUResourceSet(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state) :
     framesCount_(framesCount),
     states_(framesCount, state),
     size_(size),
@@ -24,7 +24,7 @@ GPUFrameResource::GPUFrameResource(int framesCount, ID3D12Device* device, std::s
     }
 }
 
-GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state) :
+GPUResourceSet::GPUResourceSet(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state) :
     framesCount_(framesCount),
     states_(framesCount, state),
     size_(resourceSize),
@@ -37,11 +37,11 @@ GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, Mi
     }
 }
 
-GPUFrameResource::GPUFrameResource(GPUFrameResource&& rhs) = default;
+GPUResourceSet::GPUResourceSet(GPUResourceSet&& rhs) = default;
 
-GPUFrameResource& GPUFrameResource::operator=(GPUFrameResource&& rhs) = default;
+GPUResourceSet& GPUResourceSet::operator=(GPUResourceSet&& rhs) = default;
 
-void GPUFrameResource::CreateResources(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES initialState)
+void GPUResourceSet::CreateResources(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES initialState)
 {
     resources_.clear();
     framesCount_ = framesCount;
@@ -63,18 +63,18 @@ void GPUFrameResource::CreateResources(int framesCount, ID3D12Device* device, st
     capacity_ = size;
 }
 
-void GPUFrameResource::UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUFrameResource& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes)
+void GPUResourceSet::UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUResourceSet& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes)
 {
     commandList->CopyBufferRegion(resources_[frameIndex].Get(), offsetInDest, src.Get(srcFrameIndex), offsetInSrc, numBytes);
 }
 
-void GPUFrameResource::Transition(int frameIndex, ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state)
+void GPUResourceSet::Transition(int frameIndex, ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state)
 {
     commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resources_[frameIndex].Get(), states_[frameIndex], state));
     states_[frameIndex] = state;
 }
 
-D3D12_RESOURCE_STATES GPUFrameResource::State(int frameIndex) const
+D3D12_RESOURCE_STATES GPUResourceSet::State(int frameIndex) const
 {
     return states_[frameIndex];
 }

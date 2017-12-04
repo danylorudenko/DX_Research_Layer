@@ -8,7 +8,7 @@ class GPUFrameRootTablesMap
 {
 public:
     // Target state of the resource and the resource.
-    using StateAndResource = std::pair<D3D12_RESOURCE_STATES, GPUFrameResource*>;
+    using StateAndResource = std::pair<D3D12_RESOURCE_STATES, GPUResourceSet*>;
     
     GPUFrameRootTablesMap();
     GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceView> const& map, std::vector<StateAndResource> const& describedResources);
@@ -26,7 +26,7 @@ public:
 
     int TableSize() const;
     int DescribedResourceCount(int frameIndex) const;
-    GPUFrameResource* DescribedResource(int resourceIndex);
+    GPUResourceSet* DescribedResource(int resourceIndex);
     D3D12_RESOURCE_STATES DescribedResourceTargetState(int resourceIndex) const;
     D3D12_RESOURCE_STATES DescribedResourceCurrentState(int frameIndex, int resourceIndex) const;
 

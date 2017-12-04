@@ -53,7 +53,7 @@ void DirectAppDelegate::start(Application& application)
 
 
     GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
-    triangleMesh_ = GPUFrameResource{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
+    triangleMesh_ = GPUResourceSet{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
     //triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COPY_DEST);
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
     triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
@@ -204,7 +204,7 @@ void DirectAppDelegate::Draw()
     ++frameIndex_;
     
     //GPUEngine& graphicsEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
-    //GPUFrameResource& currentFrameResource = gpuAccess_.CurrentFrameResource();
+    //GPUResourceSet& currentFrameResource = gpuAccess_.CurrentFrameResource();
     //
     //// Set general pipeline state.
     //graphicsEngine.Commit().SetPipelineState(pipelineState_.Get());

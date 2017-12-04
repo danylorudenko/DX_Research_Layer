@@ -7,5 +7,5 @@
 class IResourceCapacityGetter
 {
 public:
-    virtual std::size_t& GetResourceCapacity(GPUResource& resource) = 0;
+    virtual std::size_t GetResourceCapacity(GPUResource const& resource) = 0;
 };

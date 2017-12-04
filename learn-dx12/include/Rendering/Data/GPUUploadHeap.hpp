@@ -4,7 +4,7 @@
 
 #include <Rendering\Data\GPUFrameResource.hpp>
 
-class GPUUploadHeap : public GPUFrameResource
+class GPUUploadHeap : public GPUResourceSet
 {
 public:
     GPUUploadHeap();

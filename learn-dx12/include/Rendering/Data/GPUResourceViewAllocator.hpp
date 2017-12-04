@@ -18,31 +18,31 @@ public:
 
     void Reset();
 
-    GPUFrameResourceView AllocRtvLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocRtvLinear(GPUResourceSet* resources,
                                               D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceView AllocDsvLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocDsvLinear(GPUResourceSet* resources,
                                               D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceView AllocCbvLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocCbvLinear(GPUResourceSet* resources,
                                               D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceView AllocSrvLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocSrvLinear(GPUResourceSet* resources,
                                               D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceView AllocUavLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocUavLinear(GPUResourceSet* resources,
                                               D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",

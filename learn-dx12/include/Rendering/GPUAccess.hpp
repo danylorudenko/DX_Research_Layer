@@ -75,8 +75,8 @@ private:
 
     GPUFrameGraph* frameGraph_ = nullptr;
 
-    GPUFrameResource* renderTargetBuffers_ = nullptr;
-    GPUFrameResource* depthStencilBuffers_ = nullptr;
+    GPUResourceSet* renderTargetBuffers_ = nullptr;
+    GPUResourceSet* depthStencilBuffers_ = nullptr;
     GPUFrameResourceView* finalRenderTargetViews_ = nullptr;
     GPUFrameResourceView* finalDepthStencilViews_ = nullptr;
 

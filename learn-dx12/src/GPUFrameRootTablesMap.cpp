@@ -38,7 +38,7 @@ int GPUFrameRootTablesMap::DescribedResourceCount(int frameIndex) const
     return static_cast<int>(describedResources_.size());
 }
 
-GPUFrameResource* GPUFrameRootTablesMap::DescribedResource(int resourceIndex)
+GPUResourceSet* GPUFrameRootTablesMap::DescribedResource(int resourceIndex)
 {
     return describedResources_[resourceIndex].second;
 }

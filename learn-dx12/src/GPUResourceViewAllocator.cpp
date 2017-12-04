@@ -65,7 +65,7 @@ void GPUResourceViewAllocator::Reset()
     heapCbvSrvUavLastDescriptorOffset_ = 0;
 }
 
-GPUFrameResourceView GPUResourceViewAllocator::AllocRtvLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocRtvLinear(GPUResourceSet* resources,
                                                              D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -84,7 +84,7 @@ GPUFrameResourceView GPUResourceViewAllocator::AllocRtvLinear(GPUFrameResource* 
     return rtvDescriptor;
 }
 
-GPUFrameResourceView GPUResourceViewAllocator::AllocDsvLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocDsvLinear(GPUResourceSet* resources,
                                                              D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -103,7 +103,7 @@ GPUFrameResourceView GPUResourceViewAllocator::AllocDsvLinear(GPUFrameResource* 
     return dsvDescriptor;
 }
 
-GPUFrameResourceView GPUResourceViewAllocator::AllocCbvLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocCbvLinear(GPUResourceSet* resources,
                                                              D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -122,7 +122,7 @@ GPUFrameResourceView GPUResourceViewAllocator::AllocCbvLinear(GPUFrameResource* 
     return cbvDescriptor;
 }
 
-GPUFrameResourceView GPUResourceViewAllocator::AllocSrvLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocSrvLinear(GPUResourceSet* resources,
                                                              D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -141,7 +141,7 @@ GPUFrameResourceView GPUResourceViewAllocator::AllocSrvLinear(GPUFrameResource* 
     return srvDescriptor;
 }
 
-GPUFrameResourceView GPUResourceViewAllocator::AllocUavLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocUavLinear(GPUResourceSet* resources,
                                                              D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,

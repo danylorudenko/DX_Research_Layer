@@ -10,7 +10,7 @@ GPUPresentGraphNode::GPUPresentGraphNode(GPUPresentGraphNode&& rhs) = default;
 
 GPUPresentGraphNode& GPUPresentGraphNode::operator=(GPUPresentGraphNode&& rhs) = default;
 
-void GPUPresentGraphNode::ImportRenderTarget(GPUFrameResource* renderTarget)
+void GPUPresentGraphNode::ImportRenderTarget(GPUResourceSet* renderTarget)
 {
     renderTargets_.push_back(renderTarget);
 }

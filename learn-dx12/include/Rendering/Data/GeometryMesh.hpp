@@ -20,10 +20,10 @@ class GeometryMesh
 public:
     using SubmeshMap = std::map<std::string, SubmeshInfo>;
 
-    GPUFrameResource vertices;
+    GPUResourceSet vertices;
     D3D12_VERTEX_BUFFER_VIEW verticesView;
 
-    GPUFrameResource indicies;
+    GPUResourceSet indicies;
     D3D12_INDEX_BUFFER_VIEW indiciesView;
 
 private:

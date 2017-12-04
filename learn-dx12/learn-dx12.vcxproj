@@ -220,6 +220,14 @@
     <ClInclude Include="include\Rendering\GPUFence.hpp" />
     <ClInclude Include="include\Rendering\GPUEngine.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphNode.hpp" />
+    <ClInclude Include="include\Rendering\Interfaces\IResourceCapacityEditor.hpp" />
+    <ClInclude Include="include\Rendering\Interfaces\IResourceCapacityGetter.hpp" />
+    <ClInclude Include="include\Rendering\Interfaces\IResourceHandleEditor.hpp" />
+    <ClInclude Include="include\Rendering\Interfaces\IResourceSizeEditor.hpp" />
+    <ClInclude Include="include\Rendering\Interfaces\IResourceSizeGetter.hpp" />
+    <ClInclude Include="include\Rendering\Interfaces\IResourceStateEditor.hpp" />
+    <ClInclude Include="include\Rendering\Interfaces\IResourceStateGetter.hpp" />
+    <ClInclude Include="include\Rendering\Interfaces\IResourceVirtualGPUAddressGetter.hpp" />
     <ClInclude Include="include\Utility\Application.hpp" />
     <ClInclude Include="include\Utility\DirectAppDelegate.hpp" />
     <ClInclude Include="include\Utility\PerformanceTimer.hpp" />

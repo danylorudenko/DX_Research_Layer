@@ -7,5 +7,5 @@
 class IResourceStateGetter
 {
 public:
-    virtual D3D12_RESOURCE_STATES& GetResourceState(GPUResource& resource) = 0;
+    virtual D3D12_RESOURCE_STATES GetResourceVirtualState(GPUResource const& resource) = 0;
 };
