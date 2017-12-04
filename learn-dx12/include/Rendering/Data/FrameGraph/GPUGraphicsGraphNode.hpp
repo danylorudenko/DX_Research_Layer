@@ -16,10 +16,10 @@ public:
     GPUGraphicsGraphNode& operator=(GPUGraphicsGraphNode const&) = delete;
     GPUGraphicsGraphNode& operator=(GPUGraphicsGraphNode&& rhs);
 
-    void ImportRenderTargets(std::vector<GPUFrameResourceDescriptor> const& renderTargets);
-    void ImportRenderTargets(std::vector<GPUFrameResourceDescriptor>&& renderTargets);
-    void ImportRenderTarget(GPUFrameResourceDescriptor const& renderTarget);
-    void ImportDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor);
+    void ImportRenderTargets(std::vector<GPUFrameResourceView> const& renderTargets);
+    void ImportRenderTargets(std::vector<GPUFrameResourceView>&& renderTargets);
+    void ImportRenderTarget(GPUFrameResourceView const& renderTarget);
+    void ImportDepthStencilTarget(GPUFrameResourceView depthStencilDescriptor);
 
     void ImportRenderItem(GPURenderItem const& item);
     void ImportRenderItem(GPURenderItem&& item);
@@ -41,6 +41,6 @@ private:
 
     std::vector<GPURenderItem> renderItems_;
 
-    std::vector<GPUFrameResourceDescriptor> renderTargets_;
-    GPUFrameResourceDescriptor depthStencilTarget_;
+    std::vector<GPUFrameResourceView> renderTargets_;
+    GPUFrameResourceView depthStencilTarget_;
 };

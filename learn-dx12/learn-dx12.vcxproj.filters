@@ -63,9 +63,6 @@
     <ClCompile Include="src\GPURootSignature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUFrameResourceDescriptor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GPUFrameRootTablesMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -81,13 +78,16 @@
     <ClCompile Include="src\GPUFrameGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUDescriptorHeap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GPUFrameResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GPUResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUResourceViewAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUFrameResourceView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,9 +152,6 @@
     <ClInclude Include="include\Rendering\Data\GeometryMesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\GPUFrameResourceDescriptor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\Data\GPUFrameRootTablesMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -176,13 +173,16 @@
     <ClInclude Include="include\Rendering\Data\Vertex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\GPUDescriptorHeap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\Data\GPUFrameResource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\Data\GPUResource.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\GPUResourceViewAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\GPUFrameResourceView.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

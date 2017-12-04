@@ -11,8 +11,8 @@ public:
     using StateAndResource = std::pair<D3D12_RESOURCE_STATES, GPUFrameResource*>;
     
     GPUFrameRootTablesMap();
-    GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources);
-    GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources);
+    GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceView> const& map, std::vector<StateAndResource> const& describedResources);
+    GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceView>&& map, std::vector<StateAndResource>&& describedResources);
     GPUFrameRootTablesMap(GPUFrameRootTablesMap const&);
     GPUFrameRootTablesMap(GPUFrameRootTablesMap&&);
 
@@ -40,7 +40,7 @@ private:
     // Other parts of root signature (such as solo root descriptors and root constants) are also
     // dependant on this continuity.
     // Example: https://habrahabr.ru/company/intel/blog/277121/
-    std::vector<GPUFrameResourceDescriptor> descriptorTable_;
+    std::vector<GPUFrameResourceView> descriptorTable_;
 
     // vector of vectors: first level is about frame buffering.
     // First item in pair describes target state for the resouce.

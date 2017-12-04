@@ -4,19 +4,19 @@
 
 #include <Rendering\Data\GPUFrameResource.hpp>
 
-class GPUFrameResourceDescriptor
+class GPUFrameResourceView
 {
 public:
-    GPUFrameResourceDescriptor();
-    GPUFrameResourceDescriptor(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, 
+    GPUFrameResourceView();
+    GPUFrameResourceView(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, 
                                UINT descriptorSize, int* offsetsInHeap,
                                D3D12_RESOURCE_STATES state, char const* semantics, 
                                GPUFrameResource* resource);
-    GPUFrameResourceDescriptor(GPUFrameResourceDescriptor const&);
-    GPUFrameResourceDescriptor(GPUFrameResourceDescriptor&&);
+    GPUFrameResourceView(GPUFrameResourceView const&);
+    GPUFrameResourceView(GPUFrameResourceView&&);
 
-    GPUFrameResourceDescriptor& operator=(GPUFrameResourceDescriptor const&);
-    GPUFrameResourceDescriptor& operator=(GPUFrameResourceDescriptor&&);
+    GPUFrameResourceView& operator=(GPUFrameResourceView const&);
+    GPUFrameResourceView& operator=(GPUFrameResourceView&&);
 
     bool IsValid() const { return describedResource_ != nullptr; }
 

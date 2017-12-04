@@ -15,6 +15,6 @@ public:
     D3D12_INDEX_BUFFER_VIEW indexBufferDescriptor_;
     UINT indexCount_;
 
-    using BindPointDescriptorPair = std::pair<UINT, GPUFrameResourceDescriptor>;
+    using BindPointDescriptorPair = std::pair<UINT, GPUFrameResourceView>;
     std::vector<BindPointDescriptorPair> perItemResourceDescriptors_;
 };

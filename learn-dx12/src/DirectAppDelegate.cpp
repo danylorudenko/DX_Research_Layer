@@ -43,7 +43,7 @@ void DirectAppDelegate::start(Application& application)
     };
     constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
 
-    std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
+    std::vector<GPUFrameResourceView> describedResourcesViews{ 1, constantBufferView_ };
     std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
     GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), describedResourcesViews, describedResources };
 

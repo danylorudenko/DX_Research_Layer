@@ -1,8 +1,8 @@
-#include <Rendering\Data\GPUDescriptorHeap.hpp>
+#include <Rendering\Data\GPUResourceViewAllocator.hpp>
 
-GPUDescriptorHeap::GPUDescriptorHeap() = default;
+GPUResourceViewAllocator::GPUResourceViewAllocator() = default;
 
-GPUDescriptorHeap::GPUDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device,
+GPUResourceViewAllocator::GPUResourceViewAllocator(Microsoft::WRL::ComPtr<ID3D12Device> device,
                                                int rtvCapacity,
                                                int dsvCapacity,
                                                int CbvSrvUavCapacity)
@@ -54,18 +54,18 @@ GPUDescriptorHeap::GPUDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device
     }
 }
 
-GPUDescriptorHeap::GPUDescriptorHeap(GPUDescriptorHeap&& rhs) = default;
+GPUResourceViewAllocator::GPUResourceViewAllocator(GPUResourceViewAllocator&& rhs) = default;
 
-GPUDescriptorHeap& GPUDescriptorHeap::operator=(GPUDescriptorHeap&& rhs) = default;
+GPUResourceViewAllocator& GPUResourceViewAllocator::operator=(GPUResourceViewAllocator&& rhs) = default;
 
-void GPUDescriptorHeap::Reset()
+void GPUResourceViewAllocator::Reset()
 {
     heapRtvLastDescriptorOffset_ = 0;
     heapDsvLastDescriptorOffset_ = 0;
     heapCbvSrvUavLastDescriptorOffset_ = 0;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocRtvLinear(GPUFrameResource* resources,
                                                              D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -80,11 +80,11 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(GPUFrameResource* r
         descriptorsOffsets[i] = heapRtvLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor rtvDescriptor{ frameCount, heapRtv_, heapRtvIncrementalSize_, descriptorsOffsets, state, semantics, resources };
+    GPUFrameResourceView rtvDescriptor{ frameCount, heapRtv_, heapRtvIncrementalSize_, descriptorsOffsets, state, semantics, resources };
     return rtvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocDsvLinear(GPUFrameResource* resources,
                                                              D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -99,11 +99,11 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(GPUFrameResource* r
         descriptorOffsets[i] = heapDsvLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor dsvDescriptor{ frameCount, heapDsv_, heapDsvIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    GPUFrameResourceView dsvDescriptor{ frameCount, heapDsv_, heapDsvIncrementalSize_, descriptorOffsets, state, semantics, resources };
     return dsvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocCbvLinear(GPUFrameResource* resources,
                                                              D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -118,11 +118,11 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(GPUFrameResource* r
         descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor cbvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    GPUFrameResourceView cbvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
     return cbvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocSrvLinear(GPUFrameResource* resources,
                                                              D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -137,11 +137,11 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(GPUFrameResource* r
         descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor srvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    GPUFrameResourceView srvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
     return srvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(GPUFrameResource* resources,
+GPUFrameResourceView GPUResourceViewAllocator::AllocUavLinear(GPUFrameResource* resources,
                                                              D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -156,6 +156,6 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(GPUFrameResource* r
         descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor uavDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    GPUFrameResourceView uavDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
     return uavDescriptor;
 }

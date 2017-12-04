@@ -1,8 +1,8 @@
-#include <Rendering\Data\GPUFrameResourceDescriptor.hpp>
+#include <Rendering\Data\GPUFrameResourceView.hpp>
 
-GPUFrameResourceDescriptor::GPUFrameResourceDescriptor() = default;
+GPUFrameResourceView::GPUFrameResourceView() = default;
 
-GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap,
+GPUFrameResourceView::GPUFrameResourceView(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap,
                                                        UINT descriptorSize, int* offsetsInHeap,
                                                        D3D12_RESOURCE_STATES state, char const* semantics, GPUFrameResource* describedResource) :
     frameCount_(frameCount), descriptorHeap_(heap), descriptorSize_(descriptorSize), 
@@ -15,22 +15,22 @@ GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(int frameCount, Microsoft
     }
 }
 
-GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(GPUFrameResourceDescriptor const& rhs) = default;
+GPUFrameResourceView::GPUFrameResourceView(GPUFrameResourceView const& rhs) = default;
 
-GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(GPUFrameResourceDescriptor&& rhs) = default;
+GPUFrameResourceView::GPUFrameResourceView(GPUFrameResourceView&& rhs) = default;
 
-GPUFrameResourceDescriptor& GPUFrameResourceDescriptor::operator=(GPUFrameResourceDescriptor const& rhs) = default;
+GPUFrameResourceView& GPUFrameResourceView::operator=(GPUFrameResourceView const& rhs) = default;
 
-GPUFrameResourceDescriptor& GPUFrameResourceDescriptor::operator=(GPUFrameResourceDescriptor&& rhs) = default;
+GPUFrameResourceView& GPUFrameResourceView::operator=(GPUFrameResourceView&& rhs) = default;
 
-D3D12_GPU_DESCRIPTOR_HANDLE GPUFrameResourceDescriptor::GPUViewHandle(int frameIndex) const
+D3D12_GPU_DESCRIPTOR_HANDLE GPUFrameResourceView::GPUViewHandle(int frameIndex) const
 {
     assert(frameIndex < frameCount_ && "Handle getter recieved invalid frame index.");
     CD3DX12_GPU_DESCRIPTOR_HANDLE handle(descriptorHeap_->GetGPUDescriptorHandleForHeapStart(), descriptorOffsets_[frameIndex], descriptorSize_);
     return handle;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE GPUFrameResourceDescriptor::CPUViewHandle(int frameIndex) const
+D3D12_CPU_DESCRIPTOR_HANDLE GPUFrameResourceView::CPUViewHandle(int frameIndex) const
 {
     assert(frameIndex < frameCount_ && "Handle getter recieved invalid frame index.");
     CD3DX12_CPU_DESCRIPTOR_HANDLE handle(descriptorHeap_->GetCPUDescriptorHandleForHeapStart(), descriptorOffsets_[frameIndex], descriptorSize_);

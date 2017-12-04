@@ -41,11 +41,11 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Device> Device() const { return device_; }
     Microsoft::WRL::ComPtr<IDXGISwapChain> SwapChain() { return swapChain_; }
 
-    GPUFrameResourceDescriptor& FinalRenderTargetViews() { return *finalRenderTargetViews_; }
-    GPUFrameResourceDescriptor& FinalDepthSteniclViews() { return *finalDepthStencilViews_; }
+    GPUFrameResourceView& FinalRenderTargetViews() { return *finalRenderTargetViews_; }
+    GPUFrameResourceView& FinalDepthSteniclViews() { return *finalDepthStencilViews_; }
 
     GPUFrameGraph& FrameGraph() { return *frameGraph_; }
-    GPUDescriptorHeap& DescriptorHeap() { return *descriptorHeap_; }
+    GPUResourceViewAllocator& DescriptorHeap() { return *descriptorHeap_; }
 
     void CommitDefaultViewportScissorRects();
 
@@ -77,15 +77,15 @@ private:
 
     GPUFrameResource* renderTargetBuffers_ = nullptr;
     GPUFrameResource* depthStencilBuffers_ = nullptr;
-    GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
-    GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
+    GPUFrameResourceView* finalRenderTargetViews_ = nullptr;
+    GPUFrameResourceView* finalDepthStencilViews_ = nullptr;
 
     // Default surface description.
     D3D12_VIEWPORT viewportRect_;
     D3D12_RECT scissorRect_;
 
 
-    GPUDescriptorHeap* descriptorHeap_ = nullptr;
+    GPUResourceViewAllocator* descriptorHeap_ = nullptr;
     int static constexpr RTV_HEAP_CAPACITY = 30;
     int static constexpr DSV_HEAP_CAPACITY = 30;
     int static constexpr CBV_SRV_UAV_CAPACITY = 30;

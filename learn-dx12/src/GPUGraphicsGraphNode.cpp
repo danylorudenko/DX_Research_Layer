@@ -44,22 +44,22 @@ void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
     }
 }
 
-void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceDescriptor> const& renderTargets)
+void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceView> const& renderTargets)
 {
     renderTargets_ = renderTargets;
 }
 
-void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceDescriptor>&& renderTargets)
+void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceView>&& renderTargets)
 {
     renderTargets_ = std::move(renderTargets);
 }
 
-void GPUGraphicsGraphNode::ImportRenderTarget(GPUFrameResourceDescriptor const& renderTarget)
+void GPUGraphicsGraphNode::ImportRenderTarget(GPUFrameResourceView const& renderTarget)
 {
     renderTargets_.push_back(renderTarget);
 }
 
-void GPUGraphicsGraphNode::ImportDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor)
+void GPUGraphicsGraphNode::ImportDepthStencilTarget(GPUFrameResourceView depthStencilDescriptor)
 {
     depthStencilTarget_ = depthStencilDescriptor;
 }

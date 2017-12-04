@@ -2,6 +2,12 @@
 
 #include <pch.hpp>
 
+#include <Rendering\Interfaces\IResourceHandleGetter.hpp>
+#include <Rendering\Interfaces\IResourceStateGetter.hpp>
+#include <Rendering\Interfaces\IResourceSizeGetter.hpp>
+#include <Rendering\Interfaces\IResourceCapacityGetter.hpp>
+#include <Rendering\Interfaces\IResourceVirtualGPUAddressGetter.hpp>
+
 struct GPUResourceDesc
 {
     Microsoft::WRL::ComPtr<ID3D12Resource> resourceHandle = nullptr;
@@ -22,14 +28,14 @@ public:
     GPUResource& operator=(GPUResource const& rhs) = delete;
     GPUResource& operator=(GPUResource&& rhs);
     
-    ID3D12Resource* Get();
-    Microsoft::WRL::ComPtr<ID3D12Resource>& GetHandle();
+    Microsoft::WRL::ComPtr<ID3D12Resource>& GetHandle(IResourceHandleGetter const&);
 
-    D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress() const;
+    D3D12_RESOURCE_STATES& GetVirtualState(IResourceStateGetter const&);
+    D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress(IResourceVirtualGPUAddressGetter const&);
 
-    D3D12_RESOURCE_STATES GetVirtualState() const;
-    D3D12_RESOURCE_STATES SetVirtualState(D3D12_RESOURCE_STATES state);
-
+    std::size_t& GetSize(IResourceSizeGetter const&);
+    std::size_t& GetCapacity(IResourceCapacityGetter const&);
+    
 
 
 private:

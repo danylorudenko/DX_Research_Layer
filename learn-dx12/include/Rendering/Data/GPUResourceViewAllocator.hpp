@@ -2,47 +2,47 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\GPUFrameResourceDescriptor.hpp>
+#include <Rendering\Data\GPUFrameResourceView.hpp>
 
-class GPUDescriptorHeap
+class GPUResourceViewAllocator
 {
 public:
-    GPUDescriptorHeap();
-    GPUDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, int rtvCapacity, int dsvCapacity, int CbvSrvUavCapacity);
+    GPUResourceViewAllocator();
+    GPUResourceViewAllocator(Microsoft::WRL::ComPtr<ID3D12Device> device, int rtvCapacity, int dsvCapacity, int CbvSrvUavCapacity);
 
-    GPUDescriptorHeap(GPUDescriptorHeap const&) = delete;
-    GPUDescriptorHeap(GPUDescriptorHeap&& rhs);
+    GPUResourceViewAllocator(GPUResourceViewAllocator const&) = delete;
+    GPUResourceViewAllocator(GPUResourceViewAllocator&& rhs);
 
-    GPUDescriptorHeap& operator=(GPUDescriptorHeap const&) = delete;
-    GPUDescriptorHeap& operator=(GPUDescriptorHeap&& rhs);
+    GPUResourceViewAllocator& operator=(GPUResourceViewAllocator const&) = delete;
+    GPUResourceViewAllocator& operator=(GPUResourceViewAllocator&& rhs);
 
     void Reset();
 
-    GPUFrameResourceDescriptor AllocRtvLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocRtvLinear(GPUFrameResource* resources,
                                               D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocDsvLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocDsvLinear(GPUFrameResource* resources,
                                               D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocCbvLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocCbvLinear(GPUFrameResource* resources,
                                               D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocSrvLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocSrvLinear(GPUFrameResource* resources,
                                               D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocUavLinear(GPUFrameResource* resources,
+    GPUFrameResourceView AllocUavLinear(GPUFrameResource* resources,
                                               D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
@@ -60,13 +60,13 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heapDsv_ = nullptr;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heapCbvSrvUav_ = nullptr;
 
-    int heapCapacityRtv_ = 0ULL;
-    int heapCapacityDsv_ = 0ULL;
-    int heapCapacityCbvSrvUav_ = 0ULL;
+    int heapCapacityRtv_ = 0;
+    int heapCapacityDsv_ = 0;
+    int heapCapacityCbvSrvUav_ = 0;
 
-    UINT heapRtvIncrementalSize_ = 0U;
-    UINT heapDsvIncrementalSize_ = 0U;
-    UINT heapCbvSrvUavIncrementalSize_ = 0U;
+    UINT heapRtvIncrementalSize_ = 0;
+    UINT heapDsvIncrementalSize_ = 0;
+    UINT heapCbvSrvUavIncrementalSize_ = 0;
 
     int heapRtvLastDescriptorOffset_ = 0;
     int heapDsvLastDescriptorOffset_ = 0;

@@ -140,7 +140,7 @@ void GPUAccess::CreateFrameResources()
 
     renderTargetBuffers_ = new GPUFrameResource{ framesCount, HEIGHT * WIDTH, renderBuffers, D3D12_RESOURCE_STATE_RENDER_TARGET };
     auto rtv = descriptorHeap_->AllocRtvLinear(renderTargetBuffers_, nullptr, D3D12_RESOURCE_STATE_RENDER_TARGET, "renderBuffer", framesCount);
-    finalRenderTargetViews_ = new GPUFrameResourceDescriptor{ rtv };
+    finalRenderTargetViews_ = new GPUFrameResourceView{ rtv };
 
     // Creation of depth-stencil buffers, creation of views.
     D3D12_RESOURCE_DESC depthStencilDesc{};
@@ -164,12 +164,12 @@ void GPUAccess::CreateFrameResources()
     dsvDesc.Texture2D.MipSlice = 0;
     dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
     auto dsv = descriptorHeap_->AllocDsvLinear(depthStencilBuffers_, &dsvDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, "depthStencil", framesCount);
-    finalDepthStencilViews_ = new GPUFrameResourceDescriptor{ dsv };
+    finalDepthStencilViews_ = new GPUFrameResourceView{ dsv };
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()
 {
-    descriptorHeap_ = new GPUDescriptorHeap{ device_, RTV_HEAP_CAPACITY, DSV_HEAP_CAPACITY, CBV_SRV_UAV_CAPACITY };
+    descriptorHeap_ = new GPUResourceViewAllocator{ device_, RTV_HEAP_CAPACITY, DSV_HEAP_CAPACITY, CBV_SRV_UAV_CAPACITY };
 }
 
 void GPUAccess::SetViewportScissor()
