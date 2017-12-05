@@ -21,12 +21,12 @@ void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
     int const frameIndexLocal = frameIndex % frameBufferCount_;
     
     TransitionRenderTargets(frameIndexLocal);
-    BindPipelineState();
-
+    TransitionDepthStencilTarget(frameIndexLocal);
     TransitionPassResources(frameIndexLocal);
+
+    BindPipelineState();
     BindPassRootSignature(frameIndexLocal);
 
-    TransitionDepthStencilTarget(frameIndexLocal);
     BindRenderDepthStencilTargets(frameIndexLocal);
 
     IterateRenderItems(frameIndex % frameBufferCount_);
@@ -34,8 +34,8 @@ void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
 
 void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
 {
-    auto const itemCount = renderItems_.size();
-    for (size_t i = 0; i < itemCount; i++) {
+    int const itemCount = static_cast<int>(renderItems_.size());
+    for (int i = 0; i < itemCount; i++) {
         auto item = renderItems_[i];
         BindRenderItemVertexBuffer(item);
         BindRenderItemIndexBuffer(item);
@@ -102,21 +102,6 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)
     auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
     assert(renderTargetsCount <= 5 && "More that 5 render targets is not currently supported.");
     
-    /*D3D12_RESOURCE_BARRIER barriers[5];
-    for (int i = 0; i < renderTargetsCount; i++) {
-        if (renderTargets_[i].DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
-            barriers[i] = CD3DX12_RESOURCE_BARRIER::Transition(
-                renderTargets_[i].DescribedResource()->Get(frameIndex),
-                renderTargets_[i].DescribedResource()->State(frameIndex),
-                D3D12_RESOURCE_STATE_RENDER_TARGET
-            );
-        }
-    }
-
-    if (renderTargetsCount > 0) {
-        executionEngine_->Commit().ResourceBarrier(renderTargetsCount, barriers);
-    }*/
-
     for (int i = 0; i < renderTargetsCount; i++) {
         if (renderTargets_[i].DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
             renderTargets_[i].DescribedResource()->Transition(frameIndex, executionEngine_->CommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -127,18 +112,15 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)
 void GPUGraphicsGraphNode::TransitionDepthStencilTarget(int frameIndex)
 {
     if (depthStencilTarget_.DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_DEPTH_WRITE) {
-        D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-            depthStencilTarget_.DescribedResource()->Get(frameIndex),
-            depthStencilTarget_.DescribedResource()->State(frameIndex),
-            D3D12_RESOURCE_STATE_DEPTH_WRITE);
+        depthStencilTarget_.DescribedResource()->Transition(frameIndex, executionEngine_->CommandList(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
     }
 }
 
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, int frameIndex)
 {
-    auto const resCount = static_cast<int>(item.perItemResourceDescriptors_.size());
-    for (size_t i = 0; i < resCount; i++) {
-        auto resDesc = item.perItemResourceDescriptors_[i];
+    int const resCount = static_cast<int>(item.perItemResourceDescriptors_.size());
+    for (int i = 0; i < resCount; i++) {
+        auto const& resDesc = item.perItemResourceDescriptors_[i];
         executionEngine_->Commit().SetGraphicsRootDescriptorTable(resDesc.first, resDesc.second.GPUViewHandle(frameIndex));
     }
 }

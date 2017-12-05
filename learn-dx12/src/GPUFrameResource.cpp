@@ -20,7 +20,7 @@ GPUFrameResource::GPUFrameResource(int framesCount, ID3D12Device* device, std::s
             IID_PPV_ARGS(&resources_[i])
         );
         ThrowIfFailed(result);
-        gpuAddresses_.push_back(resources_[i]->GetGPUVirtualAddress());
+        gpuAddresses_.push_back(D3D12_GPU_VIRTUAL_ADDRESS{});
     }
 }
 
@@ -33,7 +33,7 @@ GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, Mi
 {
     for (int i = 0; i < framesCount_; i++) {
         resources_.push_back(resources[i]);
-        gpuAddresses_.push_back(resources_[i]->GetGPUVirtualAddress());
+        gpuAddresses_.push_back(D3D12_GPU_VIRTUAL_ADDRESS{});
     }
 }
 
@@ -56,11 +56,19 @@ void GPUFrameResource::CreateResources(int framesCount, ID3D12Device* device, st
 
         ThrowIfFailed(result);
         states_[i] = initialState;
-        gpuAddresses_[i] = resources_[i]->GetGPUVirtualAddress();
+        gpuAddresses_[i] = D3D12_GPU_VIRTUAL_ADDRESS{};
     }
     
     size_ = size;
     capacity_ = size;
+}
+
+D3D12_GPU_VIRTUAL_ADDRESS GPUFrameResource::GPUVirtualAddress(int frameIndex)
+{
+    return 
+        gpuAddresses_[frameIndex] != 0 
+        ? gpuAddresses_[frameIndex] 
+        : gpuAddresses_[frameIndex] = resources_[frameIndex]->GetGPUVirtualAddress();
 }
 
 void GPUFrameResource::UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUFrameResource& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes)

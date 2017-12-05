@@ -54,7 +54,6 @@ void DirectAppDelegate::start(Application& application)
 
     GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
     triangleMesh_ = GPUFrameResource{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
-    //triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COPY_DEST);
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
     triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
@@ -67,6 +66,7 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    triangleRenderItem.perItemResourceDescriptors_.push_back(std::make_pair(0, constantBufferView_));
 
     triangleGraphNode_ = GPUGraphicsGraphNode{ &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>(), &triangleRootSignature_, &trianglePipelineState_, framesCount };
     triangleGraphNode_.ImportRenderItem(triangleRenderItem);
@@ -186,6 +186,8 @@ void DirectAppDelegate::Draw()
     auto& graphEnd = graph.GraphQueueEnd();
     
     auto& directEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+
+    gpuAccess_.CommitDefaultViewportScissorRects();
 
     // Quick hack to fix the back buffers states.
     auto* backBuffer = gpuAccess_.FinalRenderTargetViews().DescribedResource();

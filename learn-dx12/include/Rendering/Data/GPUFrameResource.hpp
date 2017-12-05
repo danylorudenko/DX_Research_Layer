@@ -19,7 +19,7 @@ public:
     std::size_t Capacity() const { return capacity_; }
     int FramesCount() const { return framesCount_; }
 
-    D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress(int frameIndex) const { return gpuAddresses_[frameIndex]; }
+    D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress(int frameIndex);
 
     void CreateResources(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES initialState);
     void UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUFrameResource& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes);

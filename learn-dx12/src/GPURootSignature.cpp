@@ -41,25 +41,9 @@ void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, int f
     int const resourceNum = static_cast<int>(passRootDescriptorTablesMap_.DescribedResourceCount(frameIndex));
     assert(resourceNum < 10 && "Resource count reached static limit.");
 
-    D3D12_RESOURCE_BARRIER barriers[10];
-
     for (int i = 0; i < resourceNum; i++) {
         if (passRootDescriptorTablesMap_.DescribedResourceCurrentState(frameIndex, i) != passRootDescriptorTablesMap_.DescribedResourceTargetState(i)) {
             passRootDescriptorTablesMap_.DescribedResource(i)->Transition(frameIndex, executionEngine->CommandList(), passRootDescriptorTablesMap_.DescribedResourceTargetState(i));
         }
     }
-    /*for (int i = 0; i < resourceNum; i++) {
-        if (passRootDescriptorTablesMap_.DescribedResourceCurrentState(frameIndex, i) != passRootDescriptorTablesMap_.DescribedResourceTargetState(i)) {
-            barriers[barriersCounter] = CD3DX12_RESOURCE_BARRIER::Transition(
-                passRootDescriptorTablesMap_.DescribedResource(i)->Get(frameIndex),
-                passRootDescriptorTablesMap_.DescribedResource(i)->State(frameIndex),
-                passRootDescriptorTablesMap_.DescribedResourceTargetState(i));
-
-            ++barriersCounter;
-        }
-    }
-
-    if (barriersCounter > 0) {
-        executionEngine->Commit().ResourceBarrier(barriersCounter, barriers);
-    }*/
 }
