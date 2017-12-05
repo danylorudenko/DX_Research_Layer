@@ -102,7 +102,7 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)
     auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
     assert(renderTargetsCount <= 5 && "More that 5 render targets is not currently supported.");
     
-    D3D12_RESOURCE_BARRIER barriers[5];
+    /*D3D12_RESOURCE_BARRIER barriers[5];
     for (int i = 0; i < renderTargetsCount; i++) {
         if (renderTargets_[i].DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
             barriers[i] = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -115,13 +115,13 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)
 
     if (renderTargetsCount > 0) {
         executionEngine_->Commit().ResourceBarrier(renderTargetsCount, barriers);
-    }
+    }*/
 
-    /*for (int i = 0; i < renderTargetsCount; i++) {
+    for (int i = 0; i < renderTargetsCount; i++) {
         if (renderTargets_[i].DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
             renderTargets_[i].DescribedResource()->Transition(frameIndex, executionEngine_->CommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
         }
-    }*/
+    }
 }
 
 void GPUGraphicsGraphNode::TransitionDepthStencilTarget(int frameIndex)
