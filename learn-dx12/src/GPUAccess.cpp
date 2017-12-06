@@ -138,9 +138,10 @@ void GPUAccess::CreateFrameResources()
 
     int const framesCount = static_cast<int>(SWAP_CHAIN_BUFFER_COUNT);
 
-    renderTargetBuffers_ = new GPUFrameResource{ framesCount, HEIGHT * WIDTH, renderBuffers, D3D12_RESOURCE_STATE_PRESENT };
-    auto rtv = descriptorHeap_->AllocRtvLinear(renderTargetBuffers_, nullptr, D3D12_RESOURCE_STATE_PRESENT, "renderBuffer", framesCount);
-    finalRenderTargetViews_ = new GPUFrameResourceDescriptor{ rtv };
+    //                                                      WRONG SIZE
+    renderTargetBuffers_ = new GPUResourceFrameSet{ framesCount, HEIGHT * WIDTH, renderBuffers, D3D12_RESOURCE_STATE_RENDER_TARGET };
+    auto rtv = descriptorHeap_->AllocRtvLinear(renderTargetBuffers_, nullptr, D3D12_RESOURCE_STATE_RENDER_TARGET, "renderBuffer", framesCount);
+    finalRenderTargetViews_ = new GPUResourceFrameSetDescriptor{ rtv };
 
     // Creation of depth-stencil buffers, creation of views.
     D3D12_RESOURCE_DESC depthStencilDesc{};
@@ -156,7 +157,7 @@ void GPUAccess::CreateFrameResources()
     depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     depthStencilDesc.MipLevels = 1;
 
-    depthStencilBuffers_ = new GPUFrameResource{ framesCount, device_.Get(), WIDTH * HEIGHT, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE };
+    depthStencilBuffers_ = new GPUResourceFrameSet{ framesCount, device_.Get(), WIDTH * HEIGHT, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE };
 
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
     dsvDesc.Format = depthStencilBufferFormat;
@@ -164,7 +165,7 @@ void GPUAccess::CreateFrameResources()
     dsvDesc.Texture2D.MipSlice = 0;
     dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
     auto dsv = descriptorHeap_->AllocDsvLinear(depthStencilBuffers_, &dsvDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, "depthStencil", framesCount);
-    finalDepthStencilViews_ = new GPUFrameResourceDescriptor{ dsv };
+    finalDepthStencilViews_ = new GPUResourceFrameSetDescriptor{ dsv };
 }
 
 void GPUAccess::CreateDefaultDescriptorHeaps()

@@ -20,16 +20,16 @@ void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
 {
     int const frameIndexLocal = frameIndex % frameBufferCount_;
     
+    BindPipelineState();
+    BindPassRootSignature(frameIndexLocal);
+
     TransitionRenderTargets(frameIndexLocal);
     TransitionDepthStencilTarget(frameIndexLocal);
     TransitionPassResources(frameIndexLocal);
 
-    BindPipelineState();
-    BindPassRootSignature(frameIndexLocal);
-
     BindRenderDepthStencilTargets(frameIndexLocal);
 
-    IterateRenderItems(frameIndex % frameBufferCount_);
+    IterateRenderItems(frameIndexLocal);
 }
 
 void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
@@ -44,22 +44,22 @@ void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
     }
 }
 
-void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceDescriptor> const& renderTargets)
+void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUResourceFrameSetDescriptor> const& renderTargets)
 {
     renderTargets_ = renderTargets;
 }
 
-void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceDescriptor>&& renderTargets)
+void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUResourceFrameSetDescriptor>&& renderTargets)
 {
     renderTargets_ = std::move(renderTargets);
 }
 
-void GPUGraphicsGraphNode::ImportRenderTarget(GPUFrameResourceDescriptor const& renderTarget)
+void GPUGraphicsGraphNode::ImportRenderTarget(GPUResourceFrameSetDescriptor const& renderTarget)
 {
     renderTargets_.push_back(renderTarget);
 }
 
-void GPUGraphicsGraphNode::ImportDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor)
+void GPUGraphicsGraphNode::ImportDepthStencilTarget(GPUResourceFrameSetDescriptor depthStencilDescriptor)
 {
     depthStencilTarget_ = depthStencilDescriptor;
 }
@@ -133,7 +133,9 @@ void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)
 
 void GPUGraphicsGraphNode::BindRenderItemIndexBuffer(GPURenderItem& item)
 {
-    executionEngine_->Commit().IASetIndexBuffer(&item.indexBufferDescriptor_);
+    if (item.hasIndexBuffer_) {
+        executionEngine_->Commit().IASetIndexBuffer(&item.indexBufferDescriptor_);
+    }
 }
 
 void GPUGraphicsGraphNode::DrawCallRenderItem(GPURenderItem& item)

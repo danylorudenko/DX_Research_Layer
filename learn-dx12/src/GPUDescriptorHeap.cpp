@@ -65,7 +65,7 @@ void GPUDescriptorHeap::Reset()
     heapCbvSrvUavLastDescriptorOffset_ = 0;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(GPUFrameResource* resources,
+GPUResourceFrameSetDescriptor GPUDescriptorHeap::AllocRtvLinear(GPUResourceFrameSet* resources,
                                                              D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -80,11 +80,11 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(GPUFrameResource* r
         descriptorsOffsets[i] = heapRtvLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor rtvDescriptor{ frameCount, heapRtv_, heapRtvIncrementalSize_, descriptorsOffsets, state, semantics, resources };
+    GPUResourceFrameSetDescriptor rtvDescriptor{ frameCount, heapRtv_, heapRtvIncrementalSize_, descriptorsOffsets, state, semantics, resources };
     return rtvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(GPUFrameResource* resources,
+GPUResourceFrameSetDescriptor GPUDescriptorHeap::AllocDsvLinear(GPUResourceFrameSet* resources,
                                                              D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -99,11 +99,11 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(GPUFrameResource* r
         descriptorOffsets[i] = heapDsvLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor dsvDescriptor{ frameCount, heapDsv_, heapDsvIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    GPUResourceFrameSetDescriptor dsvDescriptor{ frameCount, heapDsv_, heapDsvIncrementalSize_, descriptorOffsets, state, semantics, resources };
     return dsvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(GPUFrameResource* resources,
+GPUResourceFrameSetDescriptor GPUDescriptorHeap::AllocCbvLinear(GPUResourceFrameSet* resources,
                                                              D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -118,11 +118,11 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(GPUFrameResource* r
         descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor cbvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    GPUResourceFrameSetDescriptor cbvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
     return cbvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(GPUFrameResource* resources,
+GPUResourceFrameSetDescriptor GPUDescriptorHeap::AllocSrvLinear(GPUResourceFrameSet* resources,
                                                              D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -137,11 +137,11 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(GPUFrameResource* r
         descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor srvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    GPUResourceFrameSetDescriptor srvDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
     return srvDescriptor;
 }
 
-GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(GPUFrameResource* resources,
+GPUResourceFrameSetDescriptor GPUDescriptorHeap::AllocUavLinear(GPUResourceFrameSet* resources,
                                                              D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
@@ -156,6 +156,6 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(GPUFrameResource* r
         descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
     }
 
-    GPUFrameResourceDescriptor uavDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
+    GPUResourceFrameSetDescriptor uavDescriptor{ frameCount, heapCbvSrvUav_, heapCbvSrvUavIncrementalSize_, descriptorOffsets, state, semantics, resources };
     return uavDescriptor;
 }

@@ -38,7 +38,7 @@ private:
 
     // CUSTOM APPLICATION DATA
     GPUUploadHeap constantBuffer_;
-    GPUFrameResourceDescriptor constantBufferView_;
+    GPUResourceFrameSetDescriptor constantBufferView_;
     SceneConstantBuffer constantBufferData_;
 
     GPURootSignature triangleRootSignature_;
@@ -47,6 +47,6 @@ private:
     GPUGraphicsGraphNode triangleGraphNode_;
     GPUPresentGraphNode presentNode_;
 
-    GPUFrameResource triangleMesh_;
+    GPUResourceFrameSet triangleMesh_;
     GeometryMesh triangleMeshData_;
 };

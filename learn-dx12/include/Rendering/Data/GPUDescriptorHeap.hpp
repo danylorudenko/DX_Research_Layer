@@ -18,31 +18,31 @@ public:
 
     void Reset();
 
-    GPUFrameResourceDescriptor AllocRtvLinear(GPUFrameResource* resources,
+    GPUResourceFrameSetDescriptor AllocRtvLinear(GPUResourceFrameSet* resources,
                                               D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocDsvLinear(GPUFrameResource* resources,
+    GPUResourceFrameSetDescriptor AllocDsvLinear(GPUResourceFrameSet* resources,
                                               D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocCbvLinear(GPUFrameResource* resources,
+    GPUResourceFrameSetDescriptor AllocCbvLinear(GPUResourceFrameSet* resources,
                                               D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocSrvLinear(GPUFrameResource* resources,
+    GPUResourceFrameSetDescriptor AllocSrvLinear(GPUResourceFrameSet* resources,
                                               D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",
                                               int frameCount = 1U);
 
-    GPUFrameResourceDescriptor AllocUavLinear(GPUFrameResource* resources,
+    GPUResourceFrameSetDescriptor AllocUavLinear(GPUResourceFrameSet* resources,
                                               D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
                                               D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON,
                                               char const* semantics = "default",

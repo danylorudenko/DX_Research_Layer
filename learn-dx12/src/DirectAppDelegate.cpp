@@ -43,7 +43,7 @@ void DirectAppDelegate::start(Application& application)
     };
     constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
 
-    std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
+    std::vector<GPUResourceFrameSetDescriptor> describedResourcesViews{ 1, constantBufferView_ };
     std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
     GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), describedResourcesViews, describedResources };
 
@@ -53,7 +53,7 @@ void DirectAppDelegate::start(Application& application)
 
 
     GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
-    triangleMesh_ = GPUFrameResource{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
+    triangleMesh_ = GPUResourceFrameSet{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
     triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
@@ -190,11 +190,11 @@ void DirectAppDelegate::Draw()
     gpuAccess_.CommitDefaultViewportScissorRects();
 
     // Quick hack to fix the back buffers states.
-    auto* backBuffer = gpuAccess_.FinalRenderTargetViews().DescribedResource();
+    //auto* backBuffer = gpuAccess_.FinalRenderTargetViews().DescribedResource();
     int const localFrameIndex = frameIndex_ % gpuAccess_.SWAP_CHAIN_BUFFER_COUNT;
-    if (backBuffer->State(localFrameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
+    /*if (backBuffer->State(localFrameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
         backBuffer->Transition(localFrameIndex, directEngine.CommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
-    }
+    }*/
 
     float clearColor[] = { 0.1f, 0.2f, 0.3f, 1.0f };
     directEngine.Commit().ClearRenderTargetView(gpuAccess_.FinalRenderTargetViews().CPUViewHandle(localFrameIndex), clearColor, 0, nullptr);
@@ -206,7 +206,7 @@ void DirectAppDelegate::Draw()
     ++frameIndex_;
     
     //GPUEngine& graphicsEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
-    //GPUFrameResource& currentFrameResource = gpuAccess_.CurrentFrameResource();
+    //GPUResourceFrameSet& currentFrameResource = gpuAccess_.CurrentFrameResource();
     //
     //// Set general pipeline state.
     //graphicsEngine.Commit().SetPipelineState(pipelineState_.Get());

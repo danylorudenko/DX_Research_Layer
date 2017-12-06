@@ -2,17 +2,17 @@
 
 #include <pch.hpp>
 
-class GPUFrameResource
+class GPUResourceFrameSet
 {
 public:
-    GPUFrameResource();
-    GPUFrameResource(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state);
-    GPUFrameResource(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state);
-    GPUFrameResource(GPUFrameResource const&) = delete;
-    GPUFrameResource(GPUFrameResource&& rhs);
+    GPUResourceFrameSet();
+    GPUResourceFrameSet(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state);
+    GPUResourceFrameSet(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state);
+    GPUResourceFrameSet(GPUResourceFrameSet const&) = delete;
+    GPUResourceFrameSet(GPUResourceFrameSet&& rhs);
 
-    GPUFrameResource& operator=(GPUFrameResource const&) = delete;
-    GPUFrameResource& operator=(GPUFrameResource&& rhs);
+    GPUResourceFrameSet& operator=(GPUResourceFrameSet const&) = delete;
+    GPUResourceFrameSet& operator=(GPUResourceFrameSet&& rhs);
     
     ID3D12Resource* Get(int frameIndex) const { return resources_[frameIndex].Get(); }
     std::size_t Size() const { return size_; };
@@ -22,7 +22,7 @@ public:
     D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress(int frameIndex);
 
     void CreateResources(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES initialState);
-    void UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUFrameResource& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes);
+    void UpdateData(int frameIndex, ID3D12GraphicsCommandList* commandList, std::size_t offsetInDest, GPUResourceFrameSet& src, int srcFrameIndex, std::size_t offsetInSrc, std::size_t numBytes);
 
     void Transition(int frameIndex, ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES state);
     D3D12_RESOURCE_STATES State(int frameIndex) const;

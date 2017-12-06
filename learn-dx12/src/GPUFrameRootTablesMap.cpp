@@ -2,11 +2,11 @@
 
 GPUFrameRootTablesMap::GPUFrameRootTablesMap() = default;
 
-GPUFrameRootTablesMap::GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceDescriptor> const& map, std::vector<StateAndResource> const& describedResources) :
+GPUFrameRootTablesMap::GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUResourceFrameSetDescriptor> const& map, std::vector<StateAndResource> const& describedResources) :
     parentHeap_(parentHeap), descriptorTable_(map), describedResources_(describedResources)
 { }
 
-GPUFrameRootTablesMap::GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUFrameResourceDescriptor>&& map, std::vector<StateAndResource>&& describedResources) :
+GPUFrameRootTablesMap::GPUFrameRootTablesMap(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& parentHeap, std::vector<GPUResourceFrameSetDescriptor>&& map, std::vector<StateAndResource>&& describedResources) :
     parentHeap_(parentHeap_), descriptorTable_(std::move(map)), describedResources_(describedResources)
 { }
 
@@ -38,7 +38,7 @@ int GPUFrameRootTablesMap::DescribedResourceCount(int frameIndex) const
     return static_cast<int>(describedResources_.size());
 }
 
-GPUFrameResource* GPUFrameRootTablesMap::DescribedResource(int resourceIndex)
+GPUResourceFrameSet* GPUFrameRootTablesMap::DescribedResource(int resourceIndex)
 {
     return describedResources_[resourceIndex].second;
 }

@@ -4,7 +4,7 @@
 
 #include <Utility\Application.hpp>
 #include <Rendering\GPUEngine.hpp>
-#include <Rendering\Data\GPUFrameResource.hpp>
+#include <Rendering\Data\GPUResourceFrameSet.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>
 #include <Rendering\Data\GPUDescriptorHeap.hpp>
 #include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
@@ -41,8 +41,8 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Device> Device() const { return device_; }
     Microsoft::WRL::ComPtr<IDXGISwapChain> SwapChain() { return swapChain_; }
 
-    GPUFrameResourceDescriptor& FinalRenderTargetViews() { return *finalRenderTargetViews_; }
-    GPUFrameResourceDescriptor& FinalDepthSteniclViews() { return *finalDepthStencilViews_; }
+    GPUResourceFrameSetDescriptor& FinalRenderTargetViews() { return *finalRenderTargetViews_; }
+    GPUResourceFrameSetDescriptor& FinalDepthSteniclViews() { return *finalDepthStencilViews_; }
 
     GPUFrameGraph& FrameGraph() { return *frameGraph_; }
     GPUDescriptorHeap& DescriptorHeap() { return *descriptorHeap_; }
@@ -75,10 +75,10 @@ private:
 
     GPUFrameGraph* frameGraph_ = nullptr;
 
-    GPUFrameResource* renderTargetBuffers_ = nullptr;
-    GPUFrameResource* depthStencilBuffers_ = nullptr;
-    GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
-    GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
+    GPUResourceFrameSet* renderTargetBuffers_ = nullptr;
+    GPUResourceFrameSet* depthStencilBuffers_ = nullptr;
+    GPUResourceFrameSetDescriptor* finalRenderTargetViews_ = nullptr;
+    GPUResourceFrameSetDescriptor* finalDepthStencilViews_ = nullptr;
 
     // Default surface description.
     D3D12_VIEWPORT viewportRect_;

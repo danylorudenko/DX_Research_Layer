@@ -1,10 +1,10 @@
 #include <Rendering\Data\GPUFrameResourceDescriptor.hpp>
 
-GPUFrameResourceDescriptor::GPUFrameResourceDescriptor() = default;
+GPUResourceFrameSetDescriptor::GPUResourceFrameSetDescriptor() = default;
 
-GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap,
+GPUResourceFrameSetDescriptor::GPUResourceFrameSetDescriptor(int frameCount, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap,
                                                        UINT descriptorSize, int* offsetsInHeap,
-                                                       D3D12_RESOURCE_STATES state, char const* semantics, GPUFrameResource* describedResource) :
+                                                       D3D12_RESOURCE_STATES state, char const* semantics, GPUResourceFrameSet* describedResource) :
     frameCount_(frameCount), descriptorHeap_(heap), descriptorSize_(descriptorSize), 
     state_(state), semantics_(semantics), describedResource_(describedResource)
 {
@@ -15,22 +15,22 @@ GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(int frameCount, Microsoft
     }
 }
 
-GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(GPUFrameResourceDescriptor const& rhs) = default;
+GPUResourceFrameSetDescriptor::GPUResourceFrameSetDescriptor(GPUResourceFrameSetDescriptor const& rhs) = default;
 
-GPUFrameResourceDescriptor::GPUFrameResourceDescriptor(GPUFrameResourceDescriptor&& rhs) = default;
+GPUResourceFrameSetDescriptor::GPUResourceFrameSetDescriptor(GPUResourceFrameSetDescriptor&& rhs) = default;
 
-GPUFrameResourceDescriptor& GPUFrameResourceDescriptor::operator=(GPUFrameResourceDescriptor const& rhs) = default;
+GPUResourceFrameSetDescriptor& GPUResourceFrameSetDescriptor::operator=(GPUResourceFrameSetDescriptor const& rhs) = default;
 
-GPUFrameResourceDescriptor& GPUFrameResourceDescriptor::operator=(GPUFrameResourceDescriptor&& rhs) = default;
+GPUResourceFrameSetDescriptor& GPUResourceFrameSetDescriptor::operator=(GPUResourceFrameSetDescriptor&& rhs) = default;
 
-D3D12_GPU_DESCRIPTOR_HANDLE GPUFrameResourceDescriptor::GPUViewHandle(int frameIndex) const
+D3D12_GPU_DESCRIPTOR_HANDLE GPUResourceFrameSetDescriptor::GPUViewHandle(int frameIndex) const
 {
     assert(frameIndex < frameCount_ && "Handle getter recieved invalid frame index.");
     CD3DX12_GPU_DESCRIPTOR_HANDLE handle(descriptorHeap_->GetGPUDescriptorHandleForHeapStart(), descriptorOffsets_[frameIndex], descriptorSize_);
     return handle;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE GPUFrameResourceDescriptor::CPUViewHandle(int frameIndex) const
+D3D12_CPU_DESCRIPTOR_HANDLE GPUResourceFrameSetDescriptor::CPUViewHandle(int frameIndex) const
 {
     assert(frameIndex < frameCount_ && "Handle getter recieved invalid frame index.");
     CD3DX12_CPU_DESCRIPTOR_HANDLE handle(descriptorHeap_->GetCPUDescriptorHandleForHeapStart(), descriptorOffsets_[frameIndex], descriptorSize_);

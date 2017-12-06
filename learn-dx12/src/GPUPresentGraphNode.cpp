@@ -10,14 +10,14 @@ GPUPresentGraphNode::GPUPresentGraphNode(GPUPresentGraphNode&& rhs) = default;
 
 GPUPresentGraphNode& GPUPresentGraphNode::operator=(GPUPresentGraphNode&& rhs) = default;
 
-void GPUPresentGraphNode::ImportRenderTarget(GPUFrameResource* renderTarget)
+void GPUPresentGraphNode::ImportRenderTarget(GPUResourceFrameSet* renderTarget)
 {
     renderTargets_.push_back(renderTarget);
 }
 
 void GPUPresentGraphNode::Process(UINT64 frameIndex) 
 {
-    int const localFrameIndex = frameIndex % 3;
+    int const localFrameIndex = static_cast<int>(frameIndex % 3);
     TransitionRenderTargetState(localFrameIndex);
 
     executionEngine_->FlushReset();

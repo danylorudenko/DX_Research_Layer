@@ -42,12 +42,12 @@ GPUUploadHeap::GPUUploadHeap(
 }
 
 GPUUploadHeap::GPUUploadHeap(GPUUploadHeap&& rhs) :
-    GPUFrameResource(std::move(rhs))
+    GPUResourceFrameSet(std::move(rhs))
 {
 }
 
 GPUUploadHeap& GPUUploadHeap::operator=(GPUUploadHeap&& rhs)
 {
-    GPUFrameResource::operator=(std::move(rhs));
+    GPUResourceFrameSet::operator=(std::move(rhs));
     return *this;
 }

@@ -2,9 +2,9 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\GPUFrameResource.hpp>
+#include <Rendering\Data\GPUResourceFrameSet.hpp>
 
-class GPUUploadHeap : public GPUFrameResource
+class GPUUploadHeap : public GPUResourceFrameSet
 {
 public:
     GPUUploadHeap();
