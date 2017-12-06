@@ -2,6 +2,8 @@
 
 #include <pch.hpp>
 
+#include <Rendering\GPUEngine.hpp>
+
 class GPUEngine;
 
 class GPUResource
@@ -24,6 +26,8 @@ public:
     D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress();
 
     D3D12_RESOURCE_STATES Transition(GPUEngine& executionEngine, D3D12_RESOURCE_STATES targetState);
+
+    void UpdateData(GPUEngine& executionEngine, std::size_t offsetInDestination, GPUResource& src, std::size_t numBytes, std::size_t offsetInSrc = 0);
     
 protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> resourceHandle_;

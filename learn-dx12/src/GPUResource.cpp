@@ -1,4 +1,4 @@
-#include <Rendering\Data\GPUResource.hpp>
+#include <Rendering\Data\Resource\GPUResource.hpp>
 
 #include <Rendering\GPUEngine.hpp>
 
@@ -25,6 +25,16 @@ GPUResource::GPUResource(GPUResource&& rhs) = default;
 
 GPUResource& GPUResource::operator=(GPUResource&& rhs) = default;
 
+ID3D12Resource* GPUResource::Get()
+{
+    return resourceHandle_.Get();
+}
+
+ID3D12Resource* GPUResource::operator->()
+{
+    return resourceHandle_.Get();
+}
+
 D3D12_RESOURCE_STATES GPUResource::VirtualState() const
 {
     return virtualState_;
@@ -46,12 +56,7 @@ D3D12_RESOURCE_STATES GPUResource::Transition(GPUEngine& executionEngine, D3D12_
     return prevState;
 }
 
-ID3D12Resource* GPUResource::Get()
+void GPUResource::UpdateData(GPUEngine& executionEngine, std::size_t offsetInDestination, GPUResource& src, std::size_t numBytes, std::size_t offsetInSrc)
 {
-    return resourceHandle_.Get();
-}
-
-ID3D12Resource* GPUResource::operator->()
-{
-    return resourceHandle_.Get();
+    executionEngine.Commit().CopyBufferRegion(Get(), offsetInDestination, src.Get(), offsetInSrc, numBytes);
 }

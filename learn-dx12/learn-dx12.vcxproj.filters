@@ -167,9 +167,6 @@
     <ClInclude Include="include\Rendering\Data\GPURootSignature.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\GPUUploadHeap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\Data\SceneConstantBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -179,10 +176,13 @@
     <ClInclude Include="include\Rendering\Data\GPUDescriptorHeap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\GPUResource.hpp">
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\GPUResourceFrameSet.hpp">
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameSet.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\Resource\GPUUploadHeap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

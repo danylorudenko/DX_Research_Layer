@@ -206,10 +206,10 @@
     <ClInclude Include="include\Rendering\Data\GeometryMesh.hpp" />
     <ClInclude Include="include\Rendering\Data\GPUPipelineState.hpp" />
     <ClInclude Include="include\Rendering\Data\GPURenderItem.hpp" />
-    <ClInclude Include="include\Rendering\Data\GPUResourceFrameSet.hpp" />
-    <ClInclude Include="include\Rendering\Data\GPUResource.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameSet.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResource.hpp" />
     <ClInclude Include="include\Rendering\Data\GPURootSignature.hpp" />
-    <ClInclude Include="include\Rendering\Data\GPUUploadHeap.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUUploadHeap.hpp" />
     <ClInclude Include="include\Math\Camera.hpp" />
     <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />
