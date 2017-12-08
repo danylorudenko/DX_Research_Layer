@@ -1,16 +1,14 @@
 #pragma once
 
-#include <Rendering\Data\GPUUploadHeap.hpp>
+#include <Rendering\Data\Resource\GPUUploadHeapBuffer.hpp>
 
-GPUUploadHeap::GPUUploadHeap() = default;
+GPUUploadHeapBuffer::GPUUploadHeapBuffer() = default;
 
-GPUUploadHeap::GPUUploadHeap(
-    int framesCount,
+GPUUploadHeapBuffer::GPUUploadHeapBuffer(
     ID3D12Device* device,
     void const* data,
-    std::size_t size,
     D3D12_RESOURCE_DESC* resourceDesc,
-    bool isConstBuffer)
+    std::size_t size)
 {
     framesCount_ = framesCount;
     size_ = size;
@@ -41,12 +39,12 @@ GPUUploadHeap::GPUUploadHeap(
     }
 }
 
-GPUUploadHeap::GPUUploadHeap(GPUUploadHeap&& rhs) :
+GPUUploadHeapBuffer::GPUUploadHeapBuffer(GPUUploadHeapBuffer&& rhs) :
     GPUResourceFrameSet(std::move(rhs))
 {
 }
 
-GPUUploadHeap& GPUUploadHeap::operator=(GPUUploadHeap&& rhs)
+GPUUploadHeapBuffer& GPUUploadHeapBuffer::operator=(GPUUploadHeapBuffer&& rhs)
 {
     GPUResourceFrameSet::operator=(std::move(rhs));
     return *this;

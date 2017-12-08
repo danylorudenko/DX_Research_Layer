@@ -37,7 +37,7 @@ private:
 
 
     // CUSTOM APPLICATION DATA
-    GPUUploadHeap constantBuffer_;
+    GPUUploadHeapBuffer constantBuffer_;
     GPUResourceFrameSetDescriptor constantBufferView_;
     SceneConstantBuffer constantBufferData_;
 

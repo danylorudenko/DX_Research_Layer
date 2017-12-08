@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
+    <ClCompile Include="src\GPUBuffer.cpp" />
     <ClCompile Include="src\GPUDescriptorHeap.cpp" />
     <ClCompile Include="src\GPUFrameGraph.cpp" />
     <ClCompile Include="src\GPUFrameResourceDescriptor.cpp" />
@@ -186,7 +187,7 @@
     <ClCompile Include="src\GPUResourceFrameSet.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
-    <ClCompile Include="src\GPUUploadHeap.cpp" />
+    <ClCompile Include="src\GPUUploadHeapBuffer.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />
     <ClCompile Include="src\Camera.cpp" />
@@ -206,10 +207,11 @@
     <ClInclude Include="include\Rendering\Data\GeometryMesh.hpp" />
     <ClInclude Include="include\Rendering\Data\GPUPipelineState.hpp" />
     <ClInclude Include="include\Rendering\Data\GPURenderItem.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUBuffer.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameSet.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResource.hpp" />
     <ClInclude Include="include\Rendering\Data\GPURootSignature.hpp" />
-    <ClInclude Include="include\Rendering\Data\Resource\GPUUploadHeap.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUUploadHeapBuffer.hpp" />
     <ClInclude Include="include\Math\Camera.hpp" />
     <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />

@@ -37,7 +37,7 @@ void DirectAppDelegate::start(Application& application)
     trianglePipelineState_ = GPUPipelineState{ pipelineState };
 
     auto const framesCount = static_cast<int>(GPUAccess::SWAP_CHAIN_BUFFER_COUNT);
-    constantBuffer_ = GPUUploadHeap{ 
+    constantBuffer_ = GPUUploadHeapBuffer{ 
         framesCount, gpuAccess_.Device().Get(), 
         &constantBufferData_, sizeof(constantBufferData_), &CD3DX12_RESOURCE_DESC::Buffer(sizeof(constantBufferData_)), true 
     };
@@ -52,7 +52,7 @@ void DirectAppDelegate::start(Application& application)
     //////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
+    GPUUploadHeapBuffer triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
     triangleMesh_ = GPUResourceFrameSet{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
     triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
