@@ -6,7 +6,7 @@
 #include <Utility\PerformanceTimer.hpp>
 #include <Rendering\GPUAccess.hpp>
 #include <Rendering\Data\GeometryMesh.hpp>
-#include <Rendering\Data\Resource\GPUUploadHeap.hpp>
+#include <Rendering\Data\Resource\GPUUploadHeapBuffer.hpp>
 #include <Rendering\Data\SceneConstantBuffer.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>

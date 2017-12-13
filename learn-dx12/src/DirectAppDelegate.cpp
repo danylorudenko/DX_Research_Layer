@@ -5,7 +5,7 @@
 #include <Utility\DirectAppDelegate.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
-#include <Rendering\Data\GPUUploadHeap.hpp>
+#include <Rendering\Data\Resource/GPUUploadHeapBuffer.hpp>
 #include <Rendering\Data\GPURenderItem.hpp>
 
 void DirectAppDelegate::start(Application& application)
@@ -37,10 +37,9 @@ void DirectAppDelegate::start(Application& application)
     trianglePipelineState_ = GPUPipelineState{ pipelineState };
 
     auto const framesCount = static_cast<int>(GPUAccess::SWAP_CHAIN_BUFFER_COUNT);
-    constantBuffer_ = GPUUploadHeapBuffer{ 
-        framesCount, gpuAccess_.Device().Get(), 
-        &constantBufferData_, sizeof(constantBufferData_), &CD3DX12_RESOURCE_DESC::Buffer(sizeof(constantBufferData_)), true 
-    };
+
+    constantBuffer_ = GPUUploadHeapBuffer{ gpuAccess_.Device().Get(), &constantBufferData_, &CD3DX12_RESOURCE_DESC::Buffer(sizeof(constantBufferData_)), sizeof(constantBufferData_), true };
+    
     constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
 
     std::vector<GPUResourceFrameSetDescriptor> describedResourcesViews{ 1, constantBufferView_ };

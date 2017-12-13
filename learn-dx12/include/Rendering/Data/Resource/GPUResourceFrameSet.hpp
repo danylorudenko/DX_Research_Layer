@@ -7,6 +7,7 @@ class GPUResourceFrameSet
 {
 public:
     GPUResourceFrameSet();
+
     GPUResourceFrameSet(int framesCount, GPUResource* resources);
     GPUResourceFrameSet(GPUResourceFrameSet const&) = delete;
     GPUResourceFrameSet(GPUResourceFrameSet&& rhs);
@@ -14,10 +15,10 @@ public:
     GPUResourceFrameSet& operator=(GPUResourceFrameSet const&) = delete;
     GPUResourceFrameSet& operator=(GPUResourceFrameSet&& rhs);
     
-    int FramesCount() const { return resources_.size(); }
+    std::size_t FramesCount() const;
 
     GPUResource& operator[](int const resourceIndex);
 
 protected:
-    std::vector<GPUResource> resources_;
+    std::vector<GPUResource*> resources_;
 };

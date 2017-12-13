@@ -18,8 +18,8 @@ public:
 
     std::size_t Size() const;
     
-    void Map(void** mapDest, D3D12_RANGE const& range);
-    void Unmap(D3D12_RANGE const& rangle);
+    void Map(void** mapDest, D3D12_RANGE const* range);
+    void Unmap(D3D12_RANGE const* range);
 
 protected:
     std::size_t bufferSize_;

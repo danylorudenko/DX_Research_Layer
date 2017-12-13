@@ -5,7 +5,7 @@
 #include <Utility\Application.hpp>
 #include <Rendering\GPUEngine.hpp>
 #include <Rendering\Data\Resource\GPUResourceFrameSet.hpp>
-#include <Rendering\Data\Resource\GPUUploadHeap.hpp>
+#include <Rendering\Data\Resource\GPUUploadHeapBuffer.hpp>
 #include <Rendering\Data\GPUDescriptorHeap.hpp>
 #include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
 

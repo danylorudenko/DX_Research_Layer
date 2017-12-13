@@ -3,7 +3,9 @@
 GPUBuffer::GPUBuffer() : GPUResource{}, bufferSize_{ 0 }
 { }
 
-GPUBuffer::GPUBuffer(ID3D12Device* device, D3D12_RESOURCE_DESC const* resourceDesc, D3D12_RESOURCE_STATES initialState, std::size_t size)
+GPUBuffer::GPUBuffer(ID3D12Device* device, D3D12_RESOURCE_DESC const* resourceDesc, D3D12_RESOURCE_STATES initialState, std::size_t size) :
+    GPUResource{},
+    bufferSize_(0)
 {
     {
         auto const result = device->CreateCommittedResource(
@@ -28,12 +30,12 @@ std::size_t GPUBuffer::Size() const
     return bufferSize_;
 }
 
-void GPUBuffer::Map(void** mapDest, D3D12_RANGE const& range)
+void GPUBuffer::Map(void** mapDest, D3D12_RANGE const* range)
 {
-    resourceHandle_->Map(0, &range, mapDest);
+    resourceHandle_->Map(0, range, mapDest);
 }
 
-void GPUBuffer::Unmap(D3D12_RANGE const& range)
+void GPUBuffer::Unmap(D3D12_RANGE const* range)
 {
-    resourceHandle_->Unmap(0, &range);
+    resourceHandle_->Unmap(0, range);
 }
