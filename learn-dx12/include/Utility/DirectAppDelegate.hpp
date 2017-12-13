@@ -47,6 +47,6 @@ private:
     GPUGraphicsGraphNode triangleGraphNode_;
     GPUPresentGraphNode presentNode_;
 
-    GPUResourceFrameSet triangleMesh_;
+    GPUBuffer triangleMesh_;
     GeometryMesh triangleMeshData_;
 };

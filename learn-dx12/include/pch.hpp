@@ -20,8 +20,9 @@
 
 #include <d3dcompiler.h>
 
-#include <Rendering\Data\Vertex.hpp>
-#include <Rendering\Data\SceneConstantBuffer.hpp>
+#define D3D12_RESOURCE_STATE_INVALID static_cast<D3D12_RESOURCE_STATES>(-1)
+
+#define D3D12_GPU_VIRTUAL_ADDRESS_ZERO static_cast<D3D12_GPU_VIRTUAL_ADDRESS>(0)
 
 #ifndef ThrowIfFailed
 

@@ -10,6 +10,7 @@ class GPUResource
 {
 public:
     GPUResource();
+    GPUResource(Microsoft::WRL::ComPtr<ID3D12Resource>& resourceHandle, D3D12_RESOURCE_STATES state);
     GPUResource(ID3D12Device* device, D3D12_RESOURCE_DESC const* resourceDesc, D3D12_RESOURCE_STATES initialState);
     
     GPUResource(GPUResource const&) = delete;

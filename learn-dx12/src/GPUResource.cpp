@@ -3,7 +3,11 @@
 #include <Rendering\GPUEngine.hpp>
 
 GPUResource::GPUResource() :
-    resourceHandle_{ nullptr }, virtualState_{ (D3D12_RESOURCE_STATES)-1 }, gpuAddress_{ (D3D12_GPU_VIRTUAL_ADDRESS)0 }
+    resourceHandle_{ nullptr }, virtualState_{ D3D12_RESOURCE_STATE_INVALID }, gpuAddress_{ D3D12_GPU_VIRTUAL_ADDRESS_ZERO }
+{ }
+
+GPUResource::GPUResource(Microsoft::WRL::ComPtr<ID3D12Resource>& resourceHandle, D3D12_RESOURCE_STATES state) :
+    resourceHandle_{ resourceHandle }, virtualState_{ state }, gpuAddress_{ D3D12_GPU_VIRTUAL_ADDRESS_ZERO }
 { }
 
 GPUResource::GPUResource(ID3D12Device* device, D3D12_RESOURCE_DESC const* resourceDesc, D3D12_RESOURCE_STATES initialState)

@@ -215,6 +215,7 @@
     <ClInclude Include="include\Math\Camera.hpp" />
     <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\View\GPUResourceView.hpp" />
     <ClInclude Include="include\Rendering\GPUAccess.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandList.hpp" />

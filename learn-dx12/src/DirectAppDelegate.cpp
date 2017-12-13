@@ -1,7 +1,9 @@
 #include <pch.hpp>
+
 #include <thread>
 #include <chrono>
 
+#include <Rendering\Data\Vertex.hpp>
 #include <Utility\DirectAppDelegate.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
@@ -40,25 +42,25 @@ void DirectAppDelegate::start(Application& application)
 
     constantBuffer_ = GPUUploadHeapBuffer{ gpuAccess_.Device().Get(), &constantBufferData_, &CD3DX12_RESOURCE_DESC::Buffer(sizeof(constantBufferData_)), sizeof(constantBufferData_), true };
     
-    constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
+    //constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
 
-    std::vector<GPUResourceFrameSetDescriptor> describedResourcesViews{ 1, constantBufferView_ };
-    std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
-    GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), describedResourcesViews, describedResources };
+    //std::vector<GPUResourceFrameSetDescriptor> describedResourcesViews{ 1, constantBufferView_ };
+    //std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
+    //GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), describedResourcesViews, describedResources };
 
-    triangleRootSignature_.ImportPassFrameRootDescriptorTable(rootTableMap);
+    //triangleRootSignature_.ImportPassFrameRootDescriptorTable(rootTableMap);
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
+    GPUUploadHeapBuffer triangleMeshUploadHeap{ gpuAccess_.Device().Get(), verticesData, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), verticesDataSize, false};
 
-    GPUUploadHeapBuffer triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
-    triangleMesh_ = GPUResourceFrameSet{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
-    triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
-    triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+    triangleMesh_ = GPUBuffer{ gpuAccess_.Device().Get(), &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST, verticesDataSize };
+    triangleMesh_.UpdateData(initializationEngine, 0, triangleMeshUploadHeap, triangleMeshUploadHeap.Size(), 0);
+    triangleMesh_.Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
     D3D12_VERTEX_BUFFER_VIEW triangleView{};
-    triangleView.BufferLocation = triangleMesh_.GPUVirtualAddress(0);
-    triangleView.SizeInBytes = /*static_cast<UINT>(triangleMesh_.Size()*/verticesDataSize;
+    triangleView.BufferLocation = triangleMesh_.GPUVirtualAddress();
+    triangleView.SizeInBytes = verticesDataSize;
     triangleView.StrideInBytes = sizeof(Vertex);
     
     GPURenderItem triangleRenderItem{};
