@@ -186,6 +186,7 @@
     <ClCompile Include="src\GPUPresentGraphNode.cpp" />
     <ClCompile Include="src\GPUResourceFrameSet.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
+    <ClCompile Include="src\GPUResourceView.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUUploadHeapBuffer.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
