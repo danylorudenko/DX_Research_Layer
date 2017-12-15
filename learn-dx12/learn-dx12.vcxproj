@@ -207,8 +207,10 @@
     <ClInclude Include="include\Rendering\Data\GPUFrameRootTablesMap.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUFrameGraph.hpp" />
     <ClInclude Include="include\Rendering\Data\GeometryMesh.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUPassResourcesAggregator.hpp" />
     <ClInclude Include="include\Rendering\Data\GPUPipelineState.hpp" />
     <ClInclude Include="include\Rendering\Data\GPURenderItem.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPURootMap.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUBuffer.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameSet.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResource.hpp" />
