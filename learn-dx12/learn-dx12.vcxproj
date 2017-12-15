@@ -186,6 +186,7 @@
     <ClCompile Include="src\GPUPresentGraphNode.cpp" />
     <ClCompile Include="src\GPUResourceFrameSet.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
+    <ClCompile Include="src\GPUResourceNativeView.cpp" />
     <ClCompile Include="src\GPUResourceView.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUUploadHeapBuffer.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="include\Math\Camera.hpp" />
     <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\View\GPUResourceNativeView.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\View\GPUResourceView.hpp" />
     <ClInclude Include="include\Rendering\GPUAccess.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />

@@ -96,6 +96,9 @@
     <ClCompile Include="src\GPUResourceView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUResourceNativeView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">
@@ -195,6 +198,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\Data\Resource\View\GPUResourceView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\Resource\View\GPUResourceNativeView.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
