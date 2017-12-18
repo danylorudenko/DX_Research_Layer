@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\Resource\View\GPUResourceNativeView.hpp>
+#include <Rendering\Data\GPURootMap.hpp>
 
 class GPUPassResourcesAggregator
 {
@@ -15,7 +15,7 @@ public:
     GPUPassResourcesAggregator& operator=(GPUPassResourcesAggregator&& rhs);
 
 private:
-    // GPURootResourceMap
+    GPURootMap rootMap_;
 
     std::vector<GPUResourceNativeView> renderTargets_;
     

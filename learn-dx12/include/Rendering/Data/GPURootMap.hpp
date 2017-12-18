@@ -14,8 +14,16 @@ public:
     GPURootMap& operator=(GPURootMap const& rhs);
     GPURootMap& operator=(GPURootMap&& rhs);
 
-private:
-    std::
+    void ImportTableBindPoint(GPUResourceNativeView const& view);
+    void ImportResourceView(GPUResourceView const& view);
 
+    GPUResourceNativeView const& BindPoint(int index) const;
+    std::size_t BindPointCount() const;
+
+    GPUResourceView const& RootResource(int index) const;
+    std::size_t RootResourceCount() const;
+
+private:
+    std::vector<GPUResourceNativeView> rootTableBindPoints_;
     std::vector<GPUResourceView> rootResources_;
 };

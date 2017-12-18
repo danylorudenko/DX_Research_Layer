@@ -188,6 +188,7 @@
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPUResourceNativeView.cpp" />
     <ClCompile Include="src\GPUResourceView.cpp" />
+    <ClCompile Include="src\GPURootMap.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUUploadHeapBuffer.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />

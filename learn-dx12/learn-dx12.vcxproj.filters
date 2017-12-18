@@ -99,6 +99,9 @@
     <ClCompile Include="src\GPUResourceNativeView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPURootMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">
