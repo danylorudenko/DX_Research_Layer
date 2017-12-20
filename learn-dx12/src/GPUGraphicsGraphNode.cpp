@@ -1,5 +1,9 @@
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 
+Color::Color(float r, float g, float b, float a) : 
+    color{ r, g, b, a }
+{ }
+
 GPUGraphicsGraphNode::GPUGraphicsGraphNode() = default;
 
 GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState, int frameBufferCount) :
@@ -28,6 +32,9 @@ void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
     BindPassRootSignature(frameIndexLocal);
 
     BindRenderDepthStencilTargets(frameIndexLocal);
+    
+    ClearRenderTargets(frameIndexLocal);
+    ClearDepthStencilTargets(frameIndexLocal);
 
     IterateRenderItems(frameIndex % frameBufferCount_);
 }
@@ -74,6 +81,16 @@ void GPUGraphicsGraphNode::ImportRenderItem(GPURenderItem&& renderItem)
     renderItems_.push_back(std::move(renderItem));
 }
 
+void GPUGraphicsGraphNode::ImportClearColors(Color const* clearColors, std::size_t colorCount)
+{
+    assert(colorCount <= renderTargets_.size() && "Can't have more clear colors than there are render targets.");
+    assert(clearColors_.empty() && "Clear colors list is immutable once set.");
+
+    for (size_t i = 0; i < colorCount; i++) {
+        clearColors_.push_back(clearColors[i]);
+    }
+}
+
 void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(int frameIndex)
 {    
     auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
@@ -114,6 +131,19 @@ void GPUGraphicsGraphNode::TransitionDepthStencilTarget(int frameIndex)
     if (depthStencilTarget_.DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_DEPTH_WRITE) {
         depthStencilTarget_.DescribedResource()->Transition(frameIndex, executionEngine_->CommandList(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
     }
+}
+
+void GPUGraphicsGraphNode::ClearRenderTargets(int frameIndex)
+{
+    std::size_t const clearColorsCount = clearColors_.size();
+    for (size_t i = 0; i < clearColorsCount; i++) {
+        executionEngine_->Commit().ClearRenderTargetView(renderTargets_[i].CPUViewHandle(frameIndex), clearColors_[i].color, 0, nullptr);
+    }
+}
+
+void GPUGraphicsGraphNode::ClearDepthStencilTargets(int frameIndex)
+{
+
 }
 
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, int frameIndex)

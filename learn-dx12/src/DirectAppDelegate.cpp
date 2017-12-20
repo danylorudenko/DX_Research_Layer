@@ -36,6 +36,10 @@ void DirectAppDelegate::start(Application& application)
     triangleRootSignature_ = GPURootSignature{ rootSignature };
     trianglePipelineState_ = GPUPipelineState{ pipelineState };
 
+
+
+
+
     auto const framesCount = static_cast<int>(GPUAccess::SWAP_CHAIN_BUFFER_COUNT);
     constantBuffer_ = GPUUploadHeap{ 
         framesCount, gpuAccess_.Device().Get(), 
@@ -43,24 +47,34 @@ void DirectAppDelegate::start(Application& application)
     };
     constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
 
-    std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
-    std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
+
+
+
+
+    //std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
+    //std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
+    std::vector<GPUFrameResourceDescriptor> describedResourcesViews{};
+    std::vector < GPUFrameRootTablesMap::StateAndResource> describedResources{};
     GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), describedResourcesViews, describedResources };
 
     triangleRootSignature_.ImportPassFrameRootDescriptorTable(rootTableMap);
 
-    //////////////////////////////////////////////////////////////////////////////////////////////
+
+    
 
 
     GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
     triangleMesh_ = GPUFrameResource{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
-    triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+    triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);
 
     D3D12_VERTEX_BUFFER_VIEW triangleView{};
     triangleView.BufferLocation = triangleMesh_.GPUVirtualAddress(0);
-    triangleView.SizeInBytes = /*static_cast<UINT>(triangleMesh_.Size()*/verticesDataSize;
+    triangleView.SizeInBytes = verticesDataSize;
     triangleView.StrideInBytes = sizeof(Vertex);
+
+
+
     
     GPURenderItem triangleRenderItem{};
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
@@ -68,14 +82,26 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     triangleRenderItem.perItemResourceDescriptors_.push_back(std::make_pair(0, constantBufferView_));
 
+
+
+
     triangleGraphNode_ = GPUGraphicsGraphNode{ &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>(), &triangleRootSignature_, &trianglePipelineState_, framesCount };
     triangleGraphNode_.ImportRenderItem(triangleRenderItem);
     triangleGraphNode_.ImportRenderTarget(gpuAccess_.FinalRenderTargetViews());
     triangleGraphNode_.ImportDepthStencilTarget(gpuAccess_.FinalDepthSteniclViews());
 
+    Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
+    triangleGraphNode_.ImportClearColors(&clearColor, 1);
+
+
+
+
     presentNode_ = GPUPresentGraphNode{ gpuAccess_.SwapChain(), &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>() };
     presentNode_.ImportRenderTarget(gpuAccess_.FinalRenderTargetViews().DescribedResource());
     
+
+
+
     triangleGraphNode_.ImportChildNode(&presentNode_);
 
     gpuAccess_.FrameGraph().AddParentNode(&triangleGraphNode_);
@@ -86,7 +112,7 @@ void DirectAppDelegate::start(Application& application)
 
 void DirectAppDelegate::update(Application& application)
 {
-    CustomAction();
+    //CustomAction();
     Draw();
 
     gameTimer_.Tick();
@@ -190,14 +216,13 @@ void DirectAppDelegate::Draw()
     gpuAccess_.CommitDefaultViewportScissorRects();
 
     // Quick hack to fix the back buffers states.
-    auto* backBuffer = gpuAccess_.FinalRenderTargetViews().DescribedResource();
+    /*auto* backBuffer = gpuAccess_.FinalRenderTargetViews().DescribedResource();
     int const localFrameIndex = frameIndex_ % gpuAccess_.SWAP_CHAIN_BUFFER_COUNT;
     if (backBuffer->State(localFrameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
         backBuffer->Transition(localFrameIndex, directEngine.CommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
     }
 
-    float clearColor[] = { 0.1f, 0.2f, 0.3f, 1.0f };
-    directEngine.Commit().ClearRenderTargetView(gpuAccess_.FinalRenderTargetViews().CPUViewHandle(localFrameIndex), clearColor, 0, nullptr);
+    directEngine.Commit().ClearRenderTargetView(gpuAccess_.FinalRenderTargetViews().CPUViewHandle(localFrameIndex), clearColor, 0, nullptr);*/
     while (graphIterator != graphEnd) {
         (*graphIterator)->Process(frameIndex_);
         ++graphIterator;
