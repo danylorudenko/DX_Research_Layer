@@ -67,6 +67,8 @@ void DirectAppDelegate::start(Application& application)
     triangleMesh_ = GPUFrameResource{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
     triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);
+    initializationEngine.FlushReset();
+
 
     D3D12_VERTEX_BUFFER_VIEW triangleView{};
     triangleView.BufferLocation = triangleMesh_.GPUVirtualAddress(0);
