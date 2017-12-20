@@ -215,17 +215,9 @@ void DirectAppDelegate::Draw()
     
     auto& directEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
 
-    gpuAccess_.CommitDefaultViewportScissorRects();
 
-    // Quick hack to fix the back buffers states.
-    /*auto* backBuffer = gpuAccess_.FinalRenderTargetViews().DescribedResource();
-    int const localFrameIndex = frameIndex_ % gpuAccess_.SWAP_CHAIN_BUFFER_COUNT;
-    if (backBuffer->State(localFrameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
-        backBuffer->Transition(localFrameIndex, directEngine.CommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
-    }
-
-    directEngine.Commit().ClearRenderTargetView(gpuAccess_.FinalRenderTargetViews().CPUViewHandle(localFrameIndex), clearColor, 0, nullptr);*/
     while (graphIterator != graphEnd) {
+        gpuAccess_.CommitDefaultViewportScissorRects();
         (*graphIterator)->Process(frameIndex_);
         ++graphIterator;
     }
