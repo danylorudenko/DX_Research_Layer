@@ -24,7 +24,7 @@ void GPUGraphicsGraphNode::Process(int frameIndex)
 {
     BindPipelineState();
     BindViewportScissor();
-    BindPassRootSignature(frameIndex);
+    BindPassRoot(frameIndex);
 
     BindRenderDepthStencilTargets(frameIndex);
     

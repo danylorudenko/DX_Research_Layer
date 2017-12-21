@@ -50,9 +50,9 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-    std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
-    std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
-    GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), describedResourcesViews, describedResources };
+    std::vector<GPUFrameResourceDescriptor> tableStartViews{ 1, constantBufferView_ };
+    std::vector<GPUFrameRootTablesMap::StateAndResource> tableResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
+    GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), tableStartViews, tableResources };
 
     triangleRootSignature_.ImportPassFrameRootDescriptorTable(rootTableMap);
 
@@ -79,7 +79,6 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    //triangleRenderItem.perItemResourceDescriptors_.push_back(std::make_pair(0, constantBufferView_));
 
 
 

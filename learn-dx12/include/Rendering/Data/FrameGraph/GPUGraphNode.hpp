@@ -29,7 +29,7 @@ public:
     virtual void Process(int frameIndex) = 0;
 
 protected:
-    void BindPassRootSignature(int frameIndex);
+    void BindPassRoot(int frameIndex);
     void TransitionPassResources(int frameIndex);
 
     int frameBufferCount_;

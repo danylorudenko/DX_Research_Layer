@@ -40,7 +40,7 @@ int GPUGraphNode::ChildCount() const
     return static_cast<int>(childNodes_.size());
 }
 
-void GPUGraphNode::BindPassRootSignature(int frameIndex)
+void GPUGraphNode::BindPassRoot(int frameIndex)
 {
     rootSignature_->BindPassRootSignature(executionEngine_);
     rootSignature_->BindPassRootSignatureDescriptorTables(executionEngine_, frameIndex);
