@@ -50,11 +50,8 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-
     std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
     std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
-    //std::vector<GPUFrameResourceDescriptor> describedResourcesViews{};
-    //std::vector < GPUFrameRootTablesMap::StateAndResource> describedResources{};
     GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), describedResourcesViews, describedResources };
 
     triangleRootSignature_.ImportPassFrameRootDescriptorTable(rootTableMap);
@@ -82,7 +79,7 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    triangleRenderItem.perItemResourceDescriptors_.push_back(std::make_pair(0, constantBufferView_));
+    //triangleRenderItem.perItemResourceDescriptors_.push_back(std::make_pair(0, constantBufferView_));
 
 
 
@@ -244,8 +241,10 @@ void DirectAppDelegate::CustomAction(int frameIndex)
         constantBufferData_.offset.x -= 2 * offsetBounds;
     }
 
+    static D3D12_RANGE readRange{ 0, 0 };
+
     void* mappedData;
-    constantBuffer_.Map(frameIndex, &mappedData, nullptr);
+    constantBuffer_.Map(frameIndex, &mappedData, &readRange);
     memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
-    constantBuffer_.Unmap(frameIndex, nullptr);
+    constantBuffer_.Unmap(frameIndex, &readRange);
 }
