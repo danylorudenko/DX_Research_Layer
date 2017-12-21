@@ -27,6 +27,7 @@ public:
     void ImportRenderTarget(GPUFrameResourceDescriptor const& renderTarget);
     void ImportDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor);
     void ImportClearColors(Color const* clearColors, std::size_t colorCount);
+    void ImportViewportScissor(D3D12_VIEWPORT const& viewport, D3D12_RECT const& scissorRect);
 
     void ImportRenderItem(GPURenderItem const& item);
     void ImportRenderItem(GPURenderItem&& item);
@@ -36,6 +37,7 @@ public:
 private:
     void BindRenderDepthStencilTargets(int frameIndex);
     void BindPipelineState();
+    void BindViewportScissor();
 
     void TransitionRenderTargets(int frameIndex);
     void TransitionDepthStencilTarget(int frameIndex);
@@ -52,7 +54,11 @@ private:
     std::vector<GPURenderItem> renderItems_;
 
     std::vector<GPUFrameResourceDescriptor> renderTargets_;
+    std::vector<Color> clearColors_;
+
     GPUFrameResourceDescriptor depthStencilTarget_;
 
-    std::vector<Color> clearColors_;
+    D3D12_VIEWPORT viewportRect_;
+    D3D12_RECT scissorRect_;
+
 };

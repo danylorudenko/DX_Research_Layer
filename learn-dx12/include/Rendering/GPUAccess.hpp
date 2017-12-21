@@ -47,8 +47,6 @@ public:
     GPUFrameGraph& FrameGraph() { return *frameGraph_; }
     GPUDescriptorHeap& DescriptorHeap() { return *descriptorHeap_; }
 
-    void CommitDefaultViewportScissorRects();
-
     void CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest);
     void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
 
@@ -62,7 +60,6 @@ private:
     void CreateSwapChain(Application& application, IDXGIFactory* factory);
     void CreateFrameResources();
     void CreateDefaultDescriptorHeaps();
-    void SetViewportScissor();
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
@@ -79,11 +76,6 @@ private:
     GPUFrameResource* depthStencilBuffers_ = nullptr;
     GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
     GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
-
-    // Default surface description.
-    D3D12_VIEWPORT viewportRect_;
-    D3D12_RECT scissorRect_;
-
 
     GPUDescriptorHeap* descriptorHeap_ = nullptr;
     int static constexpr RTV_HEAP_CAPACITY = 30;

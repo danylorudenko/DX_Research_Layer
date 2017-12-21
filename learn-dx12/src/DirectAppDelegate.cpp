@@ -95,6 +95,16 @@ void DirectAppDelegate::start(Application& application)
     Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
     triangleGraphNode_.ImportClearColors(&clearColor, 1);
 
+    D3D12_VIEWPORT viewport{};
+    viewport.TopLeftX = 0.0f;
+    viewport.TopLeftY = 0.0f;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    viewport.Width = static_cast<float>(GPUAccess::WIDTH);
+    viewport.Height = static_cast<float>(GPUAccess::HEIGHT);
+    CD3DX12_RECT scissorRect{ 0, 0, static_cast<LONG>(GPUAccess::WIDTH), static_cast<LONG>(GPUAccess::HEIGHT) };
+    triangleGraphNode_.ImportViewportScissor(viewport, scissorRect);
+
 
 
 
@@ -217,7 +227,6 @@ void DirectAppDelegate::Draw()
 
 
     while (graphIterator != graphEnd) {
-        gpuAccess_.CommitDefaultViewportScissorRects();
         (*graphIterator)->Process(frameIndex_);
         ++graphIterator;
     }

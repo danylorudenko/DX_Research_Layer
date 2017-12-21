@@ -24,19 +24,21 @@ void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
 {
     int const frameIndexLocal = frameIndex % frameBufferCount_;
     
-    TransitionRenderTargets(frameIndexLocal);
-    TransitionDepthStencilTarget(frameIndexLocal);
-    TransitionPassResources(frameIndexLocal);
 
     BindPipelineState();
+    BindViewportScissor();
     BindPassRootSignature(frameIndexLocal);
 
     BindRenderDepthStencilTargets(frameIndexLocal);
     
+    TransitionRenderTargets(frameIndexLocal);
+    TransitionDepthStencilTarget(frameIndexLocal);
+    TransitionPassResources(frameIndexLocal);
+
     ClearRenderTargets(frameIndexLocal);
     ClearDepthStencilTargets(frameIndexLocal);
 
-    IterateRenderItems(frameIndex % frameBufferCount_);
+    IterateRenderItems(frameIndexLocal);
 }
 
 void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
@@ -91,6 +93,12 @@ void GPUGraphicsGraphNode::ImportClearColors(Color const* clearColors, std::size
     }
 }
 
+void GPUGraphicsGraphNode::ImportViewportScissor(D3D12_VIEWPORT const& viewport, D3D12_RECT const& scissorRect)
+{
+    viewportRect_ = viewport;
+    scissorRect_ = scissorRect;
+}
+
 void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(int frameIndex)
 {    
     auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
@@ -112,6 +120,12 @@ void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(int frameIndex)
 void GPUGraphicsGraphNode::BindPipelineState()
 {
     executionEngine_->Commit().SetPipelineState(pipelineState_->Get());
+}
+
+void GPUGraphicsGraphNode::BindViewportScissor()
+{
+    executionEngine_->Commit().RSSetViewports(1, &viewportRect_);
+    executionEngine_->Commit().RSSetScissorRects(1, &scissorRect_);
 }
 
 void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)

@@ -16,9 +16,6 @@ GPUAccess::GPUAccess(Application& application)
     CreateDefaultDescriptorHeaps();
     CreateFrameResources();
 
-    // Set default viewport and scissor values.
-    SetViewportScissor();
-
     frameGraph_ = new GPUFrameGraph{};
 }
 
@@ -172,18 +169,6 @@ void GPUAccess::CreateDefaultDescriptorHeaps()
     descriptorHeap_ = new GPUDescriptorHeap{ device_, RTV_HEAP_CAPACITY, DSV_HEAP_CAPACITY, CBV_SRV_UAV_CAPACITY };
 }
 
-void GPUAccess::SetViewportScissor()
-{
-    viewportRect_.TopLeftX = 0.0f;
-    viewportRect_.TopLeftY = 0.0f;
-    viewportRect_.MinDepth = 0.0f;
-    viewportRect_.MaxDepth = 1.0f;
-    viewportRect_.Width = static_cast<float>(WIDTH);
-    viewportRect_.Height = static_cast<float>(HEIGHT);
-
-    scissorRect_ = CD3DX12_RECT{ 0, 0, static_cast<LONG>(WIDTH), static_cast<LONG>(HEIGHT) };
-}
-
 void GPUAccess::CreateSwapChain(Application& application, IDXGIFactory* factory)
 {
     swapChain_.Reset();
@@ -225,12 +210,6 @@ void GPUAccess::ResetAll()
     Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
     Engine<GPU_ENGINE_TYPE_COPY>().Reset();
     Engine<GPU_ENGINE_TYPE_COMPUTE>().Reset();
-}
-
-void GPUAccess::CommitDefaultViewportScissorRects()
-{
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetViewports(1, &viewportRect_);
-    Engine<GPU_ENGINE_TYPE_DIRECT>().Commit().RSSetScissorRects(1, &scissorRect_);
 }
 
 void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
