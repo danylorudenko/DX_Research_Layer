@@ -15,10 +15,9 @@ void GPUPresentGraphNode::ImportRenderTarget(GPUFrameResource* renderTarget)
     renderTargets_.push_back(renderTarget);
 }
 
-void GPUPresentGraphNode::Process(UINT64 frameIndex) 
+void GPUPresentGraphNode::Process(int frameIndex) 
 {
-    int const localFrameIndex = frameIndex % 3;
-    TransitionRenderTargetState(localFrameIndex);
+    TransitionRenderTargetState(frameIndex);
 
     executionEngine_->FlushReset();
     swapChain_->Present(0, 0);

@@ -32,7 +32,7 @@ public:
     void ImportRenderItem(GPURenderItem const& item);
     void ImportRenderItem(GPURenderItem&& item);
 
-    virtual void Process(UINT64 frameIndex) override;
+    virtual void Process(int frameIndex) override;
 
 private:
     void BindRenderDepthStencilTargets(int frameIndex);

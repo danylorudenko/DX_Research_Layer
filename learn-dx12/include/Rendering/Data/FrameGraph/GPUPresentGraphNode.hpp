@@ -18,7 +18,7 @@ public:
 
     void ImportRenderTarget(GPUFrameResource* renderTarget);
 
-    virtual void Process(UINT64 frameIndex) override;
+    virtual void Process(int frameIndex) override;
 
 protected:
     void TransitionRenderTargetState(int frameIndex);

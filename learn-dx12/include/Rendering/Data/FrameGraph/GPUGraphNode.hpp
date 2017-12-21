@@ -26,7 +26,7 @@ public:
     GPUGraphNode* GetChild(int childIndex);
     int ChildCount() const;
 
-    virtual void Process(UINT64 frameIndex) = 0;
+    virtual void Process(int frameIndex) = 0;
 
 protected:
     void BindPassRootSignature(int frameIndex);

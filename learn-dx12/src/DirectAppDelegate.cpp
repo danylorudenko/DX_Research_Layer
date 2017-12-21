@@ -51,10 +51,10 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-    //std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
-    //std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
-    std::vector<GPUFrameResourceDescriptor> describedResourcesViews{};
-    std::vector < GPUFrameRootTablesMap::StateAndResource> describedResources{};
+    std::vector<GPUFrameResourceDescriptor> describedResourcesViews{ 1, constantBufferView_ };
+    std::vector<GPUFrameRootTablesMap::StateAndResource> describedResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
+    //std::vector<GPUFrameResourceDescriptor> describedResourcesViews{};
+    //std::vector < GPUFrameRootTablesMap::StateAndResource> describedResources{};
     GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), describedResourcesViews, describedResources };
 
     triangleRootSignature_.ImportPassFrameRootDescriptorTable(rootTableMap);
@@ -124,11 +124,13 @@ void DirectAppDelegate::start(Application& application)
 
 void DirectAppDelegate::update(Application& application)
 {
-    //CustomAction();
-    Draw();
+    int const normalizedFrameIndex = frameIndex_ % GPUAccess::SWAP_CHAIN_BUFFER_COUNT;
+    CustomAction(normalizedFrameIndex);
+    Draw(normalizedFrameIndex);
 
     gameTimer_.Tick();
     DisplayFrameTime(application, Timer().DeltaTime());
+    ++frameIndex_;
 }
 
 void DirectAppDelegate::shutdown(Application& application)
@@ -216,61 +218,23 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     return pipelineState;
 }
 
-void DirectAppDelegate::Draw()
+void DirectAppDelegate::Draw(int frameIndex)
 {
-
     auto& graph = gpuAccess_.FrameGraph();
     auto& graphIterator = graph.GraphQueueStart();
     auto& graphEnd = graph.GraphQueueEnd();
     
     auto& directEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
 
-
     while (graphIterator != graphEnd) {
-        (*graphIterator)->Process(frameIndex_);
+        (*graphIterator)->Process(frameIndex);
         ++graphIterator;
     }
 
-    ++frameIndex_;
     
-    //GPUEngine& graphicsEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
-    //GPUFrameResource& currentFrameResource = gpuAccess_.CurrentFrameResource();
-    //
-    //// Set general pipeline state.
-    //graphicsEngine.Commit().SetPipelineState(pipelineState_.Get());
-    //
-    //// Set signature of incoming data.
-    //graphicsEngine.Commit().SetGraphicsRootSignature(rootSignature_.Get());
-    //
-    //gpuAccess_.CommitDefaultViewportScissorRects();
-    //
-    //// Set descriptor heaps which will the pipeline will use.
-    //ID3D12DescriptorHeap* ppHeaps[] = { cbvHeap_.Get() };
-    //graphicsEngine.Commit().SetDescriptorHeaps(1, ppHeaps);
-    //
-    //// Set the handle for the 0th descriptor table.
-    //graphicsEngine.Commit().SetGraphicsRootDescriptorTable(0, cbvHeap_->GetGPUDescriptorHandleForHeapStart());
-    //
-    //graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(currentFrameResource.FrameBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
-    //
-    //D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = currentFrameResource.CPURtvDescriptorHandle();
-    //D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = currentFrameResource.CPUDsvDescriptorHandle();
-    //graphicsEngine.Commit().OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
-    //
-    //// Drawing commands.
-    //static FLOAT clearColor[4] = { 0.6f, 0.2f, 0.2f, 1.0f };
-    //graphicsEngine.Commit().ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-    //graphicsEngine.Commit().IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //graphicsEngine.Commit().IASetVertexBuffers(0, 1, &triangleMesh_.verticesView);
-    //graphicsEngine.Commit().DrawInstanced(3, 1, 0, 0);
-    //                       
-    //graphicsEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(currentFrameResource.FrameBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
-    //
-    //graphicsEngine.FlushReset();
-    //gpuAccess_.Present();
 }
 
-void DirectAppDelegate::CustomAction()
+void DirectAppDelegate::CustomAction(int frameIndex)
 {
     constexpr float offset = 0.0005f;
     constexpr float offsetBounds = 1.25f;
@@ -280,6 +244,8 @@ void DirectAppDelegate::CustomAction()
         constantBufferData_.offset.x -= 2 * offsetBounds;
     }
 
-    // Update constant buffer uploadheap.
-    //memcpy(constantBufferMappedData_, &constantBufferData_, sizeof(constantBufferData_));
+    void* mappedData;
+    constantBuffer_.Map(frameIndex, &mappedData, nullptr);
+    memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
+    constantBuffer_.Unmap(frameIndex, nullptr);
 }

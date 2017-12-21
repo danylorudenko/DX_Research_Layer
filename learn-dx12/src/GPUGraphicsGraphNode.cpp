@@ -20,25 +20,22 @@ GPUGraphicsGraphNode& GPUGraphicsGraphNode::operator=(GPUGraphicsGraphNode&& rhs
     return *this;
 }
 
-void GPUGraphicsGraphNode::Process(UINT64 frameIndex)
+void GPUGraphicsGraphNode::Process(int frameIndex)
 {
-    int const frameIndexLocal = frameIndex % frameBufferCount_;
-    
-
     BindPipelineState();
     BindViewportScissor();
-    BindPassRootSignature(frameIndexLocal);
+    BindPassRootSignature(frameIndex);
 
-    BindRenderDepthStencilTargets(frameIndexLocal);
+    BindRenderDepthStencilTargets(frameIndex);
     
-    TransitionRenderTargets(frameIndexLocal);
-    TransitionDepthStencilTarget(frameIndexLocal);
-    TransitionPassResources(frameIndexLocal);
+    TransitionRenderTargets(frameIndex);
+    TransitionDepthStencilTarget(frameIndex);
+    TransitionPassResources(frameIndex);
 
-    ClearRenderTargets(frameIndexLocal);
-    ClearDepthStencilTargets(frameIndexLocal);
+    ClearRenderTargets(frameIndex);
+    ClearDepthStencilTargets(frameIndex);
 
-    IterateRenderItems(frameIndexLocal);
+    IterateRenderItems(frameIndex);
 }
 
 void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
