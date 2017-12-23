@@ -51,3 +51,14 @@ GPUUploadHeap& GPUUploadHeap::operator=(GPUUploadHeap&& rhs)
     GPUFrameResource::operator=(std::move(rhs));
     return *this;
 }
+
+void GPUUploadHeap::Map(int frameIndex, void** dest, D3D12_RANGE* range)
+{
+    auto const result = resources_[frameIndex]->Map(0, range, dest);
+    ThrowIfFailed(result);
+}
+
+void GPUUploadHeap::Unmap(int frameIndex, D3D12_RANGE* range)
+{
+    resources_[frameIndex]->Unmap(0, range);
+}

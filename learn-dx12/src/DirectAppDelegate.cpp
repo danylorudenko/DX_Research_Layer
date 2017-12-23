@@ -38,12 +38,13 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-
-
     auto const framesCount = static_cast<int>(GPUAccess::SWAP_CHAIN_BUFFER_COUNT);
+
+
+
     constantBuffer_ = GPUUploadHeap{ 
         framesCount, gpuAccess_.Device().Get(), 
-        &constantBufferData_, sizeof(constantBufferData_), &CD3DX12_RESOURCE_DESC::Buffer(sizeof(constantBufferData_)), true 
+        &constantBufferData_, sizeof(constantBufferData_), &CD3DX12_RESOURCE_DESC::Buffer((sizeof(constantBufferData_) + 255) & ~255), true
     };
     constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
 
@@ -79,6 +80,7 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    triangleRenderItem.hasIndexBuffer_ = false;
 
 
 
@@ -240,10 +242,14 @@ void DirectAppDelegate::CustomAction(int frameIndex)
         constantBufferData_.offset.x -= 2 * offsetBounds;
     }
 
-    static D3D12_RANGE readRange{ 0, 0 };
+    //static D3D12_RANGE readRange{ 0, 0 };
 
-    void* mappedData;
-    constantBuffer_.Map(frameIndex, &mappedData, &readRange);
-    memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
-    constantBuffer_.Unmap(frameIndex, &readRange);
+
+    void* mappedData = nullptr;
+    constantBuffer_.Map(frameIndex, &mappedData, nullptr);
+
+    std::memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
+
+    static D3D12_RANGE writeRange{ 0, sizeof(constantBufferData_) };
+    constantBuffer_.Unmap(frameIndex, &writeRange);
 }
