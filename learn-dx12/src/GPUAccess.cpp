@@ -79,10 +79,10 @@ GPUAccess::~GPUAccess()
     delete descriptorHeap_;
 }
 
-void GPUAccess::GetHardwareAdapter(IDXGIAdapter1** dest, IDXGIFactory1* factory)
+void GPUAccess::GetHardwareAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter1>& dest, Microsoft::WRL::ComPtr<IDXGIFactory1>& factory)
 {
     Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
-    *dest = nullptr;
+    dest = nullptr;
 
     for (UINT i = 0; factory->EnumAdapters1(i, adapter.GetAddressOf()) != DXGI_ERROR_NOT_FOUND; i++) {
         DXGI_ADAPTER_DESC1 desc;
@@ -98,16 +98,15 @@ void GPUAccess::GetHardwareAdapter(IDXGIAdapter1** dest, IDXGIFactory1* factory)
         }
     }
 
-    *dest = adapter.Detach();
+    dest = adapter;
 }
 
 void GPUAccess::InitializeD3D12()
 {
 #if defined(DEBUG) || defined(_DEBUG)
     {
-        Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
-        D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
-        debugController->EnableDebugLayer();
+        D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_));
+        debugController_->EnableDebugLayer();
     }
 #endif
 
@@ -115,7 +114,7 @@ void GPUAccess::InitializeD3D12()
     assert(SUCCEEDED(res) && "Failed to create dxgiFactory\n");
 
     Microsoft::WRL::ComPtr<IDXGIAdapter1> hardwareAdapter;
-    GetHardwareAdapter(hardwareAdapter.GetAddressOf(), dxgiFactory_.Get());
+    GetHardwareAdapter(hardwareAdapter, dxgiFactory_);
     
     D3D12CreateDevice(hardwareAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(device_.ReleaseAndGetAddressOf()));
     if (!device_) {
@@ -193,7 +192,7 @@ void GPUAccess::CreateSwapChain(Application& application, IDXGIFactory* factory)
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     {
-        auto const result = factory->CreateSwapChain(Engine<GPU_ENGINE_TYPE_DIRECT>().CommandQueue(), &sd, swapChain_.GetAddressOf());
+        auto const result = factory->CreateSwapChain(Engine<GPU_ENGINE_TYPE_DIRECT>().CommandQueue(), &sd, &swapChain_);
         ThrowIfFailed(result);
     }
 }

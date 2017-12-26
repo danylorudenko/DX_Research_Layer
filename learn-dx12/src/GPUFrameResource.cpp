@@ -5,8 +5,7 @@ GPUFrameResource::GPUFrameResource() = default;
 GPUFrameResource::GPUFrameResource(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES state) :
     framesCount_(framesCount),
     states_(framesCount, state),
-    size_(size),
-    capacity_(size)
+    size_(size)
 {
     for(int i = 0; i < framesCount; i++)
     {
@@ -27,8 +26,7 @@ GPUFrameResource::GPUFrameResource(int framesCount, ID3D12Device* device, std::s
 GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, Microsoft::WRL::ComPtr<ID3D12Resource>* resources, D3D12_RESOURCE_STATES state) :
     framesCount_(framesCount),
     states_(framesCount, state),
-    size_(resourceSize),
-    capacity_(resourceSize)
+    size_(resourceSize)
     
 {
     for (int i = 0; i < framesCount_; i++) {
@@ -60,7 +58,6 @@ void GPUFrameResource::CreateResources(int framesCount, ID3D12Device* device, st
     }
     
     size_ = size;
-    capacity_ = size;
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS GPUFrameResource::GPUVirtualAddress(int frameIndex)

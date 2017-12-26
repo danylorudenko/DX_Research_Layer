@@ -19,16 +19,17 @@ GPUUploadHeap::GPUUploadHeap(
     }
 
     for (int i = 0; i < framesCount; i++) {
-        resources_.push_back(Microsoft::WRL::ComPtr<ID3D12Resource>{nullptr});
-        HRESULT result = device->CreateCommittedResource(
+        Microsoft::WRL::ComPtr<ID3D12Resource> tempRef{ nullptr };
+        auto const result = device->CreateCommittedResource(
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
             D3D12_HEAP_FLAG_NONE,
             resourceDesc,
             D3D12_RESOURCE_STATE_GENERIC_READ,
             nullptr,
-            IID_PPV_ARGS(&resources_[i]));
+            IID_PPV_ARGS(&tempRef));
         ThrowIfFailed(result);
 
+        resources_.push_back(tempRef);
         gpuAddresses_.push_back(resources_[i]->GetGPUVirtualAddress());
         states_.push_back(D3D12_RESOURCE_STATE_GENERIC_READ);
 

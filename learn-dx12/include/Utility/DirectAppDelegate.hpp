@@ -11,6 +11,8 @@
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 
+#include <DXProgrammableCapture.h>
+
 class DirectAppDelegate : public Application::Delegate
 {
 public:
@@ -49,4 +51,6 @@ private:
 
     GPUFrameResource triangleMesh_;
     GeometryMesh triangleMeshData_;
+
+    Microsoft::WRL::ComPtr<IDXGraphicsAnalysis> graphicsAnalysis_;
 };

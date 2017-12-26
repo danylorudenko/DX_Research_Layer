@@ -8,7 +8,7 @@ class GPUDescriptorHeap
 {
 public:
     GPUDescriptorHeap();
-    GPUDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, int rtvCapacity, int dsvCapacity, int CbvSrvUavCapacity);
+    GPUDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device>& device, int rtvCapacity, int dsvCapacity, int CbvSrvUavCapacity);
 
     GPUDescriptorHeap(GPUDescriptorHeap const&) = delete;
     GPUDescriptorHeap(GPUDescriptorHeap&& rhs);

@@ -16,7 +16,6 @@ public:
     
     ID3D12Resource* Get(int frameIndex) const { return resources_[frameIndex].Get(); }
     std::size_t Size() const { return size_; };
-    std::size_t Capacity() const { return capacity_; }
     int FramesCount() const { return framesCount_; }
 
     D3D12_GPU_VIRTUAL_ADDRESS GPUVirtualAddress(int frameIndex);
@@ -33,5 +32,4 @@ protected:
     std::vector<D3D12_GPU_VIRTUAL_ADDRESS> gpuAddresses_;
     std::vector<D3D12_RESOURCE_STATES> states_;
     std::size_t size_ = 0;
-    std::size_t capacity_ = 0;
 };

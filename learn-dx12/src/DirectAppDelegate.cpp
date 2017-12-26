@@ -14,6 +14,17 @@ void DirectAppDelegate::start(Application& application)
     // TESTING CONSTANT VERTEX DATA
     /////////////////////////////////////////////////////////////////////////////
 
+    {
+        auto const result = DXGIGetDebugInterface1(0, IID_PPV_ARGS(&graphicsAnalysis_));
+        if (SUCCEEDED(result)) {
+            graphicsAnalysis_->BeginCapture();
+        }
+        else {
+            graphicsAnalysis_ = nullptr;
+        }
+        
+    }
+
     Vertex verticesData[] = {
         { { 0.0f, 0.25f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
         { { 0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
@@ -38,14 +49,14 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-    auto const framesCount = static_cast<int>(GPUAccess::SWAP_CHAIN_BUFFER_COUNT);
+    auto constexpr framesCount = static_cast<int>(GPUAccess::SWAP_CHAIN_BUFFER_COUNT);
 
 
-
+    auto constexpr constBufferSize = (sizeof(constantBufferData_) + 255) & ~255;
     constantBuffer_ = GPUUploadHeap{ 
         framesCount, gpuAccess_.Device().Get(), 
-        &constantBufferData_, sizeof(constantBufferData_), &CD3DX12_RESOURCE_DESC::Buffer((sizeof(constantBufferData_) + 255) & ~255), true
-    };
+        &constantBufferData_, sizeof(constantBufferData_), &CD3DX12_RESOURCE_DESC::Buffer(constBufferSize), true};
+
     constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
 
 
@@ -118,16 +129,29 @@ void DirectAppDelegate::start(Application& application)
     gpuAccess_.FrameGraph().ParseGraphToQueue();
 
     initializationEngine.FlushReset();
+
+    /*if (graphicsAnalysis_ != nullptr) {
+        graphicsAnalysis_->EndCapture();
+    }*/
 }
 
 void DirectAppDelegate::update(Application& application)
 {
+    if (frameIndex_ < 3 && frameIndex_ > 0 && graphicsAnalysis_ != nullptr) {
+        graphicsAnalysis_->BeginCapture();
+    }
+    
     int const normalizedFrameIndex = frameIndex_ % GPUAccess::SWAP_CHAIN_BUFFER_COUNT;
     CustomAction(normalizedFrameIndex);
     Draw(normalizedFrameIndex);
 
     gameTimer_.Tick();
     DisplayFrameTime(application, Timer().DeltaTime());
+
+    if (frameIndex_ < 3 && graphicsAnalysis_ != nullptr) {
+        graphicsAnalysis_->EndCapture();
+    }
+
     ++frameIndex_;
 }
 
@@ -197,7 +221,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
 
     // Setup pipeline state, which inludes setting shaders.
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-    psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
+    psoDesc.InputLayout = { inputElementDescs, 2 };
     psoDesc.pRootSignature = rootSignature.Get();
     psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
@@ -210,6 +234,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.NumRenderTargets = 1;
     psoDesc.RTVFormats[0] = GPUAccess::backBufferFormat_;
     psoDesc.SampleDesc.Count = 1;
+    psoDesc.SampleDesc.Quality = 0;
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
     gpuAccess_.CreatePSO(pipelineState, &psoDesc);

@@ -53,7 +53,7 @@ public:
     static void CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type);
 
 private:
-    static void GetHardwareAdapter(IDXGIAdapter1** dest, IDXGIFactory1* factory);
+    static void GetHardwareAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter1>& dest, Microsoft::WRL::ComPtr<IDXGIFactory1>& factory);
     void InitializeD3D12();
     void CreateGPUEngines();
 
@@ -62,6 +62,7 @@ private:
     void CreateDefaultDescriptorHeaps();
 
 private:
+    Microsoft::WRL::ComPtr<ID3D12Debug> debugController_;
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory_;
 

@@ -8,7 +8,7 @@ GPUCommandList::GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE typ
     // Create backing allocators
     for (size_t i = 0; i < allocatorCount; i++)
     {
-        commandAllocators_.emplace_back(device, type);
+        commandAllocators_.push_back(GPUCommandAllocator{ device, type });
     }
 
     device->CreateCommandList(0, type, CurrentAlloc().Get(), nullptr, IID_PPV_ARGS(&commandList_));

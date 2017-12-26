@@ -2,7 +2,7 @@
 
 GPUDescriptorHeap::GPUDescriptorHeap() = default;
 
-GPUDescriptorHeap::GPUDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device,
+GPUDescriptorHeap::GPUDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device>& device,
                                                int rtvCapacity,
                                                int dsvCapacity,
                                                int CbvSrvUavCapacity)
