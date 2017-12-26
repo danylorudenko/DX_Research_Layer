@@ -66,7 +66,7 @@ void GPUDescriptorHeap::Reset()
 }
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(GPUFrameResource* resources,
-                                                             D3D12_RENDER_TARGET_VIEW_DESC* viewDesc,
+                                                             D3D12_RENDER_TARGET_VIEW_DESC& viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
                                                              int frameCount)
@@ -76,7 +76,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(GPUFrameResource* r
     int descriptorsOffsets[3];
     for (int i = 0; i < frameCount; i++) {
         CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle{ heapRtv_->GetCPUDescriptorHandleForHeapStart(), heapRtvLastDescriptorOffset_, heapRtvIncrementalSize_ };
-        device_->CreateRenderTargetView(resources->Get(i), viewDesc, cpuDescriptorHandle);
+        device_->CreateRenderTargetView(resources->Get(i), &viewDesc, cpuDescriptorHandle);
         descriptorsOffsets[i] = heapRtvLastDescriptorOffset_++;
     }
 
@@ -85,7 +85,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocRtvLinear(GPUFrameResource* r
 }
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(GPUFrameResource* resources,
-                                                             D3D12_DEPTH_STENCIL_VIEW_DESC* viewDesc,
+                                                             D3D12_DEPTH_STENCIL_VIEW_DESC& viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
                                                              int frameCount)
@@ -95,7 +95,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(GPUFrameResource* r
     int descriptorOffsets[3];
     for (int i = 0; i < frameCount; i++) {
         CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle{ heapDsv_->GetCPUDescriptorHandleForHeapStart(), heapDsvLastDescriptorOffset_, heapDsvIncrementalSize_ };
-        device_->CreateDepthStencilView(resources->Get(i), viewDesc, cpuDescriptorHandle);
+        device_->CreateDepthStencilView(resources->Get(i), &viewDesc, cpuDescriptorHandle);
         descriptorOffsets[i] = heapDsvLastDescriptorOffset_++;
     }
 
@@ -104,7 +104,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocDsvLinear(GPUFrameResource* r
 }
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(GPUFrameResource* resources,
-                                                             D3D12_CONSTANT_BUFFER_VIEW_DESC* viewDesc,
+                                                             D3D12_CONSTANT_BUFFER_VIEW_DESC& viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
                                                              int frameCount)
@@ -114,7 +114,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(GPUFrameResource* r
     int descriptorOffsets[3];
     for (int i = 0; i < frameCount; i++) {
         CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle{ heapCbvSrvUav_->GetCPUDescriptorHandleForHeapStart(), heapCbvSrvUavLastDescriptorOffset_, heapCbvSrvUavIncrementalSize_ };
-        device_->CreateConstantBufferView(viewDesc, cpuDescriptorHandle);
+        device_->CreateConstantBufferView(&viewDesc, cpuDescriptorHandle);
         descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
     }
 
@@ -123,7 +123,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocCbvLinear(GPUFrameResource* r
 }
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(GPUFrameResource* resources,
-                                                             D3D12_SHADER_RESOURCE_VIEW_DESC* viewDesc,
+                                                             D3D12_SHADER_RESOURCE_VIEW_DESC& viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
                                                              int frameCount)
@@ -133,7 +133,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(GPUFrameResource* r
     int descriptorOffsets[3];
     for (int i = 0; i < frameCount; i++) {
         CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle{ heapCbvSrvUav_->GetCPUDescriptorHandleForHeapStart(), heapCbvSrvUavLastDescriptorOffset_, heapCbvSrvUavIncrementalSize_ };
-        device_->CreateShaderResourceView(resources->Get(i), viewDesc, cpuDescriptorHandle);
+        device_->CreateShaderResourceView(resources->Get(i), &viewDesc, cpuDescriptorHandle);
         descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
     }
 
@@ -142,7 +142,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocSrvLinear(GPUFrameResource* r
 }
 
 GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(GPUFrameResource* resources,
-                                                             D3D12_UNORDERED_ACCESS_VIEW_DESC* viewDesc,
+                                                             D3D12_UNORDERED_ACCESS_VIEW_DESC& viewDesc,
                                                              D3D12_RESOURCE_STATES state,
                                                              char const* semantics,
                                                              int frameCount)
@@ -152,7 +152,7 @@ GPUFrameResourceDescriptor GPUDescriptorHeap::AllocUavLinear(GPUFrameResource* r
     int descriptorOffsets[3];
     for (int i = 0; i < frameCount; i++) {
         CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescriptorHandle{ heapCbvSrvUav_->GetCPUDescriptorHandleForHeapStart(), heapCbvSrvUavLastDescriptorOffset_, heapCbvSrvUavIncrementalSize_ };
-        device_->CreateUnorderedAccessView(resources->Get(i), nullptr, viewDesc, cpuDescriptorHandle);
+        device_->CreateUnorderedAccessView(resources->Get(i), nullptr, &viewDesc, cpuDescriptorHandle);
         descriptorOffsets[i] = heapCbvSrvUavLastDescriptorOffset_++;
     }
 

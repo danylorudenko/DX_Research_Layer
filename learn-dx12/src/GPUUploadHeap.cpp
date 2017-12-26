@@ -9,7 +9,6 @@ GPUUploadHeap::GPUUploadHeap(
     ID3D12Device* device,
     void const* data,
     std::size_t size,
-    D3D12_RESOURCE_DESC* resourceDesc,
     bool isConstBuffer)
 {
     framesCount_ = framesCount;
@@ -23,13 +22,15 @@ GPUUploadHeap::GPUUploadHeap(
         auto const result = device->CreateCommittedResource(
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
             D3D12_HEAP_FLAG_NONE,
-            resourceDesc,
+            &CD3DX12_RESOURCE_DESC::Buffer(size_),
             D3D12_RESOURCE_STATE_GENERIC_READ,
             nullptr,
             IID_PPV_ARGS(&tempRef));
         ThrowIfFailed(result);
 
+
         resources_.push_back(tempRef);
+        tempRef = nullptr;
         gpuAddresses_.push_back(resources_[i]->GetGPUVirtualAddress());
         states_.push_back(D3D12_RESOURCE_STATE_GENERIC_READ);
 

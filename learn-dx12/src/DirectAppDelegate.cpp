@@ -55,9 +55,12 @@ void DirectAppDelegate::start(Application& application)
     auto constexpr constBufferSize = (sizeof(constantBufferData_) + 255) & ~255;
     constantBuffer_ = GPUUploadHeap{ 
         framesCount, gpuAccess_.Device().Get(), 
-        &constantBufferData_, sizeof(constantBufferData_), &CD3DX12_RESOURCE_DESC::Buffer(constBufferSize), true};
+        &constantBufferData_, constBufferSize, true };
 
-    constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc{};
+    cbvDesc.BufferLocation = constantBuffer_.GPUVirtualAddress(0);
+    cbvDesc.SizeInBytes = constBufferSize;
+    constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
 
 
 
@@ -72,7 +75,7 @@ void DirectAppDelegate::start(Application& application)
     
 
 
-    GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize) };
+    GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize };
     triangleMesh_ = GPUFrameResource{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
     triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);

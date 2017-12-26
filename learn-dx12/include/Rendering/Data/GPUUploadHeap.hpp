@@ -8,7 +8,7 @@ class GPUUploadHeap : public GPUFrameResource
 {
 public:
     GPUUploadHeap();
-    GPUUploadHeap(int framesCount, ID3D12Device* device, void const* data, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, bool isConstBuffer = false);
+    GPUUploadHeap(int framesCount, ID3D12Device* device, void const* data, std::size_t size, bool isConstBuffer = false);
     GPUUploadHeap(GPUUploadHeap const&) = delete;
     GPUUploadHeap(GPUUploadHeap&& rhs);
 

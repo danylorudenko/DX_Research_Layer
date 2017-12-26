@@ -35,9 +35,24 @@ GPUFrameResource::GPUFrameResource(int framesCount, std::size_t resourceSize, Mi
     }
 }
 
-GPUFrameResource::GPUFrameResource(GPUFrameResource&& rhs) = default;
+GPUFrameResource::GPUFrameResource(GPUFrameResource&& rhs) :
+    framesCount_{ std::move(rhs.framesCount_) }, resources_{ std::move(rhs.resources_) }, gpuAddresses_ { std::move(rhs.gpuAddresses_) }, states_{ std::move(rhs.states_) }, size_{ rhs.size_ }
+{
+    ZeroMemory(&rhs, sizeof(decltype(rhs)));
+}
 
-GPUFrameResource& GPUFrameResource::operator=(GPUFrameResource&& rhs) = default;
+GPUFrameResource& GPUFrameResource::operator=(GPUFrameResource&& rhs)
+{
+    framesCount_ = std::move(rhs.framesCount_);
+    resources_ = std::move(rhs.resources_);
+    gpuAddresses_ = std::move(rhs.gpuAddresses_);
+    states_ = std::move(rhs.states_);
+    size_ = std::move(rhs.size_);
+
+    ZeroMemory(&rhs, sizeof(decltype(rhs)));
+
+    return *this;
+}
 
 void GPUFrameResource::CreateResources(int framesCount, ID3D12Device* device, std::size_t size, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES initialState)
 {
