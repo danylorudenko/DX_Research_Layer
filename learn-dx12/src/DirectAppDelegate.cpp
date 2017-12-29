@@ -10,11 +10,7 @@
 
 void DirectAppDelegate::start(Application& application)
 {
-    /////////////////////////////////////////////////////////////////////////////
-    // TESTING CONSTANT VERTEX DATA
-    /////////////////////////////////////////////////////////////////////////////
-
-    {
+    /*{
         auto const result = DXGIGetDebugInterface1(0, IID_PPV_ARGS(&graphicsAnalysis_));
         if (SUCCEEDED(result)) {
             graphicsAnalysis_->BeginCapture();
@@ -23,7 +19,11 @@ void DirectAppDelegate::start(Application& application)
             graphicsAnalysis_ = nullptr;
         }
         
-    }
+    }*/
+
+    /////////////////////////////////////////////////////////////////////////////
+    // TESTING CONSTANT VERTEX DATA
+    /////////////////////////////////////////////////////////////////////////////
 
     Vertex verticesData[] = {
         { { 0.0f, 0.25f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
@@ -36,7 +36,7 @@ void DirectAppDelegate::start(Application& application)
     /////////////////////////////////////////////////////////////////////////////
     
     
-    gpuAccess_ = GPUAccess{ application };
+    gpuAccess_ = GPUFoundation{ application };
     gameTimer_.Reset();
 
     auto& initializationEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
@@ -49,7 +49,7 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-    auto constexpr framesCount = static_cast<int>(GPUAccess::SWAP_CHAIN_BUFFER_COUNT);
+    auto constexpr framesCount = static_cast<int>(GPUFoundation::SWAP_CHAIN_BUFFER_COUNT);
 
 
     auto constexpr constBufferSize = (sizeof(constantBufferData_) + 255) & ~255;
@@ -112,9 +112,9 @@ void DirectAppDelegate::start(Application& application)
     viewport.TopLeftY = 0.0f;
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
-    viewport.Width = static_cast<float>(GPUAccess::WIDTH);
-    viewport.Height = static_cast<float>(GPUAccess::HEIGHT);
-    CD3DX12_RECT scissorRect{ 0, 0, static_cast<LONG>(GPUAccess::WIDTH), static_cast<LONG>(GPUAccess::HEIGHT) };
+    viewport.Width = static_cast<float>(GPUFoundation::WIDTH);
+    viewport.Height = static_cast<float>(GPUFoundation::HEIGHT);
+    CD3DX12_RECT scissorRect{ 0, 0, static_cast<LONG>(GPUFoundation::WIDTH), static_cast<LONG>(GPUFoundation::HEIGHT) };
     triangleGraphNode_.ImportViewportScissor(viewport, scissorRect);
 
 
@@ -144,7 +144,7 @@ void DirectAppDelegate::update(Application& application)
         graphicsAnalysis_->BeginCapture();
     }
     
-    int const normalizedFrameIndex = frameIndex_ % GPUAccess::SWAP_CHAIN_BUFFER_COUNT;
+    int const normalizedFrameIndex = frameIndex_ % GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
     CustomAction(normalizedFrameIndex);
     Draw(normalizedFrameIndex);
 
@@ -235,7 +235,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.SampleMask = UINT_MAX;
     psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     psoDesc.NumRenderTargets = 1;
-    psoDesc.RTVFormats[0] = GPUAccess::backBufferFormat_;
+    psoDesc.RTVFormats[0] = GPUFoundation::backBufferFormat_;
     psoDesc.SampleDesc.Count = 1;
     psoDesc.SampleDesc.Quality = 0;
 

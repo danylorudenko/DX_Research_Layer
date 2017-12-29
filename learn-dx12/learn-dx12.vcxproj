@@ -170,11 +170,12 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
+    <ClCompile Include="src\GPUCapabilities.cpp" />
     <ClCompile Include="src\GPUDescriptorHeap.cpp" />
     <ClCompile Include="src\GPUFrameGraph.cpp" />
     <ClCompile Include="src\GPUFrameResourceDescriptor.cpp" />
     <ClCompile Include="src\GPUFrameRootTablesMap.cpp" />
-    <ClCompile Include="src\GPUAccess.cpp" />
+    <ClCompile Include="src\GPUFoundation.cpp" />
     <ClCompile Include="src\GPUCommandAllocator.cpp" />
     <ClCompile Include="src\GPUCommandList.cpp" />
     <ClCompile Include="src\GPUCommandQueue.cpp" />
@@ -211,7 +212,8 @@
     <ClInclude Include="include\Math\Camera.hpp" />
     <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />
-    <ClInclude Include="include\Rendering\GPUAccess.hpp" />
+    <ClInclude Include="include\Rendering\Foundation\GPUCapabilities.hpp" />
+    <ClInclude Include="include\Rendering\GPUFoundation.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandList.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandQueue.hpp" />

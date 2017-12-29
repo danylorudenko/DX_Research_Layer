@@ -39,9 +39,6 @@
     <ClCompile Include="src\GPUUploadHeap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUAccess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GPUEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,6 +84,12 @@
     <ClCompile Include="src\GPUFrameResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPUCapabilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUFoundation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utility\Window.hpp">
@@ -117,9 +120,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\GPUCommandList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Rendering\GPUAccess.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\GPUEngine.hpp">
@@ -177,6 +177,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\Data\GPUFrameResource.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Foundation\GPUCapabilities.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\GPUFoundation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

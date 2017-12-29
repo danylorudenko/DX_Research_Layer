@@ -4,7 +4,7 @@
 
 #include <Utility\Application.hpp>
 #include <Utility\PerformanceTimer.hpp>
-#include <Rendering\GPUAccess.hpp>
+#include <Rendering\GPUFoundation.hpp>
 #include <Rendering\Data\GeometryMesh.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>
 #include <Rendering\Data\SceneConstantBuffer.hpp>
@@ -33,7 +33,7 @@ private:
     // FOUNDATION DATA
     PerformanceTimer gameTimer_;
     std::wstring windowText_;
-    GPUAccess gpuAccess_;
+    GPUFoundation gpuAccess_;
 
     UINT64 frameIndex_ = 0;
 

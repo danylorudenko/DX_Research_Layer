@@ -9,18 +9,18 @@
 #include <Rendering\Data\GPUDescriptorHeap.hpp>
 #include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
 
-class GPUAccess
+class GPUFoundation
 {
 public:
-    GPUAccess();
-    GPUAccess(Application& application);
-    GPUAccess(GPUAccess const&) = delete;
-    GPUAccess(GPUAccess&& rhs);
+    GPUFoundation();
+    GPUFoundation(Application& application);
+    GPUFoundation(GPUFoundation const&) = delete;
+    GPUFoundation(GPUFoundation&& rhs);
 
-    GPUAccess& operator=(GPUAccess const&) = delete;
-    GPUAccess& operator=(GPUAccess&&);
+    GPUFoundation& operator=(GPUFoundation const&) = delete;
+    GPUFoundation& operator=(GPUFoundation&&);
 
-    ~GPUAccess();
+    ~GPUFoundation();
 
     static constexpr UINT WIDTH = 800;
     static constexpr UINT HEIGHT = 600;
@@ -40,6 +40,7 @@ public:
 
     Microsoft::WRL::ComPtr<ID3D12Device> Device() const { return device_; }
     Microsoft::WRL::ComPtr<IDXGISwapChain> SwapChain() { return swapChain_; }
+    Microsoft::WRL::ComPtr<IDXGIFactory1> DXGIFactory() { return dxgiFactory_; }
 
     GPUFrameResourceDescriptor& FinalRenderTargetViews() { return *finalRenderTargetViews_; }
     GPUFrameResourceDescriptor& FinalDepthSteniclViews() { return *finalDepthStencilViews_; }

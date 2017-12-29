@@ -1,8 +1,8 @@
-#include <Rendering\GPUAccess.hpp>
+#include <Rendering\GPUFoundation.hpp>
 
-GPUAccess::GPUAccess() = default;
+GPUFoundation::GPUFoundation() = default;
 
-GPUAccess::GPUAccess(Application& application)
+GPUFoundation::GPUFoundation(Application& application)
 {    
     // Create device and dxgiFactory.
     InitializeD3D12();
@@ -19,7 +19,7 @@ GPUAccess::GPUAccess(Application& application)
     frameGraph_ = new GPUFrameGraph{};
 }
 
-GPUAccess::GPUAccess(GPUAccess&& rhs)
+GPUFoundation::GPUFoundation(GPUFoundation&& rhs)
 {
     device_ = std::move(rhs.device_);
     dxgiFactory_ = std::move(rhs.dxgiFactory_);
@@ -42,7 +42,7 @@ GPUAccess::GPUAccess(GPUAccess&& rhs)
 
 }
 
-GPUAccess& GPUAccess::operator=(GPUAccess&& rhs)
+GPUFoundation& GPUFoundation::operator=(GPUFoundation&& rhs)
 {
     device_ = std::move(rhs.device_);
     dxgiFactory_ = std::move(rhs.dxgiFactory_);
@@ -66,7 +66,7 @@ GPUAccess& GPUAccess::operator=(GPUAccess&& rhs)
     return *this;
 }
 
-GPUAccess::~GPUAccess()
+GPUFoundation::~GPUFoundation()
 {
     delete renderTargetBuffers_;
     delete depthStencilBuffers_;
@@ -79,7 +79,7 @@ GPUAccess::~GPUAccess()
     delete descriptorHeap_;
 }
 
-void GPUAccess::GetHardwareAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter1>& dest, Microsoft::WRL::ComPtr<IDXGIFactory1>& factory)
+void GPUFoundation::GetHardwareAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter1>& dest, Microsoft::WRL::ComPtr<IDXGIFactory1>& factory)
 {
     Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
     dest = nullptr;
@@ -101,7 +101,7 @@ void GPUAccess::GetHardwareAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter1>& dest, 
     dest = adapter;
 }
 
-void GPUAccess::InitializeD3D12()
+void GPUFoundation::InitializeD3D12()
 {
 #if defined(DEBUG) || defined(_DEBUG)
     {
@@ -122,7 +122,7 @@ void GPUAccess::InitializeD3D12()
     }
 }
 
-void GPUAccess::CreateFrameResources()
+void GPUFoundation::CreateFrameResources()
 {
     assert(SWAP_CHAIN_BUFFER_COUNT <= 3 && "More than 3 framebuffers in not currently supported.");
     
@@ -169,12 +169,12 @@ void GPUAccess::CreateFrameResources()
     finalDepthStencilViews_ = new GPUFrameResourceDescriptor{ dsv };
 }
 
-void GPUAccess::CreateDefaultDescriptorHeaps()
+void GPUFoundation::CreateDefaultDescriptorHeaps()
 {
     descriptorHeap_ = new GPUDescriptorHeap{ device_, RTV_HEAP_CAPACITY, DSV_HEAP_CAPACITY, CBV_SRV_UAV_CAPACITY };
 }
 
-void GPUAccess::CreateSwapChain(Application& application, IDXGIFactory* factory)
+void GPUFoundation::CreateSwapChain(Application& application, IDXGIFactory* factory)
 {
     swapChain_.Reset();
 
@@ -203,27 +203,27 @@ void GPUAccess::CreateSwapChain(Application& application, IDXGIFactory* factory)
     }
 }
 
-void GPUAccess::CreateGPUEngines()
+void GPUFoundation::CreateGPUEngines()
 {
     engines_[0] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_DIRECT, SWAP_CHAIN_BUFFER_COUNT };
     engines_[1] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_COPY, SWAP_CHAIN_BUFFER_COUNT };
     engines_[2] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_COMPUTE, SWAP_CHAIN_BUFFER_COUNT };
 }
 
-void GPUAccess::ResetAll()
+void GPUFoundation::ResetAll()
 {
     Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
     Engine<GPU_ENGINE_TYPE_COPY>().Reset();
     Engine<GPU_ENGINE_TYPE_COMPUTE>().Reset();
 }
 
-void GPUAccess::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
+void GPUFoundation::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
 {
     auto const result = device_->CreateRootSignature(0, serializedRootSignature->GetBufferPointer(), serializedRootSignature->GetBufferSize(), IID_PPV_ARGS(&dest));
     ThrowIfFailed(result);
 }
 
-void GPUAccess::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type)
+void GPUFoundation::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type)
 {
 #if defined (_DEBUG) | (DEBUG)
     UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
@@ -236,7 +236,7 @@ void GPUAccess::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>
     }
 }
 
-void GPUAccess::CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc)
+void GPUFoundation::CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc)
 {
     auto const result = device_->CreateGraphicsPipelineState(desc, IID_PPV_ARGS(&dest));
     ThrowIfFailed(result);
