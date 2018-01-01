@@ -54,7 +54,6 @@ public:
     static void CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type);
 
 private:
-    static void GetHardwareAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter1>& dest, Microsoft::WRL::ComPtr<IDXGIFactory1>& factory);
     void InitializeD3D12();
     void CreateGPUEngines();
 

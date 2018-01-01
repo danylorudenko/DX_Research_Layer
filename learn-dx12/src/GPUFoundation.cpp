@@ -1,4 +1,5 @@
 #include <Rendering\GPUFoundation.hpp>
+#include <Rendering\Foundation\GPUCapabilities.hpp>
 
 GPUFoundation::GPUFoundation() = default;
 
@@ -79,28 +80,6 @@ GPUFoundation::~GPUFoundation()
     delete descriptorHeap_;
 }
 
-void GPUFoundation::GetHardwareAdapter(Microsoft::WRL::ComPtr<IDXGIAdapter1>& dest, Microsoft::WRL::ComPtr<IDXGIFactory1>& factory)
-{
-    Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
-    dest = nullptr;
-
-    for (UINT i = 0; factory->EnumAdapters1(i, adapter.GetAddressOf()) != DXGI_ERROR_NOT_FOUND; i++) {
-        DXGI_ADAPTER_DESC1 desc;
-        adapter->GetDesc1(&desc);
-
-        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
-            continue;
-        }
-
-        if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), nullptr))) {
-            OutputDebugStringA("Selected device\n");
-            break;
-        }
-    }
-
-    dest = adapter;
-}
-
 void GPUFoundation::InitializeD3D12()
 {
 #if defined(DEBUG) || defined(_DEBUG)
@@ -113,13 +92,10 @@ void GPUFoundation::InitializeD3D12()
     HRESULT res = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory_));
     assert(SUCCEEDED(res) && "Failed to create dxgiFactory\n");
 
-    Microsoft::WRL::ComPtr<IDXGIAdapter1> hardwareAdapter;
-    GetHardwareAdapter(hardwareAdapter, dxgiFactory_);
-    
-    D3D12CreateDevice(hardwareAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(device_.ReleaseAndGetAddressOf()));
-    if (!device_) {
-        OutputDebugStringA("Failed to create device\n");
-    }
+    auto adaptersInfo = GPUCapabilities::ListAdapters(*this);
+    OutputDebugStringW(adaptersInfo.c_str());
+
+    device_ = GPUCapabilities::GenerateStandardDeviceQuery(*this);
 }
 
 void GPUFoundation::CreateFrameResources()

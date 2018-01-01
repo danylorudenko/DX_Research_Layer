@@ -11,8 +11,6 @@
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 
-#include <DXProgrammableCapture.h>
-
 class DirectAppDelegate : public Application::Delegate
 {
 public:

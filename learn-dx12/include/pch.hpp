@@ -19,6 +19,7 @@
 #include <d3d12sdklayers.h>
 #include <d3d12.h>
 #include <d3dx12.h>
+#include <DXProgrammableCapture.h>
 
 #include <DirectXMath.h>
 

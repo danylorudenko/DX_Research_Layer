@@ -7,14 +7,14 @@ class GPUFoundation;
 class GPUCapabilities
 {
 public:
-    GPUCapabilities();
+    GPUCapabilities() = delete;
     GPUCapabilities(GPUCapabilities const&) = delete;
-    GPUCapabilities(GPUCapabilities&& rhs);
+    GPUCapabilities(GPUCapabilities&&) = delete;
 
     GPUCapabilities& operator=(GPUCapabilities const&) = delete;
-    GPUCapabilities& operator=(GPUCapabilities&& rhs);
+    GPUCapabilities& operator=(GPUCapabilities&&) = delete;
 
-    std::wstring ListAdapters(GPUFoundation& gpuAccess);
+    static std::wstring ListAdapters(GPUFoundation& gpuAccess);
 
-    Microsoft::WRL::ComPtr<ID3D12Device> GenerateStandardDeviceQuery(GPUFoundation& gpuAccess);
+    static Microsoft::WRL::ComPtr<ID3D12Device> GenerateStandardDeviceQuery(GPUFoundation& gpuAccess);
 };
