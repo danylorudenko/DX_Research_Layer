@@ -84,8 +84,15 @@ void GPUFoundation::InitializeD3D12()
 {
 #if defined(DEBUG) || defined(_DEBUG)
     {
-        D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_));
+        auto const result = D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_));
+        ThrowIfFailed(result);
         debugController_->EnableDebugLayer();
+        
+        {
+            Microsoft::WRL::ComPtr<ID3D12Debug1> debugController1{ nullptr };
+            auto const result = debugController_->QueryInterface(IID_PPV_ARGS(debugController1.GetAddressOf()));
+            ThrowIfFailed(result);
+        }
     }
 #endif
 
