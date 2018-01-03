@@ -185,6 +185,7 @@
     <ClCompile Include="src\GPUPipelineState.cpp" />
     <ClCompile Include="src\GPUPresentGraphNode.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
+    <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUUploadHeap.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="include\Rendering\GPUFence.hpp" />
     <ClInclude Include="include\Rendering\GPUEngine.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphNode.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResource.hpp" />
     <ClInclude Include="include\Utility\Application.hpp" />
     <ClInclude Include="include\Utility\DirectAppDelegate.hpp" />
     <ClInclude Include="include\Utility\PerformanceTimer.hpp" />

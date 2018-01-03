@@ -32,8 +32,10 @@
 
 #if defined (DEBUG) || (_DEBUG)
 #define ThrowIfFailed(result) { assert(SUCCEEDED(result)); }
+#define AssignID3D12ResourceDebugName(name) { resourcePtr_->SetName(name); }
 #else
 #define ThrowIfFailed(result) result;
+#define AssignID3D12ResourceDebugName(name) 0
 #endif // DEBUG
 
 #endif // ThrowIfFailed
