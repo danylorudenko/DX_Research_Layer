@@ -10,6 +10,7 @@
 #include <map>
 #include <set>
 #include <stack>
+#include <memory>
 
 #include <Windows.h>
 #include <wrl.h>

@@ -1,4 +1,4 @@
-#include <Rendering\Foundation\GPUCapabilities.hpp>
+#include <Foundation\GPUCapabilities.hpp>
 
 #include <Rendering\GPUFoundation.hpp>
 

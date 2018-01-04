@@ -186,6 +186,7 @@
     <ClCompile Include="src\GPUPresentGraphNode.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
+    <ClCompile Include="src\GPUResourceAllocator.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUUploadHeap.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
@@ -213,7 +214,9 @@
     <ClInclude Include="include\Math\Camera.hpp" />
     <ClInclude Include="include\Math\Transform.hpp" />
     <ClInclude Include="include\pch.hpp" />
-    <ClInclude Include="include\Rendering\Foundation\GPUCapabilities.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceAllocator.hpp" />
+    <ClInclude Include="include\Foundation\GPUCapabilities.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameTable.hpp" />
     <ClInclude Include="include\Rendering\GPUFoundation.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandList.hpp" />
@@ -222,12 +225,13 @@
     <ClInclude Include="include\Rendering\GPUEngine.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphNode.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResource.hpp" />
-    <ClInclude Include="include\Utility\Application.hpp" />
-    <ClInclude Include="include\Utility\DirectAppDelegate.hpp" />
-    <ClInclude Include="include\Utility\PerformanceTimer.hpp" />
+    <ClInclude Include="include\Foundation\Application.hpp" />
+    <ClInclude Include="include\Foundation\DirectAppDelegate.hpp" />
+    <ClInclude Include="include\Foundation\PerformanceTimer.hpp" />
     <ClInclude Include="include\Rendering\Data\SceneConstantBuffer.hpp" />
     <ClInclude Include="include\Rendering\Data\Vertex.hpp" />
-    <ClInclude Include="include\Utility\Window.hpp" />
+    <ClInclude Include="include\Foundation\Window.hpp" />
+    <ClInclude Include="src\GPUResourceFrameTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\triangle_shader.hlsl">

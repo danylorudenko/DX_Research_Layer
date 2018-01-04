@@ -2,8 +2,8 @@
 
 #include <pch.hpp>
 
-#include <Utility\Application.hpp>
-#include <Utility\PerformanceTimer.hpp>
+#include <Foundation\Application.hpp>
+#include <Foundation\PerformanceTimer.hpp>
 #include <Rendering\GPUFoundation.hpp>
 #include <Rendering\Data\GeometryMesh.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>

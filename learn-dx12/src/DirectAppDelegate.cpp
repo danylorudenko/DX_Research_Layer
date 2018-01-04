@@ -2,7 +2,7 @@
 #include <thread>
 #include <chrono>
 
-#include <Utility\DirectAppDelegate.hpp>
+#include <Foundation\DirectAppDelegate.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>

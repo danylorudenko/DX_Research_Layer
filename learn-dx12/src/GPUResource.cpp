@@ -12,6 +12,8 @@ GPUResource::GPUResource(GPUResource&& rhs) = default;
 
 GPUResource& GPUResource::operator=(GPUResource&& rhs) = default;
 
+GPUResource::~GPUResource() = default;
+
 D3D12_RESOURCE_STATES GPUResource::State() const
 {
     return state_;
@@ -25,6 +27,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> const& GPUResource::Get() const
 ID3D12Resource* GPUResource::GetPtr() const
 {
     return resourcePtr_.Get();
+}
+
+void GPUResource::Transition(GPUEngine& executionEngine, D3D12_RESOURCE_STATES targetState)
+{
+    executionEngine.Commit().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(GetPtr(), state_, targetState));
+    state_ = targetState;
 }
 
 void GPUResource::PrepareTransition(D3D12_RESOURCE_STATES targetState, D3D12_RESOURCE_BARRIER& transitionDesc)

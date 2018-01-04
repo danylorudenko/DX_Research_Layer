@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Utility\Window.hpp>
+#include <Foundation\Window.hpp>
 
 //
 // WindowClass's implementation

@@ -1,5 +1,5 @@
 #include <Rendering\GPUFoundation.hpp>
-#include <Rendering\Foundation\GPUCapabilities.hpp>
+#include <Foundation\GPUCapabilities.hpp>
 
 GPUFoundation::GPUFoundation() = default;
 

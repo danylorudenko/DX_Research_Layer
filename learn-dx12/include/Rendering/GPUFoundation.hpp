@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Utility\Application.hpp>
+#include <Foundation\Application.hpp>
 #include <Rendering\GPUEngine.hpp>
 #include <Rendering\Data\GPUFrameResource.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>
@@ -38,9 +38,9 @@ public:
 
     void ResetAll();
 
-    Microsoft::WRL::ComPtr<ID3D12Device> Device() const { return device_; }
-    Microsoft::WRL::ComPtr<IDXGISwapChain> SwapChain() { return swapChain_; }
-    Microsoft::WRL::ComPtr<IDXGIFactory1> DXGIFactory() { return dxgiFactory_; }
+    Microsoft::WRL::ComPtr<ID3D12Device> const& Device() const { return device_; }
+    Microsoft::WRL::ComPtr<IDXGISwapChain>const& SwapChain() const { return swapChain_; }
+    Microsoft::WRL::ComPtr<IDXGIFactory1> const& DXGIFactory() const { return dxgiFactory_; }
 
     GPUFrameResourceDescriptor& FinalRenderTargetViews() { return *finalRenderTargetViews_; }
     GPUFrameResourceDescriptor& FinalDepthSteniclViews() { return *finalDepthStencilViews_; }
