@@ -1,26 +1,20 @@
 #include <Rendering\Data\Resource\GPUResourceFrameTable.hpp>
 #include <Rendering\Data\Resource\GPUResourceAllocator.hpp>
 
-GPUResourceDirectID::GPUResourceDirectID() = default;
-
-GPUResourceDirectID::GPUResourceDirectID(GPUResourceAllocator& rhs) :
-    ID_{ rhs.ProvideNextResourceHandle() }
-{ }
-
-GPUResourceDirectID::GPUResourceDirectID(GPUResourceDirectID const&) = default;
-
-GPUResourceDirectID::GPUResourceDirectID(GPUResourceDirectID&&) = default;
-
-GPUResourceDirectID& GPUResourceDirectID::operator=(GPUResourceDirectID const&) = default;
-
-GPUResourceDirectID& GPUResourceDirectID::operator=(GPUResourceDirectID&&) = default;
-
-///////////////////////////////////////////////////////////////////////////////////////////
 
 GPUResourceID::GPUResourceID() = default;
 
-GPUResourceID::GPUResourceID(GPUResourceFrameTable& frameTable) :
-    ID_{ frameTable.}
+GPUResourceID::GPUResourceID(std::size_t ID) :
+    ID_{ ID }
+{ }
+
+GPUResourceID::GPUResourceID(GPUResourceID const& rhs) = default;
+
+GPUResourceID::GPUResourceID(GPUResourceID&& rhs) = default;
+
+GPUResourceID& GPUResourceID::operator=(GPUResourceID const& rhs) = default;
+
+GPUResourceID& GPUResourceID::operator=(GPUResourceID&& rhs) = default;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 GPUResourceFrameTable::GPUResourceFrameTable() = default;
@@ -35,3 +29,30 @@ GPUResourceFrameTable::GPUResourceFrameTable(std::size_t framesCount)
 GPUResourceFrameTable::GPUResourceFrameTable(GPUResourceFrameTable&& rhs) = default;
 
 GPUResourceFrameTable& GPUResourceFrameTable::operator=(GPUResourceFrameTable&& rhs) = default;
+
+GPUResourceID GPUResourceFrameTable::InsertSingleResource(GPUResourceDirectID ID)
+{
+    auto const contextCount = frameList_.size();
+    for (std::size_t i = 0; i < contextCount; i++) {
+        frameList_[i].push_back(ID);
+    }
+
+    return GPUResourceID{ frameList_.size() - 1 };
+}
+
+GPUResourceID GPUResourceFrameTable::InsertFramedResource(std::size_t frameCount, GPUResourceDirectID const* IDs)
+{
+    auto const contextCount = frameList_.size();
+    assert(contextCount != frameCount && "Count of resource frames representations does not match context count in resource table.");
+
+    for (size_t i = 0; i < frameCount; i++) {
+        frameList_[i].push_back(IDs[i]);
+    }
+
+    return GPUResourceID{ frameList_.size() - 1 };
+}
+
+GPUResourceDirectID GPUResourceFrameTable::FetchResourceExplicitID(std::size_t frameIndex, GPUResourceID virtualID)
+{
+    return frameList_[frameIndex][virtualID.ID_];
+}

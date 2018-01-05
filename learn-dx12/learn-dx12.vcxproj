@@ -217,6 +217,7 @@
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceAllocator.hpp" />
     <ClInclude Include="include\Foundation\GPUCapabilities.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameTable.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceView.hpp" />
     <ClInclude Include="include\Rendering\GPUFoundation.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandList.hpp" />

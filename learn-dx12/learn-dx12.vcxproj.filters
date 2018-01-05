@@ -203,6 +203,9 @@
     <ClInclude Include="src\GPUResourceFrameTable.cpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\triangle_shader.hlsl" />

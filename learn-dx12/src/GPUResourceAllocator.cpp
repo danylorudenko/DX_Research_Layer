@@ -1,6 +1,21 @@
 #include <Rendering\Data\Resource\GPUResourceAllocator.hpp>
-
 #include <Rendering\Data\Resource\GPUResourceFrameTable.hpp>
+
+GPUResourceDirectID::GPUResourceDirectID() = default;
+
+GPUResourceDirectID::GPUResourceDirectID(std::size_t ID) :
+    ID_{ ID }
+{ }
+
+GPUResourceDirectID::GPUResourceDirectID(GPUResourceDirectID const&) = default;
+
+GPUResourceDirectID::GPUResourceDirectID(GPUResourceDirectID&&) = default;
+
+GPUResourceDirectID& GPUResourceDirectID::operator=(GPUResourceDirectID const&) = default;
+
+GPUResourceDirectID& GPUResourceDirectID::operator=(GPUResourceDirectID&&) = default;
+
+/////////////////////////////////////////////////////////////////////////////////////////
 
 GPUResourceAllocator::GPUResourceAllocator() = default;
 
@@ -29,12 +44,6 @@ GPUResourceDirectID GPUResourceAllocator::DefaultAlloc(D3D12_RESOURCE_DESC& reso
         ThrowIfFailed(result);
     }
 
-    // WROOOOOOOOOOOONG
     committedResources_.push_back(std::make_unique<GPUResource>(std::move(tempResourcePtr), D3D12_RESOURCE_STATE_COMMON, L""));
-    return GPUResourceDirectID{ *this };
-}
-
-std::size_t GPUResourceAllocator::ProvideNextResourceHandle()
-{
-    return nextHandle_++;
+    return GPUResourceDirectID{ committedResources_.size() - 1 };
 }

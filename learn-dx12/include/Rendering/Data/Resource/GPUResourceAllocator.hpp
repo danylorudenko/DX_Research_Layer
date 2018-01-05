@@ -6,6 +6,23 @@
 #include <Rendering\Data\Resource\GPUResource.hpp>
 
 
+class GPUResourceDirectID
+{
+public:
+    GPUResourceDirectID();
+    GPUResourceDirectID(std::size_t ID);
+
+    GPUResourceDirectID(GPUResourceDirectID const& rhs);
+    GPUResourceDirectID(GPUResourceDirectID&& rhs);
+
+    GPUResourceDirectID& operator=(GPUResourceDirectID const& rhs);
+    GPUResourceDirectID& operator=(GPUResourceDirectID&& rhs);
+
+    std::size_t ID_ = 0;
+};
+
+//////////////////////////////////////////////////////////////////////////////////
+
 class GPUResourceAllocator
 {
 public:
@@ -19,7 +36,7 @@ public:
     GPUResourceAllocator& operator=(GPUResourceAllocator&& rhs);
 
     GPUResourceDirectID DefaultAlloc(D3D12_RESOURCE_DESC& resourceDesc, D3D12_RESOURCE_STATES initialState);
-    std::size_t ProvideNextResourceHandle();
+
 
 private:
     GPUFoundation const* foundation_;

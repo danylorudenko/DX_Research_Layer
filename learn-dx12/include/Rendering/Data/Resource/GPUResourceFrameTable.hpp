@@ -2,28 +2,13 @@
 
 #include <pch.hpp>
 
-class GPUResourceAllocator;
-
-class GPUResourceDirectID
-{
-public:
-    GPUResourceDirectID();
-    GPUResourceDirectID(GPUResourceAllocator& allocator);
-
-    GPUResourceDirectID(GPUResourceDirectID const& rhs);
-    GPUResourceDirectID(GPUResourceDirectID&& rhs);
-
-    GPUResourceDirectID& operator=(GPUResourceDirectID const& rhs);
-    GPUResourceDirectID& operator=(GPUResourceDirectID&& rhs);
-
-private:
-    std::size_t ID_ = 0;
-};
+class GPUResourceDirectID;
 
 class GPUResourceID
 {
+public:
     GPUResourceID();
-    GPUResourceID(GPUResourceFrameTable& frameTable);
+    GPUResourceID(std::size_t ID);
 
     GPUResourceID(GPUResourceID const& rhs);
     GPUResourceID(GPUResourceID&& rhs);
@@ -31,7 +16,6 @@ class GPUResourceID
     GPUResourceID& operator=(GPUResourceID const& rhs);
     GPUResourceID& operator=(GPUResourceID&& rhs);
 
-private:
     std::size_t ID_ = 0;
 };
 
@@ -47,9 +31,10 @@ public:
     GPUResourceFrameTable& operator=(GPUResourceFrameTable const&) = delete;
     GPUResourceFrameTable& operator=(GPUResourceFrameTable&& rhs);
 
-    GPUResourceID InsertFramedResource(std::size_t frameCount, GPUResourceDirectID* resourceIDs);
+    GPUResourceID InsertFramedResource(std::size_t frameCount, GPUResourceDirectID const* resourceIDs);
+    GPUResourceID InsertSingleResource(GPUResourceDirectID resourceID);
 
-    GPUResourceDirectID RecieveResourceExplicitID(std::size_t frameIndex, GPUResourceID virtualID);
+    GPUResourceDirectID FetchResourceExplicitID(std::size_t frameIndex, GPUResourceID virtualID);
 
 private:
     using FrameContext = std::vector<GPUResourceDirectID>;

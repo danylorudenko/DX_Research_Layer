@@ -178,7 +178,7 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
     windowText_ += std::to_wstring(1 / drawTime);
 
     HWND windowHandle = application.window().nativeHandle();
-    SetWindowText(windowHandle, windowText_.c_str());
+    //SetWindowText(windowHandle, windowText_.c_str());
 }
 
 Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignature()
