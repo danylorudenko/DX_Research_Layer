@@ -187,6 +187,7 @@
     <ClCompile Include="src\GPUFrameResource.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPUResourceAllocator.cpp" />
+    <ClCompile Include="src\GPUResourceView.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUUploadHeap.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
