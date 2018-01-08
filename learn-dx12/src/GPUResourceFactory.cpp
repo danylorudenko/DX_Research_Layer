@@ -21,3 +21,9 @@ GPUResourceID GPUResourceFactory::AllocStaticResource(std::size_t framesCount, D
 
     return staticResourcesTable_.InsertResource(framesCount, ids);
 }
+
+GPUResource& GPUResourceFactory::AccessStaticResource(std::size_t frameIndex, GPUResourceID id)
+{
+    auto directID = staticResourcesTable_.FetchDirectID(frameIndex, id);
+    return staticResourcesAllocator_.AccessResource(directID);
+}

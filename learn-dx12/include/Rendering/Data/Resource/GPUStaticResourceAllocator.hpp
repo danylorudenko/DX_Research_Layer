@@ -19,6 +19,7 @@ public:
     GPUStaticResourceAllocator& operator=(GPUStaticResourceAllocator&& rhs);
 
     GPUResourceDirectID Alloc(D3D12_RESOURCE_DESC const& resourceDesc, D3D12_RESOURCE_STATES initialState);
+    GPUResource& AccessResource(GPUResourceDirectID id);
 
 
 private:

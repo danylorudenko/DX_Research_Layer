@@ -31,3 +31,8 @@ GPUResourceDirectID GPUStaticResourceAllocator::Alloc(D3D12_RESOURCE_DESC const&
     committedResources_.push_back(std::make_unique<GPUResource>(std::move(tempResourcePtr), D3D12_RESOURCE_STATE_COMMON, L""));
     return GPUResourceDirectID{ committedResources_.size() - 1 };
 }
+
+GPUResource & GPUStaticResourceAllocator::AccessResource(GPUResourceDirectID id)
+{
+    return *committedResources_[id.ID_];
+}
