@@ -31,8 +31,7 @@ public:
     GPUResourceFrameTable& operator=(GPUResourceFrameTable const&) = delete;
     GPUResourceFrameTable& operator=(GPUResourceFrameTable&& rhs);
 
-    GPUResourceID InsertFramedResource(std::size_t frameCount, GPUResourceDirectID const* resourceIDs);
-    GPUResourceID InsertSingleResource(GPUResourceDirectID resourceID);
+    GPUResourceID InsertResource(std::size_t frameCount, GPUResourceDirectID const* resourceIDs);
 
     GPUResourceDirectID FetchResourceExplicitID(std::size_t frameIndex, GPUResourceID virtualID);
 

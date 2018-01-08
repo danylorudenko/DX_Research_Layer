@@ -27,7 +27,7 @@ GPUResourceAllocator::GPUResourceAllocator(GPUResourceAllocator&&) = default;
 
 GPUResourceAllocator& GPUResourceAllocator::operator=(GPUResourceAllocator&&) = default;
 
-GPUResourceDirectID GPUResourceAllocator::DefaultAlloc(D3D12_RESOURCE_DESC& resourceDesc, D3D12_RESOURCE_STATES initialState)
+GPUResourceDirectID GPUResourceAllocator::Alloc(D3D12_RESOURCE_DESC const& resourceDesc, D3D12_RESOURCE_STATES initialState)
 {
     Microsoft::WRL::ComPtr<ID3D12Resource> tempResourcePtr{ nullptr };
     auto& device = foundation_->Device();

@@ -35,12 +35,11 @@ public:
     GPUResourceAllocator& operator=(GPUResourceAllocator const&) = delete;
     GPUResourceAllocator& operator=(GPUResourceAllocator&& rhs);
 
-    GPUResourceDirectID DefaultAlloc(D3D12_RESOURCE_DESC& resourceDesc, D3D12_RESOURCE_STATES initialState);
+    GPUResourceDirectID Alloc(D3D12_RESOURCE_DESC const& resourceDesc, D3D12_RESOURCE_STATES initialState);
 
 
 private:
     GPUFoundation const* foundation_;
 
     std::vector<std::unique_ptr<GPUResource>> committedResources_;
-    std::size_t nextHandle_ = 0;
 };

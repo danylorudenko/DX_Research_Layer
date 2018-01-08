@@ -30,25 +30,27 @@ GPUResourceFrameTable::GPUResourceFrameTable(GPUResourceFrameTable&& rhs) = defa
 
 GPUResourceFrameTable& GPUResourceFrameTable::operator=(GPUResourceFrameTable&& rhs) = default;
 
-GPUResourceID GPUResourceFrameTable::InsertSingleResource(GPUResourceDirectID ID)
+GPUResourceID GPUResourceFrameTable::InsertResource(std::size_t frameCount, GPUResourceDirectID const* IDs)
 {
+    assert(frameCount > 0 && "Frames count can't be zero");
+    
     auto const contextCount = frameList_.size();
-    for (std::size_t i = 0; i < contextCount; i++) {
-        frameList_[i].push_back(ID);
+
+    if (frameCount == 1) {
+        
+        for (std::size_t i = 0; i < contextCount; i++) {
+            frameList_[i].push_back(*IDs);
+        }
     }
+    else {
+        assert(contextCount != frameCount && "Count of resource frames representations does not match context count in resource table.");
 
-    return GPUResourceID{ frameList_.size() - 1 };
-}
+        for (size_t i = 0; i < frameCount; i++) {
+            frameList_[i].push_back(IDs[i]);
+        }
 
-GPUResourceID GPUResourceFrameTable::InsertFramedResource(std::size_t frameCount, GPUResourceDirectID const* IDs)
-{
-    auto const contextCount = frameList_.size();
-    assert(contextCount != frameCount && "Count of resource frames representations does not match context count in resource table.");
-
-    for (size_t i = 0; i < frameCount; i++) {
-        frameList_[i].push_back(IDs[i]);
     }
-
+    
     return GPUResourceID{ frameList_.size() - 1 };
 }
 
