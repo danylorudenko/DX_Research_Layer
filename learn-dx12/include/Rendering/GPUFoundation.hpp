@@ -48,7 +48,7 @@ public:
 
     GPUFrameGraph& FrameGraph() { return *frameGraph_; }
     GPUDescriptorHeap& DescriptorHeap() { return *descriptorHeap_; }
-    GPUResourceFactory& ResourceFactory() { return resourceFactory_; }
+    GPUResourceFactory& ResourceFactory() { return *resourceFactory_; }
 
     void CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest);
     void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
@@ -61,7 +61,7 @@ private:
 
     void CreateSwapChain(Application& application, IDXGIFactory* factory);
     void CreateFrameResources();
-    void CreateDefaultDescriptorHeaps();
+    void CreateDefaultDataStorages();
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Debug> debugController_;
@@ -80,7 +80,7 @@ private:
     GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
     GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
 
-    GPUResourceFactory resourceFactory_;
+    GPUResourceFactory* resourceFactory_;
 
 
     GPUDescriptorHeap* descriptorHeap_ = nullptr;
