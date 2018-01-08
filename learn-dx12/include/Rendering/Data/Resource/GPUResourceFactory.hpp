@@ -2,8 +2,8 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\Resource\GPUResourceAllocator.hpp>
 #include <Rendering\Data\Resource\GPUResourceFrameTable.hpp>
+#include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
 
 class GPUResourceFactory
 {
@@ -19,6 +19,6 @@ public:
     GPUResourceID AllocStaticResource(std::size_t framesCount, D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COMMON);
 
 private:
-    GPUResourceAllocator staticResourcesAllocator_;
+    GPUStaticResourceAllocator staticResourcesAllocator_;
     GPUResourceFrameTable staticResourcesTable_;
 };

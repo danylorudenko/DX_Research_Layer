@@ -187,7 +187,9 @@
     <ClCompile Include="src\GPUPresentGraphNode.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
-    <ClCompile Include="src\GPUResourceAllocator.cpp" />
+    <ClCompile Include="src\GPUResourceFrameTable.cpp" />
+    <ClCompile Include="src\GPUResourceID.cpp" />
+    <ClCompile Include="src\GPUStaticResourceAllocator.cpp" />
     <ClCompile Include="src\GPUResourceFactory.cpp" />
     <ClCompile Include="src\GPUResourceView.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
@@ -222,6 +224,8 @@
     <ClInclude Include="include\Foundation\GPUCapabilities.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFactory.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameTable.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceID.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUStaticResourceAllocator.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceView.hpp" />
     <ClInclude Include="include\Rendering\GPUFoundation.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />
@@ -238,7 +242,6 @@
     <ClInclude Include="include\Rendering\Data\Vertex.hpp" />
     <ClInclude Include="include\Foundation\Window.hpp" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="src\GPUResourceFrameTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\triangle_shader.hlsl">

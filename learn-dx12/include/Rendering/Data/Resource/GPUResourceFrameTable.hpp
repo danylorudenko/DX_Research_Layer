@@ -2,22 +2,7 @@
 
 #include <pch.hpp>
 
-class GPUResourceDirectID;
-
-class GPUResourceID
-{
-public:
-    GPUResourceID();
-    GPUResourceID(std::size_t ID);
-
-    GPUResourceID(GPUResourceID const& rhs);
-    GPUResourceID(GPUResourceID&& rhs);
-
-    GPUResourceID& operator=(GPUResourceID const& rhs);
-    GPUResourceID& operator=(GPUResourceID&& rhs);
-
-    std::size_t ID_ = 0;
-};
+#include <Rendering\Data\Resource\GPUResourceID.hpp>
 
 class GPUResourceFrameTable
 {
@@ -33,7 +18,7 @@ public:
 
     GPUResourceID InsertResource(std::size_t frameCount, GPUResourceDirectID const* resourceIDs);
 
-    GPUResourceDirectID FetchResourceExplicitID(std::size_t frameIndex, GPUResourceID virtualID);
+    GPUResourceDirectID FetchDirectID(std::size_t frameIndex, GPUResourceID virtualID);
 
 private:
     using FrameContext = std::vector<GPUResourceDirectID>;

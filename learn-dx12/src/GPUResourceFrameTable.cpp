@@ -1,22 +1,5 @@
 #include <Rendering\Data\Resource\GPUResourceFrameTable.hpp>
-#include <Rendering\Data\Resource\GPUResourceAllocator.hpp>
 
-
-GPUResourceID::GPUResourceID() = default;
-
-GPUResourceID::GPUResourceID(std::size_t ID) :
-    ID_{ ID }
-{ }
-
-GPUResourceID::GPUResourceID(GPUResourceID const& rhs) = default;
-
-GPUResourceID::GPUResourceID(GPUResourceID&& rhs) = default;
-
-GPUResourceID& GPUResourceID::operator=(GPUResourceID const& rhs) = default;
-
-GPUResourceID& GPUResourceID::operator=(GPUResourceID&& rhs) = default;
-
-///////////////////////////////////////////////////////////////////////////////////////////
 GPUResourceFrameTable::GPUResourceFrameTable() = default;
 
 GPUResourceFrameTable::GPUResourceFrameTable(std::size_t framesCount)
@@ -54,7 +37,7 @@ GPUResourceID GPUResourceFrameTable::InsertResource(std::size_t frameCount, GPUR
     return GPUResourceID{ frameList_.size() - 1 };
 }
 
-GPUResourceDirectID GPUResourceFrameTable::FetchResourceExplicitID(std::size_t frameIndex, GPUResourceID virtualID)
+GPUResourceDirectID GPUResourceFrameTable::FetchDirectID(std::size_t frameIndex, GPUResourceID virtualID)
 {
     return frameList_[frameIndex][virtualID.ID_];
 }
