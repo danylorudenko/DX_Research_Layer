@@ -18,6 +18,7 @@ public:
 
     GPUResourceID AllocStaticResource(std::size_t framesCount, D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COMMON);
     GPUResource& AccessStaticResource(std::size_t frameIndex, GPUResourceID id);
+    GPUResource& AccessFramebuffer(std::size_t frameIndex);
 
 private:
     GPUStaticResourceAllocator staticResourcesAllocator_;

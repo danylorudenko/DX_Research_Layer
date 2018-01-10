@@ -80,7 +80,7 @@ private:
     GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
     GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
 
-    GPUResourceFactory* resourceFactory_;
+    GPUResourceFactory* resourceFactory_ = nullptr;
 
 
     GPUDescriptorHeap* descriptorHeap_ = nullptr;

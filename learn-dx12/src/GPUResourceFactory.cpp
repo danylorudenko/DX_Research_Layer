@@ -24,6 +24,11 @@ GPUResourceID GPUResourceFactory::AllocStaticResource(std::size_t framesCount, D
 
 GPUResource& GPUResourceFactory::AccessStaticResource(std::size_t frameIndex, GPUResourceID id)
 {
-    auto directID = staticResourcesTable_.FetchDirectID(frameIndex, id);
+    auto const directID = staticResourcesTable_.FetchDirectID(frameIndex, id);
     return staticResourcesAllocator_.AccessResource(directID);
+}
+
+GPUResource& GPUResourceFactory::AccessFramebuffer(std::size_t frameIndex)
+{
+    return staticResourcesAllocator_.AccessFramebuffer(frameIndex);
 }

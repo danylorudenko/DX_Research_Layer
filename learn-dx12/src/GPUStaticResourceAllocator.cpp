@@ -32,7 +32,20 @@ GPUResourceDirectID GPUStaticResourceAllocator::Alloc(D3D12_RESOURCE_DESC const&
     return GPUResourceDirectID{ committedResources_.size() - 1 };
 }
 
-GPUResource & GPUStaticResourceAllocator::AccessResource(GPUResourceDirectID id)
+GPUResource& GPUStaticResourceAllocator::AccessResource(GPUResourceDirectID id)
 {
-    return *committedResources_[id.ID_];
+    return *(committedResources_[id.ID_]);
+}
+
+GPUResource& GPUStaticResourceAllocator::AccessFramebuffer(std::size_t frameIndex)
+{
+    return *(framebuffers_[frameIndex]);
+}
+
+void GPUStaticResourceAllocator::InjectSwapChainBackBuffers(std::size_t frameBufferCount, GPUResource* buffers)
+{
+    framebuffers_.resize(frameBufferCount);
+    for (size_t i = 0; i < frameBufferCount; i++) {
+        framebuffers_[i] = std::make_unique<GPUResource>(buffers[i]);
+    }
 }
