@@ -186,6 +186,7 @@
     <ClCompile Include="src\GPUPipelineState.cpp" />
     <ClCompile Include="src\GPUPresentGraphNode.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
+    <ClCompile Include="src\GPURenderTargetView.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPUResourceFrameTable.cpp" />
     <ClCompile Include="src\GPUResourceID.cpp" />
@@ -226,7 +227,10 @@
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameTable.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceID.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUStaticResourceAllocator.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPURenderTargetView.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceView.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUSwapChainRenderTargetView.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUViewFactory.hpp" />
     <ClInclude Include="include\Rendering\GPUFoundation.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandList.hpp" />

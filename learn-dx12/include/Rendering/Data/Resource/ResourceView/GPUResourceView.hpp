@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\Resource\GPUResourceFactory.hpp>
+#include <Rendering\GPUEngine.hpp>
 
 
 class GPUResourceView
@@ -15,7 +15,5 @@ public:
     GPUResourceView& operator=(GPUResourceView const& rhs);
     GPUResourceView& operator=(GPUResourceView&& rhs);
 
-protected:
-    std::size_t offsetInHeap_;
-    GPUResourceID describedResource_ = SIZE_MAX;
+    virtual void Bind(GPUEngine& executionEngine) = 0;
 };

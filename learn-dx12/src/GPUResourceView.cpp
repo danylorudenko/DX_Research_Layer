@@ -1,7 +1,6 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 
-GPUResourceView::GPUResourceView() : offsetInHeap_{ SIZE_MAX }, describedResource_{ SIZE_MAX }
-{ }
+GPUResourceView::GPUResourceView() = default;
 
 GPUResourceView::GPUResourceView(GPUResourceView const& rhs) = default;
 

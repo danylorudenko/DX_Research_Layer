@@ -111,6 +111,9 @@
     <ClCompile Include="src\GPUResourceFrameTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GPURenderTargetView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pch.hpp">
@@ -231,6 +234,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceID.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPURenderTargetView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUSwapChainRenderTargetView.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUViewFactory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
