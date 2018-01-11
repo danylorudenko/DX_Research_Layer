@@ -55,6 +55,8 @@ public:
     GPUResourceViewDirectID& operator=(GPUResourceViewDirectID const& rhs);
     GPUResourceViewDirectID& operator=(GPUResourceViewDirectID&& rhs);
 
+    std::size_t ID() const;
+
 private:
     std::size_t ID_ = 0;
     GPUResourceViewHeap const* parentHeap_;

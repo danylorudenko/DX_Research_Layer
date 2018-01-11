@@ -32,6 +32,26 @@ D3D12_CPU_DESCRIPTOR_HANDLE GPUResourceViewHeap::ProvideNextHandle()
     return CD3DX12_CPU_DESCRIPTOR_HANDLE{ heapHandle_->GetCPUDescriptorHandleForHeapStart(), static_cast<INT>(currentHeapOffset_++), static_cast<UINT>(descriptorSize_) };
 }
 
+D3D12_CPU_DESCRIPTOR_HANDLE GPUResourceViewHeap::CPUHeapStart() const
+{
+    return heapHandle_->GetCPUDescriptorHandleForHeapStart();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE GPUResourceViewHeap::GPUHeapStart() const
+{
+    return heapHandle_->GetGPUDescriptorHandleForHeapStart();
+}
+
+std::size_t GPUResourceViewHeap::Capacity() const
+{
+    return heapCapacity_;
+}
+
+std::size_t GPUResourceViewHeap::DescriptorSize() const
+{
+    return descriptorSize_;
+}
+
 void GPUResourceViewHeap::Reset()
 {
     currentHeapOffset_ = 0;

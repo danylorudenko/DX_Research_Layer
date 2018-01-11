@@ -12,7 +12,7 @@ class GPUResourceView
 {
 public:
     GPUResourceView();
-    GPUResourceView(GPUResourceViewDirectID viewID, GPUResourceViewHeap const& parentHeap);
+    GPUResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap);
     GPUResourceView(GPUResourceView const& rhs);
     GPUResourceView(GPUResourceView&& rhs);
 
@@ -20,10 +20,10 @@ public:
     GPUResourceView& operator=(GPUResourceView&& rhs);
 
     virtual D3D12_RESOURCE_STATES TargetState() const = 0;
-    D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle();
+    D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle() const;
 
 protected:
-    GPUResourceViewDirectID viewID_;
+    std::size_t offsetInHeap_ = 0;
     GPUResourceViewHeap const* parentHeap_ = nullptr;
 };
 
@@ -35,7 +35,7 @@ class GPUShaderVisibleResourceView : public GPUResourceView
 {
 public:
     GPUShaderVisibleResourceView();
-    GPUShaderVisibleResourceView(GPUResourceViewDirectID viewID, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
+    GPUShaderVisibleResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
     GPUShaderVisibleResourceView(GPUShaderVisibleResourceView const& rhs);
     GPUShaderVisibleResourceView(GPUShaderVisibleResourceView&& rhs);
 
@@ -58,7 +58,7 @@ class GPUConstantBufferView : public GPUShaderVisibleResourceView
 {
 public:
     GPUConstantBufferView();
-    GPUConstantBufferView(GPUResourceViewDirectID viewID, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
+    GPUConstantBufferView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
     GPUConstantBufferView(GPUConstantBufferView const& rhs);
     GPUConstantBufferView(GPUConstantBufferView&& rhs);
 
@@ -74,7 +74,7 @@ public:
 class GPShaderResourceView : public GPUShaderVisibleResourceView
 {
     GPShaderResourceView();
-    GPShaderResourceView(GPUResourceViewDirectID viewID, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
+    GPShaderResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
     GPShaderResourceView(GPShaderResourceView const& rhs);
     GPShaderResourceView(GPShaderResourceView&& rhs);
 
@@ -90,6 +90,7 @@ class GPShaderResourceView : public GPUShaderVisibleResourceView
 class GPUUnorderedAccessView : public GPUShaderVisibleResourceView
 {
     GPUUnorderedAccessView();
+    GPUUnorderedAccessView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
     GPUUnorderedAccessView(GPUUnorderedAccessView const& rhs);
     GPUUnorderedAccessView(GPUUnorderedAccessView&& rhs);
 
@@ -107,6 +108,7 @@ class GPUUnorderedAccessView : public GPUShaderVisibleResourceView
 class GPUDepthStencilView : public GPUResourceView
 {
     GPUDepthStencilView();
+    GPUDepthStencilView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
     GPUDepthStencilView(GPUDepthStencilView const& rhs);
     GPUDepthStencilView(GPUDepthStencilView&& rhs);
 
@@ -158,5 +160,15 @@ protected:
 
 class GPUGenericRenderTargetView : public GPURenderTargetView
 {
+    GPUGenericRenderTargetView();
+    GPUGenericRenderTargetView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID)
+    GPUGenericRenderTargetView(GPUGenericRenderTargetView const& rhs);
+    GPUGenericRenderTargetView(GPUGenericRenderTargetView&& rhs);
 
+    GPUGenericRenderTargetView& operator=(GPUGenericRenderTargetView const& rhs);
+    GPUGenericRenderTargetView& operator=(GPUGenericRenderTargetView&& rhs);
+
+    virtual D3D12_RESOURCE_STATES TargetState() const override;
+protected:
+    GPUResourceDirectID resourceID_;
 };
