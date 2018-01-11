@@ -99,9 +99,6 @@
     <ClCompile Include="src\GPUDynamicResourceAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUResourceFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GPUStaticResourceAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -112,6 +109,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GPURenderTargetView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUResourceViewHeap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUResourceViewAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -182,9 +185,6 @@
     <ClInclude Include="include\Rendering\Data\Vertex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\GPUDescriptorHeap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\Data\GPUFrameResource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -218,9 +218,6 @@
     <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceView.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFactory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\Data\Resource\GPUDynamicResourceAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -236,13 +233,13 @@
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceID.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPURenderTargetView.hpp">
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUSwapChainRenderTargetView.hpp">
+    <ClInclude Include="include\Rendering\Data\GPUDescriptorHeap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUViewFactory.hpp">
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

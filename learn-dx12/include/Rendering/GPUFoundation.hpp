@@ -8,7 +8,6 @@
 #include <Rendering\Data\GPUUploadHeap.hpp>
 #include <Rendering\Data\GPUDescriptorHeap.hpp>
 #include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
-#include <Rendering\Data\Resource\GPUResourceFactory.hpp>
 
 class GPUFoundation
 {
@@ -48,7 +47,6 @@ public:
 
     GPUFrameGraph& FrameGraph() { return *frameGraph_; }
     GPUDescriptorHeap& DescriptorHeap() { return *descriptorHeap_; }
-    GPUResourceFactory& ResourceFactory() { return *resourceFactory_; }
 
     void CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest);
     void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
@@ -79,8 +77,6 @@ private:
     GPUFrameResource* depthStencilBuffers_ = nullptr;
     GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
     GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
-
-    GPUResourceFactory* resourceFactory_ = nullptr;
 
 
     GPUDescriptorHeap* descriptorHeap_ = nullptr;

@@ -39,7 +39,7 @@ GPUFoundation::GPUFoundation(GPUFoundation&& rhs)
     finalRenderTargetViews_ = rhs.finalRenderTargetViews_; rhs.finalRenderTargetViews_ = nullptr;
     finalDepthStencilViews_ = rhs.finalDepthStencilViews_; rhs.finalDepthStencilViews_ = nullptr;
 
-    resourceFactory_ = rhs.resourceFactory_; rhs.resourceFactory_ = nullptr;
+    //resourceFactory_ = rhs.resourceFactory_; rhs.resourceFactory_ = nullptr;
     descriptorHeap_ = rhs.descriptorHeap_; rhs.descriptorHeap_ = nullptr;
 
 }
@@ -63,7 +63,7 @@ GPUFoundation& GPUFoundation::operator=(GPUFoundation&& rhs)
     finalRenderTargetViews_ = rhs.finalRenderTargetViews_; rhs.finalRenderTargetViews_ = nullptr;
     finalDepthStencilViews_ = rhs.finalDepthStencilViews_; rhs.finalDepthStencilViews_ = nullptr;
 
-    resourceFactory_ = rhs.resourceFactory_; rhs.resourceFactory_ = nullptr;
+    //resourceFactory_ = rhs.resourceFactory_; rhs.resourceFactory_ = nullptr;
     descriptorHeap_ = rhs.descriptorHeap_; rhs.descriptorHeap_ = nullptr;
 
     return *this;
@@ -79,7 +79,7 @@ GPUFoundation::~GPUFoundation()
 
     delete frameGraph_;
 
-    delete resourceFactory_;
+    //delete resourceFactory_;
     delete descriptorHeap_;
 }
 
@@ -161,7 +161,7 @@ void GPUFoundation::CreateDefaultDataStorages()
 
     ////////////////////
 
-    resourceFactory_ = new GPUResourceFactory{ *this, SWAP_CHAIN_BUFFER_COUNT };
+    //resourceFactory_ = new GPUResourceFactory{ *this, SWAP_CHAIN_BUFFER_COUNT };
 }
 
 void GPUFoundation::CreateSwapChain(Application& application, IDXGIFactory* factory)

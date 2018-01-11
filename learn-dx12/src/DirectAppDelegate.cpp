@@ -5,7 +5,7 @@
 #include <Foundation\DirectAppDelegate.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
-#include <Rendering\Data\GPUUploadHeap.hpp>
+#include <Rendering\Data\GPUDescriptorHeap.hpp>
 #include <Rendering\Data\GPURenderItem.hpp>
 
 void DirectAppDelegate::start(Application& application)

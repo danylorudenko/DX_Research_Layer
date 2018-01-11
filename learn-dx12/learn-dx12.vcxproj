@@ -190,8 +190,9 @@
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPUResourceFrameTable.cpp" />
     <ClCompile Include="src\GPUResourceID.cpp" />
+    <ClCompile Include="src\GPUResourceViewAllocator.cpp" />
+    <ClCompile Include="src\GPUResourceViewHeap.cpp" />
     <ClCompile Include="src\GPUStaticResourceAllocator.cpp" />
-    <ClCompile Include="src\GPUResourceFactory.cpp" />
     <ClCompile Include="src\GPUResourceView.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUUploadHeap.cpp" />
@@ -223,14 +224,12 @@
     <ClInclude Include="include\Rendering\Data\Resource\GPUDynamicResourceAllocator.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceAllocator.hpp" />
     <ClInclude Include="include\Foundation\GPUCapabilities.hpp" />
-    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFactory.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameTable.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceID.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUStaticResourceAllocator.hpp" />
-    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPURenderTargetView.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceView.hpp" />
-    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUSwapChainRenderTargetView.hpp" />
-    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUViewFactory.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp" />
     <ClInclude Include="include\Rendering\GPUFoundation.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandAllocator.hpp" />
     <ClInclude Include="include\Rendering\GPUCommandList.hpp" />

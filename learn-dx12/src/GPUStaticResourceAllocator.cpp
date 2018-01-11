@@ -46,6 +46,6 @@ void GPUStaticResourceAllocator::InjectSwapChainBackBuffers(std::size_t frameBuf
 {
     framebuffers_.resize(frameBufferCount);
     for (size_t i = 0; i < frameBufferCount; i++) {
-        framebuffers_[i] = std::make_unique<GPUResource>(buffers[i]);
+        framebuffers_[i] = std::make_unique<GPUResource>(std::move(buffers[i]));
     }
 }
