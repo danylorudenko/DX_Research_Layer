@@ -45,8 +45,6 @@ public:
     virtual D3D12_RESOURCE_STATES TargetState() const override;
     D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle() const;
 
-    virtual void Bind(GPUEngine& executionEngine) const = 0;
-
 protected:
     GPUResourceDirectID resourceID_;
     D3D12_RESOURCE_STATES targetState_ = (D3D12_RESOURCE_STATES)0;
@@ -64,25 +62,19 @@ public:
 
     GPUConstantBufferView& operator=(GPUConstantBufferView const& rhs);
     GPUConstantBufferView& operator=(GPUConstantBufferView&& rhs);
-    
-    virtual D3D12_RESOURCE_STATES TargetState() const override;
-    virtual void Bind(GPUEngine& executionEngine) const override;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
 
-class GPShaderResourceView : public GPUShaderVisibleResourceView
+class GPUShaderResourceView : public GPUShaderVisibleResourceView
 {
-    GPShaderResourceView();
-    GPShaderResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
-    GPShaderResourceView(GPShaderResourceView const& rhs);
-    GPShaderResourceView(GPShaderResourceView&& rhs);
+    GPUShaderResourceView();
+    GPUShaderResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
+    GPUShaderResourceView(GPUShaderResourceView const& rhs);
+    GPUShaderResourceView(GPUShaderResourceView&& rhs);
 
-    GPShaderResourceView& operator=(GPShaderResourceView const& rhs);
-    GPShaderResourceView& operator=(GPShaderResourceView&& rhs);
-
-    virtual D3D12_RESOURCE_STATES TargetState() const override;
-    virtual void Bind(GPUEngine& executionEngine) const override;
+    GPUShaderResourceView& operator=(GPUShaderResourceView const& rhs);
+    GPUShaderResourceView& operator=(GPUShaderResourceView&& rhs);
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -96,9 +88,6 @@ class GPUUnorderedAccessView : public GPUShaderVisibleResourceView
 
     GPUUnorderedAccessView& operator=(GPUUnorderedAccessView const& rhs);
     GPUUnorderedAccessView& operator=(GPUUnorderedAccessView&& rhs);
-
-    virtual D3D12_RESOURCE_STATES TargetState() const override;
-    virtual void Bind(GPUEngine& executionEngine) const override;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +150,7 @@ protected:
 class GPUGenericRenderTargetView : public GPURenderTargetView
 {
     GPUGenericRenderTargetView();
-    GPUGenericRenderTargetView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID)
+    GPUGenericRenderTargetView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID);
     GPUGenericRenderTargetView(GPUGenericRenderTargetView const& rhs);
     GPUGenericRenderTargetView(GPUGenericRenderTargetView&& rhs);
 
