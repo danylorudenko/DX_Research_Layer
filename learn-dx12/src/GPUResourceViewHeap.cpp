@@ -13,7 +13,7 @@ GPUResourceViewHeap::GPUResourceViewHeap(GPUFoundation const& foundation, D3D12_
     heapDesc.NumDescriptors = static_cast<UINT>(heapCapacity_);
     heapDesc.Type = type_;
     heapDesc.NodeMask = 0;
-    heapDesc.Flags = (type == D3D12_DESCRIPTOR_HEAP_TYPE_RTV || type == D3D12_DESCRIPTOR_HEAP_TYPE_DSV) ? D3D12_DESCRIPTOR_HEAP_FLAG_NONE : D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    heapDesc.Flags = (type == type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) ? D3D12_DESCRIPTOR_HEAP_FLAG_NONE : D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     {
         auto const result = device->CreateDescriptorHeap(
             &heapDesc,
@@ -27,9 +27,9 @@ GPUResourceViewHeap::GPUResourceViewHeap(GPUResourceViewHeap&& rhs) = default;
 
 GPUResourceViewHeap& GPUResourceViewHeap::operator=(GPUResourceViewHeap&& rhs) = default;
 
-D3D12_CPU_DESCRIPTOR_HANDLE GPUResourceViewHeap::ProvideNextHandle()
+std::size_t GPUResourceViewHeap::ProvideNextOffset()
 {
-    return CD3DX12_CPU_DESCRIPTOR_HANDLE{ heapHandle_->GetCPUDescriptorHandleForHeapStart(), static_cast<INT>(currentHeapOffset_++), static_cast<UINT>(descriptorSize_) };
+    return currentHeapOffset_;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE GPUResourceViewHeap::CPUHeapStart() const
@@ -39,6 +39,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE GPUResourceViewHeap::CPUHeapStart() const
 
 D3D12_GPU_DESCRIPTOR_HANDLE GPUResourceViewHeap::GPUHeapStart() const
 {
+    assert(type_ == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV && "GPU handle can't be obtained from non shader-visible heap.");
     return heapHandle_->GetGPUDescriptorHandleForHeapStart();
 }
 

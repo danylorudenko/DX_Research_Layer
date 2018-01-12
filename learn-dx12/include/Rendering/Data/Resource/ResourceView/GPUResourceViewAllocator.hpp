@@ -8,25 +8,26 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 #include <Rendering\Data\Resource\GPUResourceID.hpp>
 
-class GPUResourveViewAllocator
+class GPUResourceViewAllocator
 {
 public:
-    GPUResourveViewAllocator();
-    GPUResourveViewAllocator(GPUFoundation const& foundation);
-    GPUResourveViewAllocator(GPUResourveViewAllocator const&) = delete;
-    GPUResourveViewAllocator(GPUResourveViewAllocator&& rhs);
+    GPUResourceViewAllocator();
+    GPUResourceViewAllocator(GPUFoundation const& foundation);
+    GPUResourceViewAllocator(GPUResourceViewAllocator const&) = delete;
+    GPUResourceViewAllocator(GPUResourceViewAllocator&& rhs);
 
-    GPUResourveViewAllocator& operator=(GPUResourveViewAllocator const&) = delete;
-    GPUResourveViewAllocator& operator=(GPUResourveViewAllocator&& rhs);
+    GPUResourceViewAllocator& operator=(GPUResourceViewAllocator const&) = delete;
+    GPUResourceViewAllocator& operator=(GPUResourceViewAllocator&& rhs);
 
-    GPUResourceViewDirectID AllocCBV();
-    GPUResourceViewDirectID AllocSRV();
-    GPUResourceViewDirectID AllocUAV();
-    GPUResourceViewDirectID AllocRTV();
-    GPUResourceViewDirectID AllocDSV();
+    GPUResourceViewDirectID AllocCBV(GPUResourceDirectID resourceID, D3D12_CONSTANT_BUFFER_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewDirectID AllocSRV(GPUResourceDirectID resourceID, D3D12_SHADER_RESOURCE_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewDirectID AllocUAV(GPUResourceDirectID resourceID, D3D12_UNORDERED_ACCESS_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewDirectID AllocSwapChainRTV(GPUResource& resource, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
+    GPUResourceViewDirectID AllocRTV(GPUResourceDirectID resourceID, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
+    GPUResourceViewDirectID AllocDSV(GPUResourceDirectID resourceID, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
 
 private:
-    void PushViewToList(GPUResourceView&& view);
+    GPUResourceViewDirectID PushViewToList(GPUResourceView&& view);
 
     static constexpr std::size_t RTV_HEAP_CAPACITY = 3;
     static constexpr std::size_t DSV_HEAP_CAPACITY = 3;

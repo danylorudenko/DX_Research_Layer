@@ -15,7 +15,7 @@ public:
     GPUResourceViewHeap& operator=(GPUResourceViewHeap const& rhs) = delete;
     GPUResourceViewHeap& operator=(GPUResourceViewHeap&& rhs);
 
-    D3D12_CPU_DESCRIPTOR_HANDLE ProvideNextHandle();
+    std::size_t ProvideNextOffset();
 
     D3D12_GPU_DESCRIPTOR_HANDLE GPUHeapStart() const;
     D3D12_CPU_DESCRIPTOR_HANDLE CPUHeapStart() const;
