@@ -6,11 +6,7 @@ GPUResourceView::GPUResourceView(std::size_t offsetInHeap, GPUResourceViewHeap c
     offsetInHeap_{ offsetInHeap }, parentHeap_{ &parentHeap }
 { }
 
-GPUResourceView::GPUResourceView(GPUResourceView const& rhs) = default;
-
 GPUResourceView::GPUResourceView(GPUResourceView&& rhs) = default;
-
-GPUResourceView& GPUResourceView::operator=(GPUResourceView const& rhs) = default;
 
 GPUResourceView& GPUResourceView::operator=(GPUResourceView&& rhs) = default;
 
@@ -29,11 +25,7 @@ GPUShaderVisibleResourceView::GPUShaderVisibleResourceView(std::size_t offsetInH
     GPUResourceView{ offsetInHeap_, parentHeap }, resourceID_{ resourceID }, targetState_{ targetState }
 { }
 
-GPUShaderVisibleResourceView::GPUShaderVisibleResourceView(GPUShaderVisibleResourceView const& rhs) = default;
-
 GPUShaderVisibleResourceView::GPUShaderVisibleResourceView(GPUShaderVisibleResourceView&& rhs) = default;
-
-GPUShaderVisibleResourceView& GPUShaderVisibleResourceView::operator=(GPUShaderVisibleResourceView const& rhs) = default;
 
 GPUShaderVisibleResourceView& GPUShaderVisibleResourceView::operator=(GPUShaderVisibleResourceView&& rhs) = default;
 
@@ -55,11 +47,7 @@ GPUConstantBufferView::GPUConstantBufferView(std::size_t offsetInHeap, GPUResour
     GPUShaderVisibleResourceView{ offsetInHeap, parentHeap, resourceID, targetState }
 { }
 
-GPUConstantBufferView::GPUConstantBufferView(GPUConstantBufferView const& rhs) = default;
-
 GPUConstantBufferView::GPUConstantBufferView(GPUConstantBufferView&& rhs) = default;
-
-GPUConstantBufferView& GPUConstantBufferView::operator=(GPUConstantBufferView const& rhs) = default;
 
 GPUConstantBufferView& GPUConstantBufferView::operator=(GPUConstantBufferView&& rhs) = default;
 
@@ -71,11 +59,7 @@ GPUShaderResourceView::GPUShaderResourceView(std::size_t offsetInHeap, GPUResour
     GPUShaderVisibleResourceView{ offsetInHeap, parentHeap, resourceID, targetState }
 { }
 
-GPUShaderResourceView::GPUShaderResourceView(GPUShaderResourceView const& rhs) = default;
-
 GPUShaderResourceView::GPUShaderResourceView(GPUShaderResourceView&& rhs) = default;
-
-GPUShaderResourceView& GPUShaderResourceView::operator=(GPUShaderResourceView const& rhs) = default;
 
 GPUShaderResourceView& GPUShaderResourceView::operator=(GPUShaderResourceView&& rhs) = default;
 
@@ -87,11 +71,69 @@ GPUUnorderedAccessView::GPUUnorderedAccessView(std::size_t offsetInHeap, GPUReso
     GPUShaderVisibleResourceView{ offsetInHeap, parentHeap, resourceID, targetState }
 { }
 
-GPUUnorderedAccessView::GPUUnorderedAccessView(GPUUnorderedAccessView const& rhs) = default;
-
 GPUUnorderedAccessView::GPUUnorderedAccessView(GPUUnorderedAccessView&& rhs) = default;
-
-GPUUnorderedAccessView& GPUUnorderedAccessView::operator=(GPUUnorderedAccessView const& rhs) = default;
 
 GPUUnorderedAccessView& GPUUnorderedAccessView::operator=(GPUUnorderedAccessView&& rhs) = default;
 
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+
+GPUDepthStencilView::GPUDepthStencilView() = default;
+
+GPUDepthStencilView::GPUDepthStencilView(GPUDepthStencilView&& rhs) = default;
+
+GPUDepthStencilView::GPUDepthStencilView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState) :
+    GPUResourceView{ offsetInHeap, parentHeap }, resourceID_{ resourceID }, targetState_{ targetState }
+{ }
+
+GPUDepthStencilView& GPUDepthStencilView::operator=(GPUDepthStencilView&& rhs) = default;
+
+D3D12_RESOURCE_STATES GPUDepthStencilView::TargetState() const
+{
+    return targetState_;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+GPURenderTargetView::GPURenderTargetView() = default;
+
+GPURenderTargetView::GPURenderTargetView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap) :
+    GPUResourceView{ offsetInHeap, parentHeap }
+{ }
+
+GPURenderTargetView::GPURenderTargetView(GPURenderTargetView&& rhs) = default;
+
+GPURenderTargetView& GPURenderTargetView::operator=(GPURenderTargetView&& rhs) = default;
+
+D3D12_RESOURCE_STATES GPURenderTargetView::TargetState() const
+{
+    return D3D12_RESOURCE_STATE_RENDER_TARGET;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+GPUSwapChainRenderTargetView::GPUSwapChainRenderTargetView() = default;
+
+GPUSwapChainRenderTargetView::GPUSwapChainRenderTargetView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResource& renderBuffer) :
+    GPURenderTargetView{ offsetInHeap, parentHeap }, renderBuffer_{ &renderBuffer }
+{ }
+
+GPUSwapChainRenderTargetView::GPUSwapChainRenderTargetView(GPUSwapChainRenderTargetView&& rhs) = default;
+
+GPUSwapChainRenderTargetView& GPUSwapChainRenderTargetView::operator=(GPUSwapChainRenderTargetView&& rhs) = default;
+
+/////////////////////////////////////////////////////////////////////////////////
+
+GPUGenericRenderTargetView::GPUGenericRenderTargetView() = default;
+
+GPUGenericRenderTargetView::GPUGenericRenderTargetView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID) :
+    GPURenderTargetView{ offsetInHeap, parentHeap }, resourceID_{ resourceID }
+{ }
+
+GPUGenericRenderTargetView::GPUGenericRenderTargetView(GPUGenericRenderTargetView&& rhs) = default;
+
+GPUGenericRenderTargetView& GPUGenericRenderTargetView::operator=(GPUGenericRenderTargetView&& rhs) = default;

@@ -13,10 +13,10 @@ class GPUResourceView
 public:
     GPUResourceView();
     GPUResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap);
-    GPUResourceView(GPUResourceView const& rhs);
+    GPUResourceView(GPUResourceView const& rhs) = delete;
     GPUResourceView(GPUResourceView&& rhs);
 
-    GPUResourceView& operator=(GPUResourceView const& rhs);
+    GPUResourceView& operator=(GPUResourceView const& rhs) = delete;
     GPUResourceView& operator=(GPUResourceView&& rhs);
 
     virtual D3D12_RESOURCE_STATES TargetState() const = 0;
@@ -36,10 +36,10 @@ class GPUShaderVisibleResourceView : public GPUResourceView
 public:
     GPUShaderVisibleResourceView();
     GPUShaderVisibleResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
-    GPUShaderVisibleResourceView(GPUShaderVisibleResourceView const& rhs);
+    GPUShaderVisibleResourceView(GPUShaderVisibleResourceView const& rhs) = delete;
     GPUShaderVisibleResourceView(GPUShaderVisibleResourceView&& rhs);
 
-    GPUShaderVisibleResourceView& operator=(GPUShaderVisibleResourceView const& rhs);
+    GPUShaderVisibleResourceView& operator=(GPUShaderVisibleResourceView const& rhs) = delete;
     GPUShaderVisibleResourceView& operator=(GPUShaderVisibleResourceView&& rhs);
 
     virtual D3D12_RESOURCE_STATES TargetState() const override;
@@ -57,10 +57,10 @@ class GPUConstantBufferView : public GPUShaderVisibleResourceView
 public:
     GPUConstantBufferView();
     GPUConstantBufferView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
-    GPUConstantBufferView(GPUConstantBufferView const& rhs);
+    GPUConstantBufferView(GPUConstantBufferView const& rhs) = delete;
     GPUConstantBufferView(GPUConstantBufferView&& rhs);
 
-    GPUConstantBufferView& operator=(GPUConstantBufferView const& rhs);
+    GPUConstantBufferView& operator=(GPUConstantBufferView const& rhs) = delete;
     GPUConstantBufferView& operator=(GPUConstantBufferView&& rhs);
 };
 
@@ -70,10 +70,10 @@ class GPUShaderResourceView : public GPUShaderVisibleResourceView
 {
     GPUShaderResourceView();
     GPUShaderResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
-    GPUShaderResourceView(GPUShaderResourceView const& rhs);
+    GPUShaderResourceView(GPUShaderResourceView const& rhs) = delete;
     GPUShaderResourceView(GPUShaderResourceView&& rhs);
 
-    GPUShaderResourceView& operator=(GPUShaderResourceView const& rhs);
+    GPUShaderResourceView& operator=(GPUShaderResourceView const& rhs) = delete;
     GPUShaderResourceView& operator=(GPUShaderResourceView&& rhs);
 };
 
@@ -81,12 +81,13 @@ class GPUShaderResourceView : public GPUShaderVisibleResourceView
 
 class GPUUnorderedAccessView : public GPUShaderVisibleResourceView
 {
+public:
     GPUUnorderedAccessView();
     GPUUnorderedAccessView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
-    GPUUnorderedAccessView(GPUUnorderedAccessView const& rhs);
+    GPUUnorderedAccessView(GPUUnorderedAccessView const& rhs) = delete;
     GPUUnorderedAccessView(GPUUnorderedAccessView&& rhs);
 
-    GPUUnorderedAccessView& operator=(GPUUnorderedAccessView const& rhs);
+    GPUUnorderedAccessView& operator=(GPUUnorderedAccessView const& rhs) = delete;
     GPUUnorderedAccessView& operator=(GPUUnorderedAccessView&& rhs);
 };
 
@@ -96,12 +97,13 @@ class GPUUnorderedAccessView : public GPUShaderVisibleResourceView
 
 class GPUDepthStencilView : public GPUResourceView
 {
+public:
     GPUDepthStencilView();
     GPUDepthStencilView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
-    GPUDepthStencilView(GPUDepthStencilView const& rhs);
+    GPUDepthStencilView(GPUDepthStencilView const& rhs) = delete;
     GPUDepthStencilView(GPUDepthStencilView&& rhs);
 
-    GPUDepthStencilView& operator=(GPUDepthStencilView const& rhs);
+    GPUDepthStencilView& operator=(GPUDepthStencilView const& rhs) = delete;
     GPUDepthStencilView& operator=(GPUDepthStencilView&& rhs);
 
     virtual D3D12_RESOURCE_STATES TargetState() const override;
@@ -117,12 +119,13 @@ protected:
 
 class GPURenderTargetView : public GPUResourceView
 {
+public:
     GPURenderTargetView();
-    GPURenderTargetView(GPUResourceViewDirectID viewID, GPUResourceViewHeap const& parentHeap);
-    GPURenderTargetView(GPURenderTargetView const& rhs);
+    GPURenderTargetView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap);
+    GPURenderTargetView(GPURenderTargetView const& rhs) = delete;
     GPURenderTargetView(GPURenderTargetView&& rhs);
 
-    GPURenderTargetView& operator=(GPURenderTargetView const& rhs);
+    GPURenderTargetView& operator=(GPURenderTargetView const& rhs) = delete;
     GPURenderTargetView& operator=(GPURenderTargetView&& rhs);
 
     virtual D3D12_RESOURCE_STATES TargetState() const override;
@@ -132,32 +135,32 @@ class GPURenderTargetView : public GPUResourceView
 
 class GPUSwapChainRenderTargetView : public GPURenderTargetView
 {
+public:
     GPUSwapChainRenderTargetView();
-    GPUSwapChainRenderTargetView(GPUSwapChainRenderTargetView const& rhs);
+    GPUSwapChainRenderTargetView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResource& renderBuffer);
+    GPUSwapChainRenderTargetView(GPUSwapChainRenderTargetView const& rhs) = delete;
     GPUSwapChainRenderTargetView(GPUSwapChainRenderTargetView&& rhs);
 
-    GPUSwapChainRenderTargetView& operator=(GPUSwapChainRenderTargetView const& rhs);
+    GPUSwapChainRenderTargetView& operator=(GPUSwapChainRenderTargetView const& rhs) = delete;
     GPUSwapChainRenderTargetView& operator=(GPUSwapChainRenderTargetView&& rhs);
 
-    virtual D3D12_RESOURCE_STATES TargetState() const override;
-
 protected:
-    GPUResource renderBuffer_;
+    GPUResource* renderBuffer_;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
 
 class GPUGenericRenderTargetView : public GPURenderTargetView
 {
+public:
     GPUGenericRenderTargetView();
     GPUGenericRenderTargetView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID);
-    GPUGenericRenderTargetView(GPUGenericRenderTargetView const& rhs);
+    GPUGenericRenderTargetView(GPUGenericRenderTargetView const& rhs) = delete;
     GPUGenericRenderTargetView(GPUGenericRenderTargetView&& rhs);
 
-    GPUGenericRenderTargetView& operator=(GPUGenericRenderTargetView const& rhs);
+    GPUGenericRenderTargetView& operator=(GPUGenericRenderTargetView const& rhs) = delete;
     GPUGenericRenderTargetView& operator=(GPUGenericRenderTargetView&& rhs);
 
-    virtual D3D12_RESOURCE_STATES TargetState() const override;
 protected:
     GPUResourceDirectID resourceID_;
 };
