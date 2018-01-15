@@ -68,6 +68,7 @@ public:
 
 class GPUShaderResourceView : public GPUShaderVisibleResourceView
 {
+public:
     GPUShaderResourceView();
     GPUShaderResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceDirectID resourceID, D3D12_RESOURCE_STATES targetState);
     GPUShaderResourceView(GPUShaderResourceView const& rhs) = delete;

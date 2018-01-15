@@ -4,6 +4,7 @@
 
 #include <Foundation\Application.hpp>
 #include <Rendering\GPUEngine.hpp>
+#include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
 #include <Rendering\Data\GPUFrameResource.hpp>
 #include <Rendering\Data\GPUUploadHeap.hpp>
 #include <Rendering\Data\GPUDescriptorHeap.hpp>
@@ -38,9 +39,10 @@ public:
 
     void ResetAll();
 
-    Microsoft::WRL::ComPtr<ID3D12Device> const& Device() const { return device_; }
-    Microsoft::WRL::ComPtr<IDXGISwapChain>const& SwapChain() const { return swapChain_; }
+    Microsoft::WRL::ComPtr<ID3D12Device>& Device() { return device_; }
+    Microsoft::WRL::ComPtr<IDXGISwapChain> const& SwapChain() const { return swapChain_; }
     Microsoft::WRL::ComPtr<IDXGIFactory1> const& DXGIFactory() const { return dxgiFactory_; }
+    GPUStaticResourceAllocator& StaticResourceAllocator() { return staticResourceAllocator_; }
 
     GPUFrameResourceDescriptor& FinalRenderTargetViews() { return *finalRenderTargetViews_; }
     GPUFrameResourceDescriptor& FinalDepthSteniclViews() { return *finalDepthStencilViews_; }
@@ -78,6 +80,7 @@ private:
     GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
     GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
 
+    GPUStaticResourceAllocator staticResourceAllocator_;
 
     GPUDescriptorHeap* descriptorHeap_ = nullptr;
     int static constexpr RTV_HEAP_CAPACITY = 30;

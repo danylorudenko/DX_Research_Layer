@@ -12,7 +12,7 @@ class GPUResourceViewAllocator
 {
 public:
     GPUResourceViewAllocator();
-    GPUResourceViewAllocator(GPUFoundation const& foundation);
+    GPUResourceViewAllocator(GPUFoundation& foundation);
     GPUResourceViewAllocator(GPUResourceViewAllocator const&) = delete;
     GPUResourceViewAllocator(GPUResourceViewAllocator&& rhs);
 
@@ -27,13 +27,13 @@ public:
     GPUResourceViewDirectID AllocDSV(GPUResourceDirectID resourceID, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
 
 private:
-    GPUResourceViewDirectID PushViewToList(GPUResourceView&& view);
+    GPUResourceViewDirectID RegisterResourceView(GPUResourceView&& view);
 
     static constexpr std::size_t RTV_HEAP_CAPACITY = 3;
     static constexpr std::size_t DSV_HEAP_CAPACITY = 3;
     static constexpr std::size_t CBV_SRV_UAV_CAPACITY = 1;
 
-    GPUFoundation const* foundation_ = nullptr;
+    GPUFoundation* foundation_ = nullptr;
 
     GPUResourceViewHeap rtvHeap_;
     GPUResourceViewHeap dsvHeap_;

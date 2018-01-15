@@ -48,7 +48,7 @@ class GPUResourceViewDirectID
 {
 public:
     GPUResourceViewDirectID();
-    GPUResourceViewDirectID(std::size_t ID, GPUResourceViewHeap const& parentHeap);
+    GPUResourceViewDirectID(std::size_t ID);
     GPUResourceViewDirectID(GPUResourceViewDirectID const& rhs);
     GPUResourceViewDirectID(GPUResourceViewDirectID&& rhs);
 
@@ -59,6 +59,5 @@ public:
 
 private:
     std::size_t ID_ = 0;
-    GPUResourceViewHeap const* parentHeap_;
 };
 
