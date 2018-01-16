@@ -32,6 +32,22 @@ GPUResourceID& GPUResourceID::operator=(GPUResourceID const& rhs) = default;
 
 GPUResourceID& GPUResourceID::operator=(GPUResourceID&& rhs) = default;
 
-std::size_t GPUResourceDirectID::ID() const { return ID_; }
+std::size_t GPUResourceID::ID() const { return ID_; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
+
+GPUResourceViewDirectID::GPUResourceViewDirectID() = default;
+
+GPUResourceViewDirectID::GPUResourceViewDirectID(std::size_t ID) :
+    ID_{ ID }
+{ }
+
+GPUResourceViewDirectID::GPUResourceViewDirectID(GPUResourceViewDirectID const& rhs) = default;
+
+GPUResourceViewDirectID::GPUResourceViewDirectID(GPUResourceViewDirectID&& rhs) = default;
+
+GPUResourceViewDirectID& GPUResourceViewDirectID::operator=(GPUResourceViewDirectID const& rhs) = default;
+
+GPUResourceViewDirectID& GPUResourceViewDirectID::operator=(GPUResourceViewDirectID&& rhs) = default;
+
+std::size_t GPUResourceViewDirectID::ID() const { return ID_; }

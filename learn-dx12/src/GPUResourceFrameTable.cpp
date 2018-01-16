@@ -39,5 +39,5 @@ GPUResourceID GPUResourceFrameTable::InsertResource(std::size_t frameCount, GPUR
 
 GPUResourceDirectID GPUResourceFrameTable::FetchDirectID(std::size_t frameIndex, GPUResourceID virtualID)
 {
-    return frameList_[frameIndex][virtualID.ID_];
+    return frameList_[frameIndex][virtualID.ID()];
 }

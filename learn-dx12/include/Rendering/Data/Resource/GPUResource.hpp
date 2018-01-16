@@ -8,7 +8,7 @@ class GPUResource
 {
 public:
     GPUResource();
-    GPUResource(Microsoft::WRL::ComPtr<ID3D12Resource>&& resourcePtr, D3D12_RESOURCE_STATES state, wchar_t const* name);
+    GPUResource(Microsoft::WRL::ComPtr<ID3D12Resource>&& resourcePtr, D3D12_RESOURCE_STATES state, wchar_t const* name = L"GPUResource");
 
     GPUResource(GPUResource const&) = delete;
     GPUResource(GPUResource&& rhs);

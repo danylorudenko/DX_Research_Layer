@@ -1,9 +1,10 @@
 #include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
+#include <Rendering\GPUFoundation.hpp>
 #include <Rendering\Data\Resource\GPUResourceFrameTable.hpp>
 
 GPUStaticResourceAllocator::GPUStaticResourceAllocator() = default;
 
-GPUStaticResourceAllocator::GPUStaticResourceAllocator(GPUFoundation const& foundation) :
+GPUStaticResourceAllocator::GPUStaticResourceAllocator(GPUFoundation& foundation) :
     foundation_{ &foundation }
 { }
 
@@ -34,7 +35,7 @@ GPUResourceDirectID GPUStaticResourceAllocator::Alloc(D3D12_RESOURCE_DESC const&
 
 GPUResource& GPUStaticResourceAllocator::AccessResource(GPUResourceDirectID id)
 {
-    return *(committedResources_[id.ID_]);
+    return *(committedResources_[id.ID()]);
 }
 
 GPUResource& GPUStaticResourceAllocator::AccessFramebuffer(std::size_t frameIndex)

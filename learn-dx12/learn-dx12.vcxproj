@@ -186,7 +186,6 @@
     <ClCompile Include="src\GPUPipelineState.cpp" />
     <ClCompile Include="src\GPUPresentGraphNode.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
-    <ClCompile Include="src\GPURenderTargetView.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPUResourceFrameTable.cpp" />
     <ClCompile Include="src\GPUResourceID.cpp" />
@@ -195,6 +194,7 @@
     <ClCompile Include="src\GPUStaticResourceAllocator.cpp" />
     <ClCompile Include="src\GPUResourceView.cpp" />
     <ClCompile Include="src\GPURootSignature.cpp" />
+    <ClCompile Include="src\GPUSwapChain.cpp" />
     <ClCompile Include="src\GPUUploadHeap.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />
@@ -244,6 +244,7 @@
     <ClInclude Include="include\Rendering\Data\SceneConstantBuffer.hpp" />
     <ClInclude Include="include\Rendering\Data\Vertex.hpp" />
     <ClInclude Include="include\Foundation\Window.hpp" />
+    <ClInclude Include="include\Rendering\GPUSwapChain.hpp" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

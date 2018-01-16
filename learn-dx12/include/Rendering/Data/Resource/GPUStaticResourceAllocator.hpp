@@ -2,15 +2,16 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUFoundation.hpp>
 #include <Rendering\Data\Resource\GPUResource.hpp>
 #include <Rendering\Data\Resource\GPUResourceID.hpp>
+
+class GPUFoundation;
 
 class GPUStaticResourceAllocator
 {
 public:
     GPUStaticResourceAllocator();
-    GPUStaticResourceAllocator(GPUFoundation const& foundation);
+    GPUStaticResourceAllocator(GPUFoundation& foundation);
 
     GPUStaticResourceAllocator(GPUStaticResourceAllocator const&) = delete;
     GPUStaticResourceAllocator(GPUStaticResourceAllocator&& rhs);
@@ -26,7 +27,7 @@ public:
 
 
 private:
-    GPUFoundation const* foundation_;
+    GPUFoundation* foundation_;
 
     std::vector<std::unique_ptr<GPUResource>> framebuffers_;
     std::vector<std::unique_ptr<GPUResource>> committedResources_;

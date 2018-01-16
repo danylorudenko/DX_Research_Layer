@@ -27,7 +27,14 @@ public:
     GPUResourceViewDirectID AllocDSV(GPUResourceDirectID resourceID, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
 
 private:
-    GPUResourceViewDirectID RegisterResourceView(GPUResourceView&& view);
+    
+    template<typename TView>
+    GPUResourceViewDirectID RegisterResourceView(TView&& view)
+    {
+        resourceViewsList_.emplace_back(std::make_unique<TView>(std::move(view)));
+        return GPUResourceViewDirectID{ resourceViewsList_.size() - 1 };
+    }
+
 
     static constexpr std::size_t RTV_HEAP_CAPACITY = 3;
     static constexpr std::size_t DSV_HEAP_CAPACITY = 3;
