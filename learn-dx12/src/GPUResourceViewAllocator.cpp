@@ -85,3 +85,8 @@ GPUResourceViewDirectHandle GPUResourceViewAllocator::AllocDSV(GPUResourceHandle
     GPUDepthStencilView view{ offset, dsvHeap_, resourceHandle, targetState };
     return RegisterResourceView(std::move(view));
 }
+
+GPUResourceView& GPUResourceViewAllocator::AccessView(GPUResourceViewDirectHandle handle)
+{
+    return *(resourceViewsList_[handle.ID()]);
+}

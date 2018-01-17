@@ -5,7 +5,7 @@
 #include <Rendering\GPUEngine.hpp>
 
 #include <Rendering\Data\Resource\GPUResource.hpp>
-#include <Rendering\Data\Resource\GPUResourceID.hpp>
+#include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp>
 
 class GPUResourceView

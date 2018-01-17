@@ -1,5 +1,7 @@
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 #include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
+#include <Rendering\Data\Resource\GPUResourceViewTable.hpp>
+#include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
 
 GPUResourceHandle::GPUResourceHandle() = default;
 
@@ -26,8 +28,8 @@ GPUResource& GPUResourceHandle::Resource() const
 
 GPUResourceViewHandle::GPUResourceViewHandle() = default;
 
-GPUResourceViewHandle::GPUResourceViewHandle(std::size_t ID) :
-    ID_{ ID }
+GPUResourceViewHandle::GPUResourceViewHandle(std::size_t ID, GPUResourceViewTable& viewTable, GPUResourceViewAllocator& allocator) :
+    ID_{ ID }, viewTable_{ &viewTable }, viewAllocator_{ &allocator }
 { }
 
 GPUResourceViewHandle::GPUResourceViewHandle(GPUResourceViewHandle const& rhs) = default;
@@ -39,6 +41,12 @@ GPUResourceViewHandle& GPUResourceViewHandle::operator=(GPUResourceViewHandle co
 GPUResourceViewHandle& GPUResourceViewHandle::operator=(GPUResourceViewHandle&& rhs) = default;
 
 std::size_t GPUResourceViewHandle::ID() const { return ID_; }
+
+GPUResourceView& GPUResourceViewHandle::View(std::size_t frameIndex) const
+{
+    auto directHandle = viewTable_->FetchDirectHandle(frameIndex, *this);
+    return viewAllocator_->AccessView(directHandle);
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 

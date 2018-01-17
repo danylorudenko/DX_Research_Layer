@@ -30,12 +30,13 @@ private:
 
 class GPUResourceView;
 class GPUResourceViewTable;
+class GPUResourceViewAllocator;
 
 class GPUResourceViewHandle
 {
 public:
     GPUResourceViewHandle();
-    GPUResourceViewHandle(std::size_t ID);
+    GPUResourceViewHandle(std::size_t ID, GPUResourceViewTable& viewTable, GPUResourceViewAllocator& allocator);
 
     GPUResourceViewHandle(GPUResourceViewHandle const& rhs);
     GPUResourceViewHandle(GPUResourceViewHandle&& rhs);
@@ -44,11 +45,12 @@ public:
     GPUResourceViewHandle& operator=(GPUResourceViewHandle&& rhs);
 
     std::size_t ID() const;
-    GPUResourceView& View() const;
+    GPUResourceView& View(std::size_t frameIndex) const;
 
 private:
     std::size_t ID_ = 0;
     GPUResourceViewTable* viewTable_;
+    GPUResourceViewAllocator* viewAllocator_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////

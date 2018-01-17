@@ -13,7 +13,7 @@ GPUResourceViewTable::GPUResourceViewTable(GPUResourceViewTable&& rhs) = default
 
 GPUResourceViewTable& GPUResourceViewTable::operator=(GPUResourceViewTable&& rhs) = default;
 
-GPUResourceViewHandle GPUResourceViewTable::InsertView(std::size_t frameCount, GPUResourceViewDirectHandle const* IDs)
+GPUResourceViewHandle GPUResourceViewTable::InsertView(std::size_t frameCount, GPUResourceViewDirectHandle const* IDs, GPUResourceViewAllocator& viewAllocator)
 {
     auto const contextCount = frameList_.size();
 
@@ -31,10 +31,10 @@ GPUResourceViewHandle GPUResourceViewTable::InsertView(std::size_t frameCount, G
         }
     }
     
-    return GPUResourceViewHandle{ frameList_.size() - 1 };
+    return GPUResourceViewHandle{ frameList_.size() - 1, *this, viewAllocator };
 }
 
-GPUResourceViewDirectHandle GPUResourceViewTable::FetchDirectID(std::size_t frameIndex, GPUResourceViewHandle virtualHandle)
+GPUResourceViewDirectHandle GPUResourceViewTable::FetchDirectHandle(std::size_t frameIndex, GPUResourceViewHandle const& virtualHandle)
 {
     return frameList_[frameIndex][virtualHandle.ID()];
 }

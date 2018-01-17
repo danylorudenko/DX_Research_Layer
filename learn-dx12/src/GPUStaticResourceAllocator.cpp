@@ -1,6 +1,5 @@
 #include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
 #include <Rendering\GPUFoundation.hpp>
-#include <Rendering\Data\Resource\GPUResourceFrameTable.hpp>
 
 GPUStaticResourceAllocator::GPUStaticResourceAllocator() = default;
 

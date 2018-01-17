@@ -6,7 +6,7 @@
 
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
-#include <Rendering\Data\Resource\GPUResourceID.hpp>
+#include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 
 class GPUResourceViewAllocator
 {
@@ -25,6 +25,8 @@ public:
     GPUResourceViewDirectHandle AllocRTV(GPUResourceHandle const& resourceHandle, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
     GPUResourceViewDirectHandle AllocSwapChainRTV(GPUResource& resource, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
     GPUResourceViewDirectHandle AllocDSV(GPUResourceHandle const& resourceHandle, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+
+    GPUResourceView& AccessView(GPUResourceViewDirectHandle handle);
 
 private:
     
