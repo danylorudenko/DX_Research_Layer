@@ -6,8 +6,8 @@ GPUSwapChain::GPUSwapChain(GPUFoundation& foundation, HWND windowHandle, DXGI_FO
 {
     DXGI_SWAP_CHAIN_DESC swapChainDesc;
     swapChainDesc.BufferDesc.Format = backBufferFormat;
-    swapChainDesc.BufferDesc.Width = width;
-    swapChainDesc.BufferDesc.Height = height;
+    swapChainDesc.BufferDesc.Width = static_cast<UINT>(width);
+    swapChainDesc.BufferDesc.Height = static_cast<UINT>(height);
     swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
     swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
     swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -17,7 +17,7 @@ GPUSwapChain::GPUSwapChain(GPUFoundation& foundation, HWND windowHandle, DXGI_FO
     swapChainDesc.SampleDesc.Quality = 0;
 
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swapChainDesc.BufferCount = bufferCount;
+    swapChainDesc.BufferCount = static_cast<UINT>(bufferCount);
     swapChainDesc.OutputWindow = windowHandle;
     swapChainDesc.Windowed = true;
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
@@ -46,3 +46,13 @@ GPUSwapChain::GPUSwapChain(GPUFoundation& foundation, HWND windowHandle, DXGI_FO
 GPUSwapChain::GPUSwapChain(GPUSwapChain&& rhs) = default;
 
 GPUSwapChain& GPUSwapChain::operator=(GPUSwapChain&& rhs) = default;
+
+GPUResource& GPUSwapChain::AccessRenderBuffer(std::size_t frameIndex)
+{
+    return renderBuffers_[frameIndex];
+}
+
+void GPUSwapChain::Present(std::size_t syncInterval)
+{
+    swapChainHandle_->Present(static_cast<UINT>(syncInterval), 0);
+}

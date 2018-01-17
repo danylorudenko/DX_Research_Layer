@@ -16,6 +16,10 @@ public:
     GPUSwapChain& operator=(GPUSwapChain const&) = delete;
     GPUSwapChain& operator=(GPUSwapChain&& rhs);
 
+    GPUResource& AccessRenderBuffer(std::size_t frameIndex);
+
+    void Present(std::size_t syncInterval);
+
 private:
     std::size_t bufferCount_ = 0;
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChainHandle_ = nullptr;

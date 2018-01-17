@@ -187,8 +187,8 @@
     <ClCompile Include="src\GPUPresentGraphNode.cpp" />
     <ClCompile Include="src\GPUFrameResource.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
-    <ClCompile Include="src\GPUResourceFrameTable.cpp" />
-    <ClCompile Include="src\GPUResourceID.cpp" />
+    <ClCompile Include="src\GPUResourceViewTable.cpp" />
+    <ClCompile Include="src\GPUResourceHandle.cpp" />
     <ClCompile Include="src\GPUResourceViewAllocator.cpp" />
     <ClCompile Include="src\GPUResourceViewHeap.cpp" />
     <ClCompile Include="src\GPUStaticResourceAllocator.cpp" />
@@ -224,8 +224,8 @@
     <ClInclude Include="include\Rendering\Data\Resource\GPUDynamicResourceAllocator.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceAllocator.hpp" />
     <ClInclude Include="include\Foundation\GPUCapabilities.hpp" />
-    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameTable.hpp" />
-    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceID.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceViewTable.hpp" />
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceHandle.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\GPUStaticResourceAllocator.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceView.hpp" />
     <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp" />

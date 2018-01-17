@@ -19,20 +19,20 @@ public:
     GPUResourceViewAllocator& operator=(GPUResourceViewAllocator const&) = delete;
     GPUResourceViewAllocator& operator=(GPUResourceViewAllocator&& rhs);
 
-    GPUResourceViewDirectID AllocCBV(GPUResourceDirectID resourceID, D3D12_CONSTANT_BUFFER_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewDirectID AllocSRV(GPUResourceDirectID resourceID, D3D12_SHADER_RESOURCE_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewDirectID AllocUAV(GPUResourceDirectID resourceID, D3D12_UNORDERED_ACCESS_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewDirectID AllocSwapChainRTV(GPUResource& resource, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
-    GPUResourceViewDirectID AllocRTV(GPUResourceDirectID resourceID, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
-    GPUResourceViewDirectID AllocDSV(GPUResourceDirectID resourceID, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewDirectHandle AllocCBV(GPUResourceHandle const& resourceHandle, D3D12_CONSTANT_BUFFER_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewDirectHandle AllocSRV(GPUResourceHandle const& resourceHandle, D3D12_SHADER_RESOURCE_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewDirectHandle AllocUAV(GPUResourceHandle const& resourceHandle, D3D12_UNORDERED_ACCESS_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewDirectHandle AllocRTV(GPUResourceHandle const& resourceHandle, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
+    GPUResourceViewDirectHandle AllocSwapChainRTV(GPUResource& resource, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
+    GPUResourceViewDirectHandle AllocDSV(GPUResourceHandle const& resourceHandle, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
 
 private:
     
     template<typename TView>
-    GPUResourceViewDirectID RegisterResourceView(TView&& view)
+    GPUResourceViewDirectHandle RegisterResourceView(TView&& view)
     {
         resourceViewsList_.emplace_back(std::make_unique<TView>(std::move(view)));
-        return GPUResourceViewDirectID{ resourceViewsList_.size() - 1 };
+        return GPUResourceViewDirectHandle{ resourceViewsList_.size() - 1 };
     }
 
 

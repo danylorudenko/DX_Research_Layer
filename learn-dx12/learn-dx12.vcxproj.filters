@@ -102,12 +102,6 @@
     <ClCompile Include="src\GPUStaticResourceAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUResourceID.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GPUResourceFrameTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GPUResourceViewHeap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -115,6 +109,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GPUSwapChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUResourceViewTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUResourceHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -212,9 +212,6 @@
     <ClInclude Include="include\Foundation\Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceFrameTable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceView.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -230,9 +227,6 @@
     <ClInclude Include="include\Rendering\Data\Resource\GPUStaticResourceAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceID.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -243,6 +237,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\GPUSwapChain.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceViewTable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\Resource\GPUResourceHandle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

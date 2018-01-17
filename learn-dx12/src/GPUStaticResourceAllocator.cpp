@@ -12,7 +12,7 @@ GPUStaticResourceAllocator::GPUStaticResourceAllocator(GPUStaticResourceAllocato
 
 GPUStaticResourceAllocator& GPUStaticResourceAllocator::operator=(GPUStaticResourceAllocator&&) = default;
 
-GPUResourceDirectID GPUStaticResourceAllocator::Alloc(D3D12_RESOURCE_DESC const& resourceDesc, D3D12_RESOURCE_STATES initialState)
+GPUResourceHandle GPUStaticResourceAllocator::Alloc(D3D12_RESOURCE_DESC const& resourceDesc, D3D12_RESOURCE_STATES initialState)
 {
     Microsoft::WRL::ComPtr<ID3D12Resource> tempResourcePtr{ nullptr };
     auto& device = foundation_->Device();
@@ -30,23 +30,11 @@ GPUResourceDirectID GPUStaticResourceAllocator::Alloc(D3D12_RESOURCE_DESC const&
     }
 
     committedResources_.push_back(std::make_unique<GPUResource>(std::move(tempResourcePtr), D3D12_RESOURCE_STATE_COMMON, L""));
-    return GPUResourceDirectID{ committedResources_.size() - 1 };
+    return GPUResourceHandle{ committedResources_.size() - 1, *this };
 }
 
-GPUResource& GPUStaticResourceAllocator::AccessResource(GPUResourceDirectID id)
+GPUResource& GPUStaticResourceAllocator::AccessResource(GPUResourceHandle const& id)
 {
     return *(committedResources_[id.ID()]);
 }
 
-GPUResource& GPUStaticResourceAllocator::AccessFramebuffer(std::size_t frameIndex)
-{
-    return *(framebuffers_[frameIndex]);
-}
-
-void GPUStaticResourceAllocator::InjectSwapChainBackBuffers(std::size_t frameBufferCount, GPUResource* buffers)
-{
-    framebuffers_.resize(frameBufferCount);
-    for (size_t i = 0; i < frameBufferCount; i++) {
-        framebuffers_[i] = std::make_unique<GPUResource>(std::move(buffers[i]));
-    }
-}
