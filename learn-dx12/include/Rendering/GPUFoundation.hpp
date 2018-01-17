@@ -4,10 +4,10 @@
 
 #include <Foundation\Application.hpp>
 #include <Rendering\GPUEngine.hpp>
+#include <Rendering\GPUSwapChain.hpp>
 #include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
-#include <Rendering\Data\GPUFrameResource.hpp>
-#include <Rendering\Data\GPUUploadHeap.hpp>
-#include <Rendering\Data\GPUDescriptorHeap.hpp>
+#include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
+#include <Rendering\Data\Resource\GPUResourceViewTable.hpp>
 #include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
 
 class GPUFoundation
@@ -20,8 +20,6 @@ public:
 
     GPUFoundation& operator=(GPUFoundation const&) = delete;
     GPUFoundation& operator=(GPUFoundation&&);
-
-    ~GPUFoundation();
 
     static constexpr UINT WIDTH = 800;
     static constexpr UINT HEIGHT = 600;
@@ -40,15 +38,18 @@ public:
     void ResetAll();
 
     Microsoft::WRL::ComPtr<ID3D12Device>& Device() { return device_; }
-    Microsoft::WRL::ComPtr<IDXGISwapChain> const& SwapChain() const { return swapChain_; }
     Microsoft::WRL::ComPtr<IDXGIFactory1> const& DXGIFactory() const { return dxgiFactory_; }
-    GPUStaticResourceAllocator& StaticResourceAllocator() { return staticResourceAllocator_; }
 
-    GPUFrameResourceDescriptor& FinalRenderTargetViews() { return *finalRenderTargetViews_; }
-    GPUFrameResourceDescriptor& FinalDepthSteniclViews() { return *finalDepthStencilViews_; }
+    GPUResourceHandle AllocResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState);
 
-    GPUFrameGraph& FrameGraph() { return *frameGraph_; }
-    GPUDescriptorHeap& DescriptorHeap() { return *descriptorHeap_; }
+    GPUResourceViewHandle AllocRTV(std::size_t frames, GPUResourceHandle const* resources, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
+    GPUResourceViewHandle AllocRTV(std::size_t frames, GPUResource const* resources, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
+    GPUResourceViewHandle AllocDSV(std::size_t frames, GPUResourceHandle const& resource, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocCBV(std::size_t frames, GPUResourceHandle const& resource, D3D12_CONSTANT_BUFFER_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocSRV(std::size_t frames, GPUResourceHandle const& resource, D3D12_SHADER_RESOURCE_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocUAV(std::size_t frames, GPUResourceHandle const& resource, D3D12_UNORDERED_ACCESS_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+
+    GPUFrameGraph& FrameGraph() { return frameGraph_; }
 
     void CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest);
     void CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc);
@@ -59,31 +60,34 @@ private:
     void InitializeD3D12();
     void CreateGPUEngines();
 
-    void CreateSwapChain(Application& application, IDXGIFactory* factory);
-    void CreateFrameResources();
-    void CreateDefaultDataStorages();
-
 private:
     Microsoft::WRL::ComPtr<ID3D12Debug> debugController_;
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory_;
 
+    GPUSwapChain swapChain_;
+
     GPUEngine engines_[3];
 
-    Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
     UINT64 currentFrame_ = 0U;
+    GPUFrameGraph frameGraph_;
+    
 
-    GPUFrameGraph* frameGraph_ = nullptr;
+    std::size_t static constexpr RTV_HEAP_CAPACITY = 30;
+    std::size_t static constexpr DSV_HEAP_CAPACITY = 30;
+    std::size_t static constexpr CBV_SRV_UAV_CAPACITY = 30;
 
-    GPUFrameResource* renderTargetBuffers_ = nullptr;
-    GPUFrameResource* depthStencilBuffers_ = nullptr;
-    GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
-    GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
-
+    GPUResourceViewAllocator viewAllocator_;
+    GPUResourceViewTable viewTable_;
+    
     GPUStaticResourceAllocator staticResourceAllocator_;
 
-    GPUDescriptorHeap* descriptorHeap_ = nullptr;
-    int static constexpr RTV_HEAP_CAPACITY = 30;
-    int static constexpr DSV_HEAP_CAPACITY = 30;
-    int static constexpr CBV_SRV_UAV_CAPACITY = 30;
+
+
+    //Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
+    //GPUFrameResource* renderTargetBuffers_ = nullptr;
+    //GPUFrameResource* depthStencilBuffers_ = nullptr;
+    //GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
+    //GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
+    //GPUDescriptorHeap* descriptorHeap_ = nullptr;
 };

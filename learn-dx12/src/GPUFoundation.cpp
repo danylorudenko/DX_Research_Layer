@@ -11,77 +11,12 @@ GPUFoundation::GPUFoundation(Application& application)
     // Create main accessors to GPU.
     CreateGPUEngines();
 
-    // Create swap chain and supporting resources.
-    CreateSwapChain(application, dxgiFactory_.Get());
-
-    CreateDefaultDataStorages();
-    CreateFrameResources();
-
-    frameGraph_ = new GPUFrameGraph{};
+    
 }
 
-GPUFoundation::GPUFoundation(GPUFoundation&& rhs)
-{
-    device_ = std::move(rhs.device_);
-    dxgiFactory_ = std::move(rhs.dxgiFactory_);
+GPUFoundation::GPUFoundation(GPUFoundation&& rhs) = default;
 
-    for (int i = 0; i < 3; i++) {
-        engines_[i] = std::move(rhs.engines_[i]);
-    }
-
-    swapChain_ = std::move(rhs.swapChain_);
-    currentFrame_ = std::move(rhs.currentFrame_);
-
-    frameGraph_ = rhs.frameGraph_; rhs.frameGraph_ = nullptr;
-
-    renderTargetBuffers_ = rhs.renderTargetBuffers_; rhs.renderTargetBuffers_ = nullptr;
-    depthStencilBuffers_ = rhs.depthStencilBuffers_; rhs.depthStencilBuffers_ = nullptr;
-    finalRenderTargetViews_ = rhs.finalRenderTargetViews_; rhs.finalRenderTargetViews_ = nullptr;
-    finalDepthStencilViews_ = rhs.finalDepthStencilViews_; rhs.finalDepthStencilViews_ = nullptr;
-
-    //resourceFactory_ = rhs.resourceFactory_; rhs.resourceFactory_ = nullptr;
-    descriptorHeap_ = rhs.descriptorHeap_; rhs.descriptorHeap_ = nullptr;
-
-}
-
-GPUFoundation& GPUFoundation::operator=(GPUFoundation&& rhs)
-{
-    device_ = std::move(rhs.device_);
-    dxgiFactory_ = std::move(rhs.dxgiFactory_);
-
-    for (int i = 0; i < 3; i++) {
-        engines_[i] = std::move(rhs.engines_[i]);
-    }
-
-    swapChain_ = std::move(rhs.swapChain_);
-    currentFrame_ = std::move(rhs.currentFrame_);
-
-    frameGraph_ = rhs.frameGraph_; rhs.frameGraph_ = nullptr;
-
-    renderTargetBuffers_ = rhs.renderTargetBuffers_; rhs.renderTargetBuffers_ = nullptr;
-    depthStencilBuffers_ = rhs.depthStencilBuffers_; rhs.depthStencilBuffers_ = nullptr;
-    finalRenderTargetViews_ = rhs.finalRenderTargetViews_; rhs.finalRenderTargetViews_ = nullptr;
-    finalDepthStencilViews_ = rhs.finalDepthStencilViews_; rhs.finalDepthStencilViews_ = nullptr;
-
-    //resourceFactory_ = rhs.resourceFactory_; rhs.resourceFactory_ = nullptr;
-    descriptorHeap_ = rhs.descriptorHeap_; rhs.descriptorHeap_ = nullptr;
-
-    return *this;
-}
-
-GPUFoundation::~GPUFoundation()
-{
-    delete renderTargetBuffers_;
-    delete depthStencilBuffers_;
-
-    delete finalRenderTargetViews_;
-    delete finalDepthStencilViews_;
-
-    delete frameGraph_;
-
-    //delete resourceFactory_;
-    delete descriptorHeap_;
-}
+GPUFoundation& GPUFoundation::operator=(GPUFoundation&& rhs) = default;
 
 void GPUFoundation::InitializeD3D12()
 {
