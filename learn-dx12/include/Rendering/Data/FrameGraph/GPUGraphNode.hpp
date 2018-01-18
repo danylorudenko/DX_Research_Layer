@@ -36,8 +36,8 @@ protected:
 
     GPUEngine* executionEngine_ = nullptr;
 
-    GPURootSignature* rootSignature_ = nullptr;
-    GPUPipelineState* pipelineState_ = nullptr;
+    GPURootSignature rootSignature_;
+    GPUPipelineState pipelineState_;
 
     std::vector<GPUGraphNode*> childNodes_;
 };

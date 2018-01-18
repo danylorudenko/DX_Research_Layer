@@ -36,9 +36,6 @@
     <ClCompile Include="src\GPUCommandList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUUploadHeap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GPUEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,12 +57,6 @@
     <ClCompile Include="src\GPURootSignature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUFrameResourceDescriptor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GPUFrameRootTablesMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GPUGraphicsGraphNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,9 +70,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GPUDescriptorHeap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GPUFrameResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GPUCapabilities.cpp">
@@ -111,10 +99,13 @@
     <ClCompile Include="src\GPUSwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUResourceViewTable.cpp">
+    <ClCompile Include="src\GPUResourceHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUResourceHandle.cpp">
+    <ClCompile Include="src\GPUResourceViewContextTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GPUResourceViewTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
