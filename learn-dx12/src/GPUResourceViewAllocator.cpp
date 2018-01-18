@@ -1,4 +1,5 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
+#include <Rendering\GPUFoundation.hpp>
 
 GPUResourceViewAllocator::GPUResourceViewAllocator() = default;
 
@@ -33,7 +34,7 @@ GPUResourceViewDirectHandle GPUResourceViewAllocator::AllocSRV(GPUResourceHandle
     auto const offset = cbvSrvUavHeap_.ProvideNextOffset();
     CD3DX12_CPU_DESCRIPTOR_HANDLE handle{ cbvSrvUavHeap_.CPUHeapStart(), static_cast<INT>(offset), static_cast<UINT>(cbvSrvUavHeap_.DescriptorSize()) };
 
-    device->CreateShaderResourceView(foundation_->StaticResourceAllocator().AccessResource(resourceHandle).GetPtr(), &desc, handle);
+    device->CreateShaderResourceView(resourceHandle.Resource().GetPtr(), &desc, handle);
     GPUShaderResourceView view{ offset, cbvSrvUavHeap_, resourceHandle, targetState };
     return RegisterResourceView(std::move(view));
 }
@@ -45,7 +46,7 @@ GPUResourceViewDirectHandle GPUResourceViewAllocator::AllocUAV(GPUResourceHandle
     auto const offset = cbvSrvUavHeap_.ProvideNextOffset();
     CD3DX12_CPU_DESCRIPTOR_HANDLE handle{ cbvSrvUavHeap_.CPUHeapStart(), static_cast<INT>(offset), static_cast<UINT>(cbvSrvUavHeap_.DescriptorSize()) };
 
-    device->CreateUnorderedAccessView(foundation_->StaticResourceAllocator().AccessResource(resourceHandle).GetPtr(), nullptr, &desc, handle);
+    device->CreateUnorderedAccessView(resourceHandle.Resource().GetPtr(), nullptr, &desc, handle);
     GPUUnorderedAccessView view{ offset, cbvSrvUavHeap_, resourceHandle, targetState };
     return RegisterResourceView(std::move(view));
 }
@@ -57,7 +58,7 @@ GPUResourceViewDirectHandle GPUResourceViewAllocator::AllocRTV(GPUResourceHandle
     auto const offset = rtvHeap_.ProvideNextOffset();
     CD3DX12_CPU_DESCRIPTOR_HANDLE handle{ rtvHeap_.CPUHeapStart(), static_cast<INT>(offset), static_cast<UINT>(rtvHeap_.DescriptorSize()) };
 
-    device->CreateRenderTargetView(foundation_->StaticResourceAllocator().AccessResource(resourceHandle).GetPtr(), &desc, handle);
+    device->CreateRenderTargetView(resourceHandle.Resource().GetPtr(), &desc, handle);
     GPUGenericRenderTargetView view{ offset, rtvHeap_, resourceHandle };
     return RegisterResourceView(std::move(view));
 }
@@ -81,7 +82,7 @@ GPUResourceViewDirectHandle GPUResourceViewAllocator::AllocDSV(GPUResourceHandle
     auto const offset = dsvHeap_.ProvideNextOffset();
     CD3DX12_CPU_DESCRIPTOR_HANDLE handle{ dsvHeap_.CPUHeapStart(), static_cast<INT>(offset), static_cast<UINT>(dsvHeap_.DescriptorSize()) };
 
-    device->CreateDepthStencilView(foundation_->StaticResourceAllocator().AccessResource(resourceHandle).GetPtr(), &desc, handle);
+    device->CreateDepthStencilView(resourceHandle.Resource().GetPtr(), &desc, handle);
     GPUDepthStencilView view{ offset, dsvHeap_, resourceHandle, targetState };
     return RegisterResourceView(std::move(view));
 }

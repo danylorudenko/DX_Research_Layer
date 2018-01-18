@@ -1,4 +1,5 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp>
+#include <Rendering\GPUFoundation.hpp>
 
 GPUResourceViewHeap::GPUResourceViewHeap() = default;
 

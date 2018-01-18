@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUFoundation.hpp>
+class GPUFoundation;
 
 class GPUResourceViewHeap
 {

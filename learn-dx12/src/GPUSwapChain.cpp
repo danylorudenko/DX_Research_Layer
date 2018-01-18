@@ -1,4 +1,5 @@
 #include <Rendering\GPUSwapChain.hpp>
+#include <Rendering\GPUFoundation.hpp>
 
 GPUSwapChain::GPUSwapChain() = default;
 
@@ -46,6 +47,11 @@ GPUSwapChain::GPUSwapChain(GPUFoundation& foundation, HWND windowHandle, DXGI_FO
 GPUSwapChain::GPUSwapChain(GPUSwapChain&& rhs) = default;
 
 GPUSwapChain& GPUSwapChain::operator=(GPUSwapChain&& rhs) = default;
+
+std::size_t GPUSwapChain::BufferCount() const
+{
+    return bufferCount_;
+}
 
 GPUResource& GPUSwapChain::AccessRenderBuffer(std::size_t frameIndex)
 {

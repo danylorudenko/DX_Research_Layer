@@ -40,14 +40,15 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Device>& Device() { return device_; }
     Microsoft::WRL::ComPtr<IDXGIFactory1> const& DXGIFactory() const { return dxgiFactory_; }
 
-    GPUResourceHandle AllocResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState);
+    GPUResourceHandle AllocDefaultResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState);
+    GPUResourceHandle AllocUploadResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState);
 
+    GPUResourceViewHandle SwapChainRTV();
     GPUResourceViewHandle AllocRTV(std::size_t frames, GPUResourceHandle const* resources, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
-    GPUResourceViewHandle AllocRTV(std::size_t frames, GPUResource const* resources, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
-    GPUResourceViewHandle AllocDSV(std::size_t frames, GPUResourceHandle const& resource, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewHandle AllocCBV(std::size_t frames, GPUResourceHandle const& resource, D3D12_CONSTANT_BUFFER_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewHandle AllocSRV(std::size_t frames, GPUResourceHandle const& resource, D3D12_SHADER_RESOURCE_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewHandle AllocUAV(std::size_t frames, GPUResourceHandle const& resource, D3D12_UNORDERED_ACCESS_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocDSV(std::size_t frames, GPUResourceHandle const* resource, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocCBV(std::size_t frames, GPUResourceHandle const* resource, D3D12_CONSTANT_BUFFER_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocSRV(std::size_t frames, GPUResourceHandle const* resource, D3D12_SHADER_RESOURCE_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocUAV(std::size_t frames, GPUResourceHandle const* resource, D3D12_UNORDERED_ACCESS_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
 
     GPUFrameGraph& FrameGraph() { return frameGraph_; }
 
@@ -59,6 +60,7 @@ public:
 private:
     void InitializeD3D12();
     void CreateGPUEngines();
+    GPUResourceViewHandle AllocSwapChainRTV(GPUSwapChain& swapChain, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Debug> debugController_;
@@ -66,6 +68,7 @@ private:
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory_;
 
     GPUSwapChain swapChain_;
+    GPUResourceViewHandle swapChainRTV_;
 
     GPUEngine engines_[3];
 

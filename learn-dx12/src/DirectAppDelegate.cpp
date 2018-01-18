@@ -39,7 +39,7 @@ void DirectAppDelegate::start(Application& application)
     gpuAccess_ = GPUFoundation{ application };
     gameTimer_.Reset();
 
-    auto& initializationEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+    /*auto& initializationEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
 
     auto rootSignature = CreateRootSignature();
     auto pipelineState = CreatePipelineState(rootSignature);
@@ -132,7 +132,7 @@ void DirectAppDelegate::start(Application& application)
     gpuAccess_.FrameGraph().ParseGraphToQueue();
 
     initializationEngine.FlushReset();
-
+*/
     /*if (graphicsAnalysis_ != nullptr) {
         graphicsAnalysis_->EndCapture();
     }*/

@@ -2,11 +2,11 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUFoundation.hpp>
-
-#include <Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
+#include <Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp>
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
+
+class GPUFoundation;
 
 class GPUResourceViewAllocator
 {

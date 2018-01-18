@@ -2,8 +2,9 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUFoundation.hpp>
 #include <Rendering\Data\Resource\GPUResource.hpp>
+
+class GPUFoundation;
 
 class GPUSwapChain
 {
@@ -16,6 +17,7 @@ public:
     GPUSwapChain& operator=(GPUSwapChain const&) = delete;
     GPUSwapChain& operator=(GPUSwapChain&& rhs);
 
+    std::size_t BufferCount() const;
     GPUResource& AccessRenderBuffer(std::size_t frameIndex);
 
     void Present(std::size_t syncInterval);

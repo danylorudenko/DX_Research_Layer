@@ -19,7 +19,9 @@ public:
     GPUStaticResourceAllocator& operator=(GPUStaticResourceAllocator const&) = delete;
     GPUStaticResourceAllocator& operator=(GPUStaticResourceAllocator&& rhs);
 
-    GPUResourceHandle Alloc(D3D12_RESOURCE_DESC const& resourceDesc, D3D12_RESOURCE_STATES initialState);
+    GPUResourceHandle AllocDefault(D3D12_RESOURCE_DESC const& resourceDesc, D3D12_RESOURCE_STATES initialState);
+    GPUResourceHandle AllocUpload(D3D12_RESOURCE_DESC const& resourceDesc, D3D12_RESOURCE_STATES initialState);
+    GPUResourceHandle AllocReadback(D3D12_RESOURCE_DESC const& resourceDesc, D3D12_RESOURCE_STATES initialState);
     GPUResource& AccessResource(GPUResourceHandle const& id);
 
 
