@@ -10,7 +10,7 @@ GPUFoundation::GPUFoundation(Application& application)
 
     staticResourceAllocator_ = GPUStaticResourceAllocator{ *this };
     viewAllocator_ = GPUResourceViewAllocator{ *this };
-    viewTable_ = GPUResourceViewTable{ swapChain_.BufferCount() };
+    viewContextTable_ = GPUResourceViewContextTable{ swapChain_.BufferCount() };
 
     swapChain_ = GPUSwapChain{ *this, application.window().nativeHandle(), backBufferFormat_, WIDTH, HEIGHT, SWAP_CHAIN_BUFFER_COUNT };
 
@@ -115,7 +115,7 @@ GPUResourceViewHandle GPUFoundation::AllocSwapChainRTV(GPUSwapChain& swapChain, 
     for (size_t i = 0; i < framesCount; i++) {
         directHandles[i] = viewAllocator_.AllocSwapChainRTV(swapChain_.AccessRenderBuffer(i), desc);
     }
-    return viewTable_.InsertView(framesCount, directHandles.data(), viewAllocator_);
+    return viewContextTable_.InsertView(framesCount, directHandles.data(), viewAllocator_);
 }
 
 GPUResourceViewHandle GPUFoundation::AllocRTV(std::size_t frames, GPUResourceHandle const* resources, D3D12_RENDER_TARGET_VIEW_DESC const& desc)
@@ -125,7 +125,7 @@ GPUResourceViewHandle GPUFoundation::AllocRTV(std::size_t frames, GPUResourceHan
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocRTV(resources[i], desc);
     }
-    return viewTable_.InsertView(frames, directHandles.data(), viewAllocator_);
+    return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
 GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHandle const* resource, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState)
@@ -135,7 +135,7 @@ GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHan
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocDSV(resource[i], desc, targetState);
     }
-    return viewTable_.InsertView(frames, directHandles.data(), viewAllocator_);
+    return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
 GPUResourceViewHandle GPUFoundation::AllocCBV(std::size_t frames, GPUResourceHandle const* resource, D3D12_CONSTANT_BUFFER_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState)
@@ -145,7 +145,7 @@ GPUResourceViewHandle GPUFoundation::AllocCBV(std::size_t frames, GPUResourceHan
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocCBV(resource[i], desc, targetState);
     }
-    return viewTable_.InsertView(frames, directHandles.data(), viewAllocator_);
+    return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
 GPUResourceViewHandle GPUFoundation::AllocSRV(std::size_t frames, GPUResourceHandle const* resource, D3D12_SHADER_RESOURCE_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState)
@@ -155,7 +155,7 @@ GPUResourceViewHandle GPUFoundation::AllocSRV(std::size_t frames, GPUResourceHan
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocSRV(resource[i], desc, targetState);
     }
-    return viewTable_.InsertView(frames, directHandles.data(), viewAllocator_);
+    return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
 GPUResourceViewHandle GPUFoundation::AllocUAV(std::size_t frames, GPUResourceHandle const* resource, D3D12_UNORDERED_ACCESS_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState)
@@ -165,7 +165,7 @@ GPUResourceViewHandle GPUFoundation::AllocUAV(std::size_t frames, GPUResourceHan
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocUAV(resource[i], desc, targetState);
     }
-    return viewTable_.InsertView(frames, directHandles.data(), viewAllocator_);
+    return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 //
 //void GPUFoundation::CreateFrameResources()

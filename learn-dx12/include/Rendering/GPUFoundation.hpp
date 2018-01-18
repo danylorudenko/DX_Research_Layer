@@ -7,7 +7,7 @@
 #include <Rendering\GPUSwapChain.hpp>
 #include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
-#include <Rendering\Data\Resource\GPUResourceViewTable.hpp>
+#include <Rendering\Data\Resource\GPUResourceViewContextTable.hpp>
 #include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
 
 class GPUFoundation
@@ -81,7 +81,7 @@ private:
     std::size_t static constexpr CBV_SRV_UAV_CAPACITY = 30;
 
     GPUResourceViewAllocator viewAllocator_;
-    GPUResourceViewTable viewTable_;
+    GPUResourceViewContextTable viewContextTable_;
     
     GPUStaticResourceAllocator staticResourceAllocator_;
 

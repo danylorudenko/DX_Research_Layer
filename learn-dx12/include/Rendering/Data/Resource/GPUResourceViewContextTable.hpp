@@ -4,17 +4,17 @@
 
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 
-class GPUResourceViewTable
+class GPUResourceViewContextTable
 {
 public:
-    GPUResourceViewTable();
-    GPUResourceViewTable(std::size_t framesCount);
+    GPUResourceViewContextTable();
+    GPUResourceViewContextTable(std::size_t framesCount);
 
-    GPUResourceViewTable(GPUResourceViewTable const&) = delete;
-    GPUResourceViewTable(GPUResourceViewTable&& rhs);
+    GPUResourceViewContextTable(GPUResourceViewContextTable const&) = delete;
+    GPUResourceViewContextTable(GPUResourceViewContextTable&& rhs);
 
-    GPUResourceViewTable& operator=(GPUResourceViewTable const&) = delete;
-    GPUResourceViewTable& operator=(GPUResourceViewTable&& rhs);
+    GPUResourceViewContextTable& operator=(GPUResourceViewContextTable const&) = delete;
+    GPUResourceViewContextTable& operator=(GPUResourceViewContextTable&& rhs);
 
     GPUResourceViewHandle InsertView(std::size_t frameCount, GPUResourceViewDirectHandle const* resourceIDs, GPUResourceViewAllocator& viewAllocator);
 
