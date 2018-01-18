@@ -1,4 +1,5 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewTable.hpp>
+#include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 
 GPUResourceViewTable::GPUResourceViewTable() = default;
 
@@ -25,6 +26,5 @@ GPUResourceViewHandle& GPUResourceViewTable::TableMember(std::size_t memberIndex
 
 D3D12_GPU_DESCRIPTOR_HANDLE GPUResourceViewTable::GPUHandle(std::size_t frameIndex)
 {
-    // I'M HERE
-    //return tableMembers_[0].View(frameIndex).
+    return reinterpret_cast<GPUShaderVisibleResourceView*>(&(tableMembers_[0].View(frameIndex)))->GPUHandle();
 }

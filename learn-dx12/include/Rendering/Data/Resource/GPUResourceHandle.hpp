@@ -49,13 +49,11 @@ public:
 
 private:
     std::size_t ID_ = 0;
-    GPUResourceViewContextTable* viewTable_;
+    GPUResourceViewContextTable* viewContextTable_;
     GPUResourceViewAllocator* viewAllocator_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
-
-class GPUResourceViewHeap;
 
 class GPUResourceViewDirectHandle
 {

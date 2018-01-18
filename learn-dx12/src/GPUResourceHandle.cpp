@@ -1,6 +1,6 @@
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 #include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
-#include <Rendering\Data\Resource\GPUResourceViewTable.hpp>
+#include <Rendering\Data\Resource\GPUResourceViewContextTable.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
 
 GPUResourceHandle::GPUResourceHandle() = default;
