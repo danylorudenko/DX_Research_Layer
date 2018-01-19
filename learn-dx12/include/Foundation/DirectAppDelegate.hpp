@@ -6,7 +6,6 @@
 #include <Foundation\PerformanceTimer.hpp>
 #include <Rendering\GPUFoundation.hpp>
 #include <Rendering\Data\GeometryMesh.hpp>
-#include <Rendering\Data\GPUUploadHeap.hpp>
 #include <Rendering\Data\SceneConstantBuffer.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
@@ -37,8 +36,6 @@ private:
 
 
     // CUSTOM APPLICATION DATA
-    GPUUploadHeap constantBuffer_;
-    GPUFrameResourceDescriptor constantBufferView_;
     SceneConstantBuffer constantBufferData_;
 
     GPURootSignature triangleRootSignature_;
@@ -47,7 +44,7 @@ private:
     GPUGraphicsGraphNode triangleGraphNode_;
     GPUPresentGraphNode presentNode_;
 
-    GPUFrameResource triangleMesh_;
+    //GPUFrameResource triangleMesh_;
     GeometryMesh triangleMeshData_;
 
     Microsoft::WRL::ComPtr<IDXGraphicsAnalysis> graphicsAnalysis_;

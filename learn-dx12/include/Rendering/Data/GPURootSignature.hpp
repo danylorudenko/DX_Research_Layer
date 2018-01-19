@@ -23,7 +23,7 @@ public:
     void PushRootArgument(std::size_t bindSlot, GPUResourceViewTable const& table);
     
     void BindPassRootSignature(GPUEngine* executionEngine);
-    void BindPassRootSignatureDescriptorTables(GPUEngine* executionEngine, std::size_t frameIndex);
+    void BindPassDescriptorTables(GPUEngine* executionEngine, std::size_t frameIndex);
     void TransitionRootResources(GPUEngine* executionEngine, std::size_t frameIndex);
 
 private:

@@ -10,29 +10,27 @@ class GPUGraphNode
 {
 public:
     GPUGraphNode();
-    GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState, int frameBufferCount);
+    GPUGraphNode(GPUEngine* engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState);
     GPUGraphNode(GPUGraphNode const&) = delete;
     GPUGraphNode(GPUGraphNode&& rhs);
 
     GPUGraphNode& operator=(GPUGraphNode const&) = delete;
     GPUGraphNode& operator=(GPUGraphNode&& rhs);
 
-    void ImportRootSignature(GPURootSignature* rootSignature);
-    void ImportPipelineState(GPUPipelineState* pipelineState);
+    void ImportRootSignature(GPURootSignature&& rootSignature);
+    void ImportPipelineState(GPUPipelineState&& pipelineState);
 
     // For now, only one child is available.
     void ImportChildNode(GPUGraphNode* outputNode);
 
-    GPUGraphNode* GetChild(int childIndex);
+    GPUGraphNode* GetChild(std::size_t childIndex);
     int ChildCount() const;
 
-    virtual void Process(int frameIndex) = 0;
+    virtual void Process(std::size_t frameIndex) = 0;
 
 protected:
-    void BindPassRoot(int frameIndex);
-    void TransitionPassResources(int frameIndex);
-
-    int frameBufferCount_;
+    void BindPassRoot(std::size_t frameIndex);
+    void TransitionPassResources(std::size_t frameIndex);
 
     GPUEngine* executionEngine_ = nullptr;
 

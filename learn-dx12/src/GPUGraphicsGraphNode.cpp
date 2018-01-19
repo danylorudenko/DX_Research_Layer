@@ -6,8 +6,8 @@ Color::Color(float r, float g, float b, float a) :
 
 GPUGraphicsGraphNode::GPUGraphicsGraphNode() = default;
 
-GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState, int frameBufferCount) :
-    GPUGraphNode(engine, rootSignature, pipelineState, frameBufferCount)
+GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUEngine* engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState) :
+    GPUGraphNode{ engine, std::move(rootSignature), std::move(pipelineState) }
 { }
 
 GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUGraphicsGraphNode&& rhs) :
@@ -20,7 +20,7 @@ GPUGraphicsGraphNode& GPUGraphicsGraphNode::operator=(GPUGraphicsGraphNode&& rhs
     return *this;
 }
 
-void GPUGraphicsGraphNode::Process(int frameIndex)
+void GPUGraphicsGraphNode::Process(std::size_t frameIndex)
 {
     BindPipelineState();
     BindViewportScissor();
@@ -29,7 +29,6 @@ void GPUGraphicsGraphNode::Process(int frameIndex)
     BindRenderDepthStencilTargets(frameIndex);
     
     TransitionRenderTargets(frameIndex);
-    TransitionDepthStencilTarget(frameIndex);
     TransitionPassResources(frameIndex);
 
     ClearRenderTargets(frameIndex);
@@ -38,10 +37,10 @@ void GPUGraphicsGraphNode::Process(int frameIndex)
     IterateRenderItems(frameIndex);
 }
 
-void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
+void GPUGraphicsGraphNode::IterateRenderItems(std::size_t frameIndex)
 {
-    int const itemCount = static_cast<int>(renderItems_.size());
-    for (int i = 0; i < itemCount; i++) {
+    auto const itemCount = renderItems_.size();
+    for (std::size_t i = 0; i < itemCount; i++) {
         auto item = renderItems_[i];
         BindRenderItemVertexBuffer(item);
         BindRenderItemIndexBuffer(item);
@@ -50,22 +49,15 @@ void GPUGraphicsGraphNode::IterateRenderItems(int frameIndex)
     }
 }
 
-void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceDescriptor> const& renderTargets)
+void GPUGraphicsGraphNode::ImportRenderTargets(std::size_t count, GPUResourceViewHandle const* renderTargets)
 {
-    renderTargets_ = renderTargets;
+    renderTargets_.clear();
+    for (std::size_t i = 0; i < count; i++) {
+        renderTargets_.emplace_back(renderTargets[i]);
+    }
 }
 
-void GPUGraphicsGraphNode::ImportRenderTargets(std::vector<GPUFrameResourceDescriptor>&& renderTargets)
-{
-    renderTargets_ = std::move(renderTargets);
-}
-
-void GPUGraphicsGraphNode::ImportRenderTarget(GPUFrameResourceDescriptor const& renderTarget)
-{
-    renderTargets_.push_back(renderTarget);
-}
-
-void GPUGraphicsGraphNode::ImportDepthStencilTarget(GPUFrameResourceDescriptor depthStencilDescriptor)
+void GPUGraphicsGraphNode::ImportDepthStencilTarget(GPUResourceViewHandle const& depthStencilDescriptor)
 {
     depthStencilTarget_ = depthStencilDescriptor;
 }
@@ -96,27 +88,26 @@ void GPUGraphicsGraphNode::ImportViewportScissor(D3D12_VIEWPORT const& viewport,
     scissorRect_ = scissorRect;
 }
 
-void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(int frameIndex)
+void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(std::size_t frameIndex)
 {    
     auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
     assert(renderTargetsCount <= 5 && "More than 5 render targets is not currently supported.");
 
     D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[5];
     for (int i = 0; i < renderTargetsCount; i++) {
-        renderTargetHandles[i] = renderTargets_[i].CPUViewHandle(frameIndex);
+        renderTargetHandles[i] = renderTargets_[i].View(frameIndex).CPUHandle();
     }
 
-    D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle = depthStencilTarget_.CPUViewHandle(frameIndex);
-    auto* depthStencilHandlePtr = depthStencilTarget_.IsValid() ? &depthStencilHandle : nullptr;
+    D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle = depthStencilTarget_.View(frameIndex).CPUHandle();
     
     if (renderTargetsCount > 0) {
-        executionEngine_->Commit().OMSetRenderTargets(renderTargetsCount, renderTargetHandles, false, depthStencilHandlePtr);
+        executionEngine_->Commit().OMSetRenderTargets(renderTargetsCount, renderTargetHandles, false, depthStencilHandle.ptr != 0 ? &depthStencilHandle : nullptr);
     }
 }
 
 void GPUGraphicsGraphNode::BindPipelineState()
 {
-    executionEngine_->Commit().SetPipelineState(pipelineState_->Get());
+    executionEngine_->Commit().SetPipelineState(pipelineState_.Get());
 }
 
 void GPUGraphicsGraphNode::BindViewportScissor()
@@ -125,39 +116,43 @@ void GPUGraphicsGraphNode::BindViewportScissor()
     executionEngine_->Commit().RSSetScissorRects(1, &scissorRect_);
 }
 
-void GPUGraphicsGraphNode::TransitionRenderTargets(int frameIndex)
+void GPUGraphicsGraphNode::TransitionRenderTargets(std::size_t frameIndex)
 {
-    auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
+    auto const renderTargetsCount = renderTargets_.size();
     assert(renderTargetsCount <= 5 && "More that 5 render targets is not currently supported.");
-    
-    for (int i = 0; i < renderTargetsCount; i++) {
-        if (renderTargets_[i].DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_RENDER_TARGET) {
-            renderTargets_[i].DescribedResource()->Transition(frameIndex, executionEngine_->CommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+    D3D12_RESOURCE_BARRIER transitions[6];
+    std::size_t transitionsCounter = 0;
+    for (std::size_t i = 0; i < renderTargetsCount; i++) {
+        auto& resourceView = renderTargets_[i].View(frameIndex);
+        if (resourceView.Resource().State() != D3D12_RESOURCE_STATE_RENDER_TARGET) {
+            resourceView.Resource().PrepareTransition(D3D12_RESOURCE_STATE_RENDER_TARGET, transitions[transitionsCounter++]);
         }
     }
-}
 
-void GPUGraphicsGraphNode::TransitionDepthStencilTarget(int frameIndex)
-{
-    if (depthStencilTarget_.DescribedResource()->State(frameIndex) != D3D12_RESOURCE_STATE_DEPTH_WRITE) {
-        depthStencilTarget_.DescribedResource()->Transition(frameIndex, executionEngine_->CommandList(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    auto& depthStencilView = depthStencilTarget_.View(frameIndex);
+    if (depthStencilView.CPUHandle().ptr != 0) {
+        depthStencilView.Resource().PrepareTransition(depthStencilView.TargetState(), transitions[transitionsCounter++]);
     }
+
+    executionEngine_->Commit().ResourceBarrier(transitionsCounter, transitions);
 }
 
-void GPUGraphicsGraphNode::ClearRenderTargets(int frameIndex)
+
+void GPUGraphicsGraphNode::ClearRenderTargets(std::size_t frameIndex)
 {
     std::size_t const clearColorsCount = clearColors_.size();
     for (size_t i = 0; i < clearColorsCount; i++) {
-        executionEngine_->Commit().ClearRenderTargetView(renderTargets_[i].CPUViewHandle(frameIndex), clearColors_[i].color, 0, nullptr);
+        executionEngine_->Commit().ClearRenderTargetView(renderTargets_[i].View(frameIndex).CPUHandle(), clearColors_[i].color, 0, nullptr);
     }
 }
 
-void GPUGraphicsGraphNode::ClearDepthStencilTargets(int frameIndex)
+void GPUGraphicsGraphNode::ClearDepthStencilTargets(std::size_t frameIndex)
 {
 
 }
 
-void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, int frameIndex)
+void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, std::size_t frameIndex)
 {
     int const resCount = static_cast<int>(item.perItemResourceDescriptors_.size());
     for (int i = 0; i < resCount; i++) {

@@ -16,13 +16,13 @@ public:
     GPUPresentGraphNode& operator=(GPUPresentGraphNode const&) = delete;
     GPUPresentGraphNode& operator=(GPUPresentGraphNode&& rhs);
 
-    void ImportRenderTarget(GPUFrameResource* renderTarget);
+    void ImportRenderTarget(GPUResourceViewHandle* renderTarget);
 
-    virtual void Process(int frameIndex) override;
+    virtual void Process(std::size_t frameIndex) override;
 
 protected:
-    void TransitionRenderTargetState(int frameIndex);
+    void TransitionRenderTargetState(std::size_t frameIndex);
 
-    std::vector<GPUFrameResource*> renderTargets_;
+    std::vector<GPUResourceViewHandle> renderTargets_;
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
 };

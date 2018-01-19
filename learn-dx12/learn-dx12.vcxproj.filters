@@ -69,9 +69,6 @@
     <ClCompile Include="src\GPUFrameGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GPUDescriptorHeap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GPUCapabilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

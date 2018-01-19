@@ -1,5 +1,6 @@
 #include <Rendering\Data\GPURootSignature.hpp>
 #include <Rendering\GPUEngine.hpp>
+#include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 
 GPURootSignature::GPURootSignature() = default;
 
@@ -23,27 +24,31 @@ void GPURootSignature::BindPassRootSignature(GPUEngine* executionEngine)
     executionEngine->Commit().SetGraphicsRootSignature(rootSignature_.Get());
 }
 
-void GPURootSignature::BindPassRootSignatureDescriptorTables(GPUEngine* executionEngine, std::size_t frameIndex)
+void GPURootSignature::BindPassDescriptorTables(GPUEngine* executionEngine, std::size_t frameIndex)
 {
-    ID3D12DescriptorHeap* descriptorHeaps[] = { passRootDescriptorTablesMap_.ParentHeap() };
-    executionEngine->Commit().SetDescriptorHeaps(1, descriptorHeaps);
+    //ID3D12DescriptorHeap* descriptorHeaps[] = { passRootDescriptorTablesMap_.ParentHeap() };
+    //executionEngine->Commit().SetDescriptorHeaps(1, descriptorHeaps);
     
-    int const tablesCount = static_cast<int>(passRootDescriptorTablesMap_.TableSize());
-    for (int i = 0; i < tablesCount; i++) {
-        // Errr, I hope it should work like this.
-        executionEngine->Commit().SetGraphicsRootDescriptorTable(i, passRootDescriptorTablesMap_.DescirptorTableGPUHandle(frameIndex, static_cast<UINT>(i)));
+    auto const tablesCount = rootArguments_.size();
+    for (std::size_t i = 0; i < tablesCount; i++) {
+        executionEngine->Commit().SetGraphicsRootDescriptorTable(rootArguments_[i].bindSlot_, rootArguments_[i].table_.GPUHandle(frameIndex));
     }
 }
 
 
 void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, std::size_t frameIndex)
 {
-    int const resourceNum = static_cast<int>(passRootDescriptorTablesMap_.DescribedResourceCount(frameIndex));
-    assert(resourceNum < 10 && "Resource count reached static limit.");
+    D3D12_RESOURCE_BARRIER transitions[10];
+    std::size_t transitionsCounter = 0;
 
-    for (int i = 0; i < resourceNum; i++) {
-        if (passRootDescriptorTablesMap_.DescribedResourceCurrentState(frameIndex, i) != passRootDescriptorTablesMap_.DescribedResourceTargetState(i)) {
-            passRootDescriptorTablesMap_.DescribedResource(i)->Transition(frameIndex, executionEngine->CommandList(), passRootDescriptorTablesMap_.DescribedResourceTargetState(i));
+    auto const argCount = rootArguments_.size();
+    for (size_t i = 0; i < argCount; i++) {
+        auto const tableSize = rootArguments_[i].table_.Size();
+        for (size_t j = 0; j < tableSize; j++) {
+            auto& rootView = rootArguments_[i].table_.TableMember(j).View(frameIndex);
+            rootView.Resource().PrepareTransition(rootView.TargetState(), transitions[transitionsCounter++]);
         }
     }
+
+    executionEngine->Commit().ResourceBarrier(transitionsCounter, transitions);
 }

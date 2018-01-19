@@ -167,6 +167,28 @@ GPUResourceViewHandle GPUFoundation::AllocUAV(std::size_t frames, GPUResourceHan
     }
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
+
+GPUResourceViewTable GPUFoundation::BuildViewTable(std::size_t tableSize, GPUShaderVisibleResourceViewDesc const* descriptions)
+{
+    std::vector<GPUResourceViewHandle> handles{ tableSize };
+    for (size_t i = 0; i < tableSize; i++) {
+        GPUShaderVisibleResourceViewDesc const& currentDesc = descriptions[i];
+        switch (currentDesc.type_) {
+        case GPU_SHADER_VISIBLE_RESOURCE_VIEW_TYPE_CBV:
+            handles[i] = AllocCBV(currentDesc.frames_, currentDesc.resources_, currentDesc.cbvDesc_, currentDesc.targetState_);
+            break;
+        case GPU_SHADER_VISIBLE_RESOURCE_VIEW_TYPE_SRV:
+            handles[i] = AllocSRV(currentDesc.frames_, currentDesc.resources_, currentDesc.srvDesc_, currentDesc.targetState_);
+            break;
+        case GPU_SHADER_VISIBLE_RESOURCE_VIEW_TYPE_UAV:
+            handles[i] = AllocUAV(currentDesc.frames_, currentDesc.resources_, currentDesc.uavDesc_, currentDesc.targetState_);
+            break;
+        }
+    }
+
+    return GPUResourceViewTable(tableSize, handles.data());
+}
+
 //
 //void GPUFoundation::CreateFrameResources()
 //{

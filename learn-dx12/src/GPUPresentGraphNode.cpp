@@ -1,21 +1,22 @@
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
+#include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 
 GPUPresentGraphNode::GPUPresentGraphNode() = default;
 
 GPUPresentGraphNode::GPUPresentGraphNode(Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain, GPUEngine* executionEngine) :
-    GPUGraphNode{ executionEngine, nullptr, nullptr, 3 }, swapChain_{ swapChain }
+    GPUGraphNode{ executionEngine, GPURootSignature{}, GPUPipelineState{} }, swapChain_{ swapChain }
 { }
 
 GPUPresentGraphNode::GPUPresentGraphNode(GPUPresentGraphNode&& rhs) = default;
 
 GPUPresentGraphNode& GPUPresentGraphNode::operator=(GPUPresentGraphNode&& rhs) = default;
 
-void GPUPresentGraphNode::ImportRenderTarget(GPUFrameResource* renderTarget)
+void GPUPresentGraphNode::ImportRenderTarget(GPUResourceViewHandle* renderTarget)
 {
-    renderTargets_.push_back(renderTarget);
+    //renderTargets_.push_back(renderTarget);
 }
 
-void GPUPresentGraphNode::Process(int frameIndex) 
+void GPUPresentGraphNode::Process(std::size_t frameIndex) 
 {
     TransitionRenderTargetState(frameIndex);
 
@@ -23,12 +24,17 @@ void GPUPresentGraphNode::Process(int frameIndex)
     swapChain_->Present(0, 0);
 }
 
-void GPUPresentGraphNode::TransitionRenderTargetState(int frameIndex)
+void GPUPresentGraphNode::TransitionRenderTargetState(std::size_t frameIndex)
 {
-    int const renderTargetCount = static_cast<int>(renderTargets_.size());
+    auto const renderTargetCount = renderTargets_.size();
+    assert(renderTargetCount <= 5 && "Render targets are limited to 5");
+
+    D3D12_RESOURCE_BARRIER transitions[5];
+    std::size_t transitionCounter = 0;
     for (int i = 0; i < renderTargetCount; i++) {
-        if (renderTargets_[i]->State(frameIndex) != D3D12_RESOURCE_STATE_PRESENT) {
-            renderTargets_[i]->Transition(frameIndex, executionEngine_->CommandList(), D3D12_RESOURCE_STATE_PRESENT);
+        auto& resourceView = renderTargets_[i].View(frameIndex);
+        if (resourceView.Resource().State() != D3D12_RESOURCE_STATE_PRESENT) {
+            //renderTargets_[i]->Transition(frameIndex, executionEngine_->CommandList(), D3D12_RESOURCE_STATE_PRESENT);
         }
     }
 }

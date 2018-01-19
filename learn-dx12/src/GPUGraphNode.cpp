@@ -2,11 +2,10 @@
 
 GPUGraphNode::GPUGraphNode() = default;
 
-GPUGraphNode::GPUGraphNode(GPUEngine* engine, GPURootSignature* rootSignature, GPUPipelineState* pipelineState, int frameBufferCount) :
+GPUGraphNode::GPUGraphNode(GPUEngine* engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState) :
     executionEngine_(engine),
-    rootSignature_(rootSignature),
-    pipelineState_(pipelineState),
-    frameBufferCount_(frameBufferCount)
+    rootSignature_(std::move(rootSignature)),
+    pipelineState_(std::move(pipelineState))
 {
 
 }
@@ -20,17 +19,17 @@ void GPUGraphNode::ImportChildNode(GPUGraphNode* outputProxy)
     childNodes_.push_back(outputProxy);
 }
 
-void GPUGraphNode::ImportRootSignature(GPURootSignature* rootSignature)
+void GPUGraphNode::ImportRootSignature(GPURootSignature&& rootSignature)
 {
-    rootSignature_ = rootSignature;
+    rootSignature_ = std::move(rootSignature);
 }
 
-void GPUGraphNode::ImportPipelineState(GPUPipelineState* pipelineState)
+void GPUGraphNode::ImportPipelineState(GPUPipelineState&& pipelineState)
 {
-    pipelineState_ = pipelineState;
+    pipelineState_ = std::move(pipelineState);
 }
 
-GPUGraphNode* GPUGraphNode::GetChild(int childIndex)
+GPUGraphNode* GPUGraphNode::GetChild(std::size_t childIndex)
 {
     return childNodes_[childIndex];
 }
@@ -40,14 +39,14 @@ int GPUGraphNode::ChildCount() const
     return static_cast<int>(childNodes_.size());
 }
 
-void GPUGraphNode::BindPassRoot(int frameIndex)
+void GPUGraphNode::BindPassRoot(std::size_t frameIndex)
 {
-    rootSignature_->BindPassRootSignature(executionEngine_);
-    rootSignature_->BindPassRootSignatureDescriptorTables(executionEngine_, frameIndex);
+    rootSignature_.BindPassRootSignature(executionEngine_);
+    rootSignature_.BindPassDescriptorTables(executionEngine_, frameIndex);
 }
 
-void GPUGraphNode::TransitionPassResources(int frameIndex)
+void GPUGraphNode::TransitionPassResources(std::size_t frameIndex)
 {
-    rootSignature_->TransitionRootResources(executionEngine_, frameIndex);
+    rootSignature_.TransitionRootResources(executionEngine_, frameIndex);
 }
 
