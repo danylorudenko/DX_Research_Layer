@@ -30,13 +30,12 @@ private:
     // FOUNDATION DATA
     PerformanceTimer gameTimer_;
     std::wstring windowText_;
-    GPUFoundation gpuAccess_;
+    GPUFoundation gpuFoundation_;
 
     UINT64 frameIndex_ = 0;
 
 
     // CUSTOM APPLICATION DATA
-    SceneConstantBuffer constantBufferData_;
 
     GPURootSignature triangleRootSignature_;
     GPUPipelineState trianglePipelineState_;
@@ -44,8 +43,11 @@ private:
     GPUGraphicsGraphNode triangleGraphNode_;
     GPUPresentGraphNode presentNode_;
 
-    //GPUFrameResource triangleMesh_;
+    
     GeometryMesh triangleMeshData_;
+    SceneConstantBuffer constantBufferData_;
+
+    GPUResourceViewHandle constBuffer_;
 
     Microsoft::WRL::ComPtr<IDXGraphicsAnalysis> graphicsAnalysis_;
 };

@@ -54,6 +54,11 @@ std::size_t GPUResourceViewHeap::DescriptorSize() const
     return descriptorSize_;
 }
 
+ID3D12DescriptorHeap* GPUResourceViewHeap::Get() const
+{
+    return heapHandle_.Get();
+}
+
 void GPUResourceViewHeap::Reset()
 {
     currentHeapOffset_ = 0;

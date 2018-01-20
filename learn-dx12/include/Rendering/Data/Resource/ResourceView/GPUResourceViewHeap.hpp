@@ -23,6 +23,8 @@ public:
     std::size_t Capacity() const;
     std::size_t DescriptorSize() const;
 
+    ID3D12DescriptorHeap* Get() const;
+
     void Reset();
 
 private:

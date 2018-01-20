@@ -35,10 +35,10 @@ void DirectAppDelegate::start(Application& application)
     /////////////////////////////////////////////////////////////////////////////
     
     
-    gpuAccess_ = GPUFoundation{ application };
+    gpuFoundation_ = GPUFoundation{ application };
     gameTimer_.Reset();
 
-    /*auto& initializationEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+    auto& initializationEngine = gpuFoundation_.Engine<GPU_ENGINE_TYPE_DIRECT>();
 
     auto rootSignature = CreateRootSignature();
     auto pipelineState = CreatePipelineState(rootSignature);
@@ -48,25 +48,31 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-    auto constexpr framesCount = static_cast<int>(GPUFoundation::SWAP_CHAIN_BUFFER_COUNT);
+    auto constexpr framesCount = GPUFoundation::SWAP_CHAIN_BUFFER_COUNT);
 
 
     auto constexpr constBufferSize = (sizeof(constantBufferData_) + 255) & ~255;
-    constantBuffer_ = GPUUploadHeap{ 
-        framesCount, gpuAccess_.Device().Get(), 
-        &constantBufferData_, constBufferSize, true };
+    GPUResourceHandle constBufferHandles[framesCount];
+    for (size_t i = 0; i < framesCount; i++) {
+        constBufferHandles[i] = gpuFoundation_.AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(constBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+    }
+    
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc[framesCount];
+    for (size_t i = 0; i < framesCount; i++) {
+        cbvDesc[i].BufferLocation = constBufferHandles[i].Resource().Get()->GetGPUVirtualAddress();
+        cbvDesc[i].SizeInBytes = constBufferSize;
+    }
+    
+    constBuffer_ = gpuFoundation_.AllocCBV(framesCount, constBufferHandles, cbvDesc)
+    constantBuffer_ = gpuFoundation_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
 
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc{};
-    cbvDesc.BufferLocation = constantBuffer_.GPUVirtualAddress(0);
-    cbvDesc.SizeInBytes = constBufferSize;
-    constantBufferView_ = gpuAccess_.DescriptorHeap().AllocCbvLinear(&constantBuffer_, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ, "constBuffer", framesCount);
-
+    gpuFoundation_.AllocCBV(3, constBufferHandles, )
 
 
 
     std::vector<GPUFrameResourceDescriptor> tableStartViews{ 1, constantBufferView_ };
     std::vector<GPUFrameRootTablesMap::StateAndResource> tableResources{ 1, std::make_pair(D3D12_RESOURCE_STATE_GENERIC_READ, &constantBuffer_) };
-    GPUFrameRootTablesMap rootTableMap{ gpuAccess_.DescriptorHeap().HeapCbvSrvUav(), tableStartViews, tableResources };
+    GPUFrameRootTablesMap rootTableMap{ gpuFoundation_.DescriptorHeap().HeapCbvSrvUav(), tableStartViews, tableResources };
 
     triangleRootSignature_.ImportPassFrameRootDescriptorTable(rootTableMap);
 
@@ -74,8 +80,8 @@ void DirectAppDelegate::start(Application& application)
     
 
 
-    GPUUploadHeap triangleMeshUploadHeap{ 1, gpuAccess_.Device().Get(), &verticesData, verticesDataSize };
-    triangleMesh_ = GPUFrameResource{ 1, gpuAccess_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
+    GPUUploadHeap triangleMeshUploadHeap{ 1, gpuFoundation_.Device().Get(), &verticesData, verticesDataSize };
+    triangleMesh_ = GPUFrameResource{ 1, gpuFoundation_.Device().Get(), verticesDataSize, &CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST };
     triangleMesh_.UpdateData(0, initializationEngine.CommandList(), 0, triangleMeshUploadHeap, 0, 0, verticesDataSize);
     triangleMesh_.Transition(0, initializationEngine.CommandList(), D3D12_RESOURCE_STATE_COMMON);
     initializationEngine.FlushReset();
@@ -98,10 +104,10 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-    triangleGraphNode_ = GPUGraphicsGraphNode{ &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>(), &triangleRootSignature_, &trianglePipelineState_, framesCount };
+    triangleGraphNode_ = GPUGraphicsGraphNode{ &gpuFoundation_.Engine<GPU_ENGINE_TYPE_DIRECT>(), &triangleRootSignature_, &trianglePipelineState_, framesCount };
     triangleGraphNode_.ImportRenderItem(triangleRenderItem);
-    triangleGraphNode_.ImportRenderTarget(gpuAccess_.FinalRenderTargetViews());
-    triangleGraphNode_.ImportDepthStencilTarget(gpuAccess_.FinalDepthSteniclViews());
+    triangleGraphNode_.ImportRenderTarget(gpuFoundation_.FinalRenderTargetViews());
+    triangleGraphNode_.ImportDepthStencilTarget(gpuFoundation_.FinalDepthSteniclViews());
 
     Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
     triangleGraphNode_.ImportClearColors(&clearColor, 1);
@@ -119,19 +125,19 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-    presentNode_ = GPUPresentGraphNode{ gpuAccess_.SwapChain(), &gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>() };
-    presentNode_.ImportRenderTarget(gpuAccess_.FinalRenderTargetViews().DescribedResource());
+    presentNode_ = GPUPresentGraphNode{ gpuFoundation_.SwapChain(), &gpuFoundation_.Engine<GPU_ENGINE_TYPE_DIRECT>() };
+    presentNode_.ImportRenderTarget(gpuFoundation_.FinalRenderTargetViews().DescribedResource());
     
 
 
 
     triangleGraphNode_.ImportChildNode(&presentNode_);
 
-    gpuAccess_.FrameGraph().AddParentNode(&triangleGraphNode_);
-    gpuAccess_.FrameGraph().ParseGraphToQueue();
+    gpuFoundation_.FrameGraph().AddParentNode(&triangleGraphNode_);
+    gpuFoundation_.FrameGraph().ParseGraphToQueue();
 
     initializationEngine.FlushReset();
-*/
+
     /*if (graphicsAnalysis_ != nullptr) {
         graphicsAnalysis_->EndCapture();
     }*/
@@ -202,7 +208,7 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignatu
     }
     
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-    gpuAccess_.CreateRootSignature(signature, rootSignature);
+    gpuFoundation_.CreateRootSignature(signature, rootSignature);
     return rootSignature;
 }
 
@@ -211,8 +217,8 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
     Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
 
-    gpuAccess_.CompileShader(L"Shaders\\triangle_shader.hlsl", vertexShader, "VS", "vs_5_0");
-    gpuAccess_.CompileShader(L"Shaders\\triangle_shader.hlsl", pixelShader, "PS", "ps_5_0");
+    gpuFoundation_.CompileShader(L"Shaders\\triangle_shader.hlsl", vertexShader, "VS", "vs_5_0");
+    gpuFoundation_.CompileShader(L"Shaders\\triangle_shader.hlsl", pixelShader, "PS", "ps_5_0");
 
     // Define the vertex input layout.
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -239,17 +245,19 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.SampleDesc.Quality = 0;
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
-    gpuAccess_.CreatePSO(pipelineState, &psoDesc);
+    gpuFoundation_.CreatePSO(pipelineState, &psoDesc);
     return pipelineState;
 }
 
 void DirectAppDelegate::Draw(int frameIndex)
 {
-    auto& graph = gpuAccess_.FrameGraph();
+    auto& graph = gpuFoundation_.FrameGraph();
     auto& graphIterator = graph.GraphQueueStart();
     auto& graphEnd = graph.GraphQueueEnd();
     
-    auto& directEngine = gpuAccess_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+    auto& directEngine = gpuFoundation_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+
+    gpuFoundation_.SetDefaultDescriptorHeaps();
 
     while (graphIterator != graphEnd) {
         (*graphIterator)->Process(frameIndex);
@@ -273,10 +281,10 @@ void DirectAppDelegate::CustomAction(int frameIndex)
 
 
     void* mappedData = nullptr;
-    constantBuffer_.Map(frameIndex, &mappedData, nullptr);
+    //constantBuffer_.Map(frameIndex, &mappedData, nullptr);
 
     std::memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
 
     static D3D12_RANGE writeRange{ 0, sizeof(constantBufferData_) };
-    constantBuffer_.Unmap(frameIndex, &writeRange);
+    //constantBuffer_.Unmap(frameIndex, &writeRange);
 }

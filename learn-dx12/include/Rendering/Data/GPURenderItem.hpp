@@ -17,4 +17,6 @@ struct GPURenderItem
         std::size_t bindSlot_;
         GPUResourceViewTable itemTable_;
     };
+
+    GPUDynamicRootArgument dynamicArg_;
 };

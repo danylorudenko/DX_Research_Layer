@@ -26,7 +26,8 @@ public:
     GPUResourceViewDirectHandle AllocRTV(GPUResourceHandle const& resourceHandle, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
     GPUResourceViewDirectHandle AllocSwapChainRTV(GPUResource& resource, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
     GPUResourceViewDirectHandle AllocDSV(GPUResourceHandle const& resourceHandle, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewTable BuildViewTable(std::size_t tableSize, GPUResourceHandle const* resources, GPUShaderVisibleResourceViewDesc const* desc);
+
+    void SetDefaultHeaps(GPUEngine& executionEngine);
 
     GPUResourceView& AccessView(GPUResourceViewDirectHandle handle);
 

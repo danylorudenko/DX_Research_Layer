@@ -31,7 +31,7 @@ void GPURootSignature::BindPassDescriptorTables(GPUEngine* executionEngine, std:
     
     auto const tablesCount = rootArguments_.size();
     for (std::size_t i = 0; i < tablesCount; i++) {
-        executionEngine->Commit().SetGraphicsRootDescriptorTable(rootArguments_[i].bindSlot_, rootArguments_[i].table_.GPUHandle(frameIndex));
+        executionEngine->Commit().SetGraphicsRootDescriptorTable(static_cast<UINT>(rootArguments_[i].bindSlot_), rootArguments_[i].table_.GPUHandle(frameIndex));
     }
 }
 
@@ -50,5 +50,5 @@ void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, std::
         }
     }
 
-    executionEngine->Commit().ResourceBarrier(transitionsCounter, transitions);
+    executionEngine->Commit().ResourceBarrier(static_cast<UINT>(transitionsCounter), transitions);
 }

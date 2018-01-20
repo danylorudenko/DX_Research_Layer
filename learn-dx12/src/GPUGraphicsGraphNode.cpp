@@ -135,7 +135,7 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(std::size_t frameIndex)
         depthStencilView.Resource().PrepareTransition(depthStencilView.TargetState(), transitions[transitionsCounter++]);
     }
 
-    executionEngine_->Commit().ResourceBarrier(transitionsCounter, transitions);
+    executionEngine_->Commit().ResourceBarrier(static_cast<UINT>(transitionsCounter), transitions);
 }
 
 
@@ -154,11 +154,7 @@ void GPUGraphicsGraphNode::ClearDepthStencilTargets(std::size_t frameIndex)
 
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, std::size_t frameIndex)
 {
-    int const resCount = static_cast<int>(item.perItemResourceDescriptors_.size());
-    for (int i = 0; i < resCount; i++) {
-        auto const& resDesc = item.perItemResourceDescriptors_[i];
-        executionEngine_->Commit().SetGraphicsRootDescriptorTable(resDesc.first, resDesc.second.GPUViewHandle(frameIndex));
-    }
+    executionEngine_->Commit().SetGraphicsRootDescriptorTable(item.dynamicArg_.bindSlot_, item.dynamicArg_.itemTable_.GPUHandle(frameIndex));
 }
 
 void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)

@@ -24,7 +24,7 @@ public:
     static constexpr UINT WIDTH = 800;
     static constexpr UINT HEIGHT = 600;
 
-    static constexpr UINT SWAP_CHAIN_BUFFER_COUNT = 3;
+    static constexpr std::size_t SWAP_CHAIN_BUFFER_COUNT = 3;
 
     static constexpr DXGI_FORMAT backBufferFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM;
     static constexpr DXGI_FORMAT depthStencilBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -43,12 +43,14 @@ public:
     GPUResourceHandle AllocDefaultResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState);
     GPUResourceHandle AllocUploadResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState);
 
+    void SetDefaultDescriptorHeaps();
+
     GPUResourceViewHandle SwapChainRTV();
-    GPUResourceViewHandle AllocRTV(std::size_t frames, GPUResourceHandle const* resources, D3D12_RENDER_TARGET_VIEW_DESC const& desc);
-    GPUResourceViewHandle AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewHandle AllocCBV(std::size_t frames, GPUResourceHandle const* resources, D3D12_CONSTANT_BUFFER_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewHandle AllocSRV(std::size_t frames, GPUResourceHandle const* resources, D3D12_SHADER_RESOURCE_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
-    GPUResourceViewHandle AllocUAV(std::size_t frames, GPUResourceHandle const* resources, D3D12_UNORDERED_ACCESS_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocRTV(std::size_t frames, GPUResourceHandle const* resources, D3D12_RENDER_TARGET_VIEW_DESC const* desc);
+    GPUResourceViewHandle AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocCBV(std::size_t frames, GPUResourceHandle const* resources, D3D12_CONSTANT_BUFFER_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocSRV(std::size_t frames, GPUResourceHandle const* resources, D3D12_SHADER_RESOURCE_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocUAV(std::size_t frames, GPUResourceHandle const* resources, D3D12_UNORDERED_ACCESS_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState);
     GPUResourceViewTable BuildViewTable(std::size_t tableSize, GPUShaderVisibleResourceViewDesc const* descriptions);
 
     GPUFrameGraph& FrameGraph() { return frameGraph_; }

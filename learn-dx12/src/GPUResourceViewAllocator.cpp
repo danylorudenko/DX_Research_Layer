@@ -87,6 +87,12 @@ GPUResourceViewDirectHandle GPUResourceViewAllocator::AllocDSV(GPUResourceHandle
     return RegisterResourceView(std::move(view));
 }
 
+void GPUResourceViewAllocator::SetDefaultHeaps(GPUEngine& executionEngine)
+{
+    ID3D12DescriptorHeap* heaps[] = { cbvSrvUavHeap_.Get() };
+    executionEngine.Commit().SetDescriptorHeaps(1, heaps);
+}
+
 GPUResourceView& GPUResourceViewAllocator::AccessView(GPUResourceViewDirectHandle handle)
 {
     return *(resourceViewsList_[handle.ID()]);
