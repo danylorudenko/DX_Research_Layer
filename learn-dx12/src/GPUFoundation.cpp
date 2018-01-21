@@ -8,11 +8,14 @@ GPUFoundation::GPUFoundation(Application& application)
     // Create device and dxgiFactory.
     InitializeD3D12();
 
+    CreateGPUEngines();
+    swapChain_ = GPUSwapChain{ *this, application.window().nativeHandle(), backBufferFormat_, WIDTH, HEIGHT, SWAP_CHAIN_BUFFER_COUNT };
+
+
     staticResourceAllocator_ = GPUStaticResourceAllocator{ *this };
     viewAllocator_ = GPUResourceViewAllocator{ *this };
     viewContextTable_ = GPUResourceViewContextTable{ swapChain_.BufferCount() };
 
-    swapChain_ = GPUSwapChain{ *this, application.window().nativeHandle(), backBufferFormat_, WIDTH, HEIGHT, SWAP_CHAIN_BUFFER_COUNT };
 
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
     rtvDesc.Format = backBufferFormat_;
@@ -20,9 +23,6 @@ GPUFoundation::GPUFoundation(Application& application)
     rtvDesc.Texture2D.MipSlice = 0;
     rtvDesc.Texture2D.PlaneSlice = 0;
     swapChainRTV_ = AllocSwapChainRTV(swapChain_, rtvDesc);
-
-    // Create main accessors to GPU.
-    CreateGPUEngines();
 }
 
 GPUFoundation::GPUFoundation(GPUFoundation&& rhs) = default;
@@ -116,7 +116,8 @@ GPUResourceViewHandle GPUFoundation::SwapChainRTV()
 GPUResourceViewHandle GPUFoundation::AllocSwapChainRTV(GPUSwapChain& swapChain, D3D12_RENDER_TARGET_VIEW_DESC const& desc)
 {
     auto const framesCount = swapChain.BufferCount();
-    std::vector<GPUResourceViewDirectHandle> directHandles{ framesCount };
+    std::vector<GPUResourceViewDirectHandle> directHandles;
+    directHandles.resize(framesCount);
     for (size_t i = 0; i < framesCount; i++) {
         directHandles[i] = viewAllocator_.AllocSwapChainRTV(swapChain_.AccessRenderBuffer(i), desc);
     }
@@ -126,7 +127,8 @@ GPUResourceViewHandle GPUFoundation::AllocSwapChainRTV(GPUSwapChain& swapChain, 
 GPUResourceViewHandle GPUFoundation::AllocRTV(std::size_t frames, GPUResourceHandle const* resources, D3D12_RENDER_TARGET_VIEW_DESC const* desc)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
-    std::vector<GPUResourceViewDirectHandle> directHandles{ frames };
+    std::vector<GPUResourceViewDirectHandle> directHandles;
+    directHandles.resize(frames);
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocRTV(resources[i], desc[i]);
     }
@@ -136,7 +138,8 @@ GPUResourceViewHandle GPUFoundation::AllocRTV(std::size_t frames, GPUResourceHan
 GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
-    std::vector<GPUResourceViewDirectHandle> directHandles{ frames };
+    std::vector<GPUResourceViewDirectHandle> directHandles;
+    directHandles.resize(frames);
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocDSV(resources[i], desc[i], targetState);
     }
@@ -146,7 +149,8 @@ GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHan
 GPUResourceViewHandle GPUFoundation::AllocCBV(std::size_t frames, GPUResourceHandle const* resources, D3D12_CONSTANT_BUFFER_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
-    std::vector<GPUResourceViewDirectHandle> directHandles{ frames };
+    std::vector<GPUResourceViewDirectHandle> directHandles;
+    directHandles.resize(frames);
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocCBV(resources[i], desc[i], targetState);
     }
@@ -156,7 +160,8 @@ GPUResourceViewHandle GPUFoundation::AllocCBV(std::size_t frames, GPUResourceHan
 GPUResourceViewHandle GPUFoundation::AllocSRV(std::size_t frames, GPUResourceHandle const* resources, D3D12_SHADER_RESOURCE_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
-    std::vector<GPUResourceViewDirectHandle> directHandles{ frames };
+    std::vector<GPUResourceViewDirectHandle> directHandles;
+    directHandles.resize(frames);
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocSRV(resources[i], desc[i], targetState);
     }
@@ -166,7 +171,8 @@ GPUResourceViewHandle GPUFoundation::AllocSRV(std::size_t frames, GPUResourceHan
 GPUResourceViewHandle GPUFoundation::AllocUAV(std::size_t frames, GPUResourceHandle const* resources, D3D12_UNORDERED_ACCESS_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
-    std::vector<GPUResourceViewDirectHandle> directHandles{ frames };
+    std::vector<GPUResourceViewDirectHandle> directHandles;
+    directHandles.resize(frames);
     for (size_t i = 0; i < frames; i++) {
         directHandles[i] = viewAllocator_.AllocUAV(resources[i], desc[i], targetState);
     }
@@ -175,7 +181,8 @@ GPUResourceViewHandle GPUFoundation::AllocUAV(std::size_t frames, GPUResourceHan
 
 GPUResourceViewTable GPUFoundation::BuildViewTable(std::size_t tableSize, GPUShaderVisibleResourceViewDesc const* descriptions)
 {
-    std::vector<GPUResourceViewHandle> handles{ tableSize };
+    std::vector<GPUResourceViewHandle> handles;
+    handles.resize(tableSize);
     for (size_t i = 0; i < tableSize; i++) {
         GPUShaderVisibleResourceViewDesc const& currentDesc = descriptions[i];
         switch (currentDesc.type_) {

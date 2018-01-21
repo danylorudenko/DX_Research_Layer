@@ -30,7 +30,7 @@ private:
     // FOUNDATION DATA
     PerformanceTimer gameTimer_;
     std::wstring windowText_;
-    GPUFoundation gpuFoundation_;
+    std::unique_ptr<GPUFoundation> gpuFoundation_;
     Microsoft::WRL::ComPtr<IDXGraphicsAnalysis> graphicsAnalysis_;
 
     UINT64 frameIndex_ = 0;

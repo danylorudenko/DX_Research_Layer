@@ -14,7 +14,7 @@ GPUResourceViewHeap::GPUResourceViewHeap(GPUFoundation& foundation, D3D12_DESCRI
     heapDesc.NumDescriptors = static_cast<UINT>(heapCapacity_);
     heapDesc.Type = type_;
     heapDesc.NodeMask = 0;
-    heapDesc.Flags = (type == type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) ? D3D12_DESCRIPTOR_HEAP_FLAG_NONE : D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    heapDesc.Flags = (type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     {
         auto const result = device->CreateDescriptorHeap(
             &heapDesc,

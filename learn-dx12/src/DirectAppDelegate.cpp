@@ -35,10 +35,10 @@ void DirectAppDelegate::start(Application& application)
     /////////////////////////////////////////////////////////////////////////////
     
     
-    gpuFoundation_ = GPUFoundation{ application };
+    gpuFoundation_ = std::make_unique<GPUFoundation>(application);
     gameTimer_.Reset();
 
-    auto& initializationEngine = gpuFoundation_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+    auto& initializationEngine = gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>();
 
     auto rootSignature = CreateRootSignature();
     auto pipelineState = CreatePipelineState(rootSignature);
@@ -54,7 +54,7 @@ void DirectAppDelegate::start(Application& application)
     auto constexpr constBufferSize = (sizeof(constantBufferData_) + 255) & ~255;
     GPUResourceHandle constBufferHandles[framesCount];
     for (size_t i = 0; i < framesCount; i++) {
-        constBufferHandles[i] = gpuFoundation_.AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(constBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+        constBufferHandles[i] = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(constBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
     }
     
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc[framesCount];
@@ -63,7 +63,7 @@ void DirectAppDelegate::start(Application& application)
         cbvDesc[i].SizeInBytes = constBufferSize;
     }
     
-    constBuffer_ = gpuFoundation_.AllocCBV(framesCount, constBufferHandles, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
+    constBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
     triangleRootSignature_.PushRootArgument(0, GPUResourceViewTable{ 1, &constBuffer_ });
 
@@ -71,8 +71,8 @@ void DirectAppDelegate::start(Application& application)
 
     
 
-    auto uploadBuffer = gpuFoundation_.AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
-    triangleMesh_ = gpuFoundation_.AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
+    auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+    triangleMesh_ = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
     
     // I'M HERE
     triangleMesh_.Resource().UpdateData(initializationEngine, uploadBuffer.Resource(), 0, verticesDataSize);
@@ -97,10 +97,10 @@ void DirectAppDelegate::start(Application& application)
 
 
 
-    triangleGraphNode_ = GPUGraphicsGraphNode{ gpuFoundation_.Engine<GPU_ENGINE_TYPE_DIRECT>(), std::move(triangleRootSignature_), std::move(trianglePipelineState_) };
+    triangleGraphNode_ = GPUGraphicsGraphNode{ gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>(), std::move(triangleRootSignature_), std::move(trianglePipelineState_) };
     triangleGraphNode_.ImportRenderItem(triangleRenderItem);
-    auto swapChainRTV = gpuFoundation_.SwapChainRTV();
-    triangleGraphNode_.ImportRenderTargets(1, &gpuFoundation_.SwapChainRTV());
+    auto swapChainRTV = gpuFoundation_->SwapChainRTV();
+    triangleGraphNode_.ImportRenderTargets(1, &gpuFoundation_->SwapChainRTV());
 
     Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
     triangleGraphNode_.ImportClearColors(&clearColor, 1);
@@ -116,18 +116,14 @@ void DirectAppDelegate::start(Application& application)
     triangleGraphNode_.ImportViewportScissor(viewport, scissorRect);
 
 
-
-
-    presentNode_ = GPUPresentGraphNode{ gpuFoundation_.SwapChain(), gpuFoundation_.Engine<GPU_ENGINE_TYPE_DIRECT>() };
-    presentNode_.ImportRenderTarget(gpuFoundation_.SwapChainRTV());
+    presentNode_ = GPUPresentGraphNode{ gpuFoundation_->SwapChain(), gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>() };
+    presentNode_.ImportRenderTarget(gpuFoundation_->SwapChainRTV());
     
-
-
 
     triangleGraphNode_.ImportChildNode(&presentNode_);
 
-    gpuFoundation_.FrameGraph().AddParentNode(&triangleGraphNode_);
-    gpuFoundation_.FrameGraph().ParseGraphToQueue();
+    gpuFoundation_->FrameGraph().AddParentNode(&triangleGraphNode_);
+    gpuFoundation_->FrameGraph().ParseGraphToQueue();
 
     initializationEngine.FlushReset();
 
@@ -201,7 +197,7 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignatu
     }
     
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-    gpuFoundation_.CreateRootSignature(signature, rootSignature);
+    gpuFoundation_->CreateRootSignature(signature, rootSignature);
     return rootSignature;
 }
 
@@ -210,8 +206,8 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
     Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
 
-    gpuFoundation_.CompileShader(L"Shaders\\triangle_shader.hlsl", vertexShader, "VS", "vs_5_0");
-    gpuFoundation_.CompileShader(L"Shaders\\triangle_shader.hlsl", pixelShader, "PS", "ps_5_0");
+    gpuFoundation_->CompileShader(L"Shaders\\triangle_shader.hlsl", vertexShader, "VS", "vs_5_0");
+    gpuFoundation_->CompileShader(L"Shaders\\triangle_shader.hlsl", pixelShader, "PS", "ps_5_0");
 
     // Define the vertex input layout.
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -238,19 +234,19 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.SampleDesc.Quality = 0;
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
-    gpuFoundation_.CreatePSO(pipelineState, &psoDesc);
+    gpuFoundation_->CreatePSO(pipelineState, &psoDesc);
     return pipelineState;
 }
 
 void DirectAppDelegate::Draw(int frameIndex)
 {
-    auto& graph = gpuFoundation_.FrameGraph();
+    auto& graph = gpuFoundation_->FrameGraph();
     auto& graphIterator = graph.GraphQueueStart();
     auto& graphEnd = graph.GraphQueueEnd();
     
-    auto& directEngine = gpuFoundation_.Engine<GPU_ENGINE_TYPE_DIRECT>();
+    auto& directEngine = gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>();
 
-    gpuFoundation_.SetDefaultDescriptorHeaps();
+    gpuFoundation_->SetDefaultDescriptorHeaps();
 
     while (graphIterator != graphEnd) {
         (*graphIterator)->Process(frameIndex);
@@ -276,7 +272,7 @@ void DirectAppDelegate::CustomAction(int frameIndex)
     void* mappedData = nullptr;
     //constantBuffer_.Map(frameIndex, &mappedData, nullptr);
 
-    std::memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
+    //std::memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
 
     static D3D12_RANGE writeRange{ 0, sizeof(constantBufferData_) };
     //constantBuffer_.Unmap(frameIndex, &writeRange);

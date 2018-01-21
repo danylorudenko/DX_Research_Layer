@@ -18,7 +18,7 @@ GPUResourceViewHandle GPUResourceViewContextTable::InsertView(std::size_t frameC
     auto const contextCount = frameList_.size();
 
     assert(frameCount > 0 && "Frames count can't be zero");
-    assert(contextCount != frameCount && "Count of resource frames representations does not match context count in resource table.");
+    assert(((frameCount == contextCount) || (frameCount == 1))  && "Count of resource frames representations does not match context count in resource table.");
 
     if (frameCount == 1) {
         for (std::size_t i = 0; i < contextCount; i++) {
