@@ -2,8 +2,8 @@
 
 GPUGraphNode::GPUGraphNode() = default;
 
-GPUGraphNode::GPUGraphNode(GPUEngine* engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState) :
-    executionEngine_(engine),
+GPUGraphNode::GPUGraphNode(GPUEngine& engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState) :
+    executionEngine_(&engine),
     rootSignature_(std::move(rootSignature)),
     pipelineState_(std::move(pipelineState))
 {

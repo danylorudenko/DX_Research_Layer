@@ -31,6 +31,7 @@ public:
 
     Microsoft::WRL::ComPtr<ID3D12Device>& Device() { return device_; }
     Microsoft::WRL::ComPtr<IDXGIFactory1> const& DXGIFactory() const { return dxgiFactory_; }
+    GPUSwapChain& SwapChain() { return swapChain_; }
 
     template<GPU_ENGINE_TYPE TYPE> GPUEngine& Engine();
     template<> constexpr GPUEngine& Engine<GPU_ENGINE_TYPE_DIRECT>() { return engines_[0]; }

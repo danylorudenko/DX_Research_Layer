@@ -18,7 +18,7 @@ class GPUEngine
 {
 public:
     GPUEngine();
-    GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type, UINT allocCount);
+    GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type, std::size_t allocCount);
     GPUEngine(GPUEngine const&) = delete;
     GPUEngine(GPUEngine&& rhs);
 

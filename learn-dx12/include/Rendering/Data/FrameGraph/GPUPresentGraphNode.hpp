@@ -9,7 +9,7 @@ class GPUPresentGraphNode : public GPUGraphNode
 {
 public:
     GPUPresentGraphNode();
-    GPUPresentGraphNode(GPUSwapChain* swapChain, GPUEngine* executionEngine);
+    GPUPresentGraphNode(GPUSwapChain& swapChain, GPUEngine& executionEngine);
 
     GPUPresentGraphNode(GPUPresentGraphNode const&) = delete;
     GPUPresentGraphNode(GPUPresentGraphNode&& rhs);

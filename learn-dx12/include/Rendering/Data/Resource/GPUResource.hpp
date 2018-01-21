@@ -23,6 +23,8 @@ public:
     void Transition(GPUEngine& executionEngine, D3D12_RESOURCE_STATES targetState);
     void PrepareTransition(D3D12_RESOURCE_STATES targetState, D3D12_RESOURCE_BARRIER& transitionDesc);
 
+    void UpdateData(GPUEngine& executionEngine, GPUResource const& source, std::size_t offset, std::size_t size);
+
     virtual ~GPUResource();
     
 protected:

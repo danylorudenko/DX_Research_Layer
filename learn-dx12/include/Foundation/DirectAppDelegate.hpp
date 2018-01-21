@@ -31,6 +31,7 @@ private:
     PerformanceTimer gameTimer_;
     std::wstring windowText_;
     GPUFoundation gpuFoundation_;
+    Microsoft::WRL::ComPtr<IDXGraphicsAnalysis> graphicsAnalysis_;
 
     UINT64 frameIndex_ = 0;
 
@@ -43,11 +44,8 @@ private:
     GPUGraphicsGraphNode triangleGraphNode_;
     GPUPresentGraphNode presentNode_;
 
-    
-    GeometryMesh triangleMeshData_;
     SceneConstantBuffer constantBufferData_;
-
     GPUResourceViewHandle constBuffer_;
 
-    Microsoft::WRL::ComPtr<IDXGraphicsAnalysis> graphicsAnalysis_;
+    GPUResourceHandle triangleMesh_;
 };

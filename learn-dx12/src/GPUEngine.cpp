@@ -2,7 +2,7 @@
 
 GPUEngine::GPUEngine() = default;
 
-GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type, UINT allocCount)
+GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type, std::size_t allocCount)
 {
     commandQueue_ = GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type) };
     commandList_ = GPUCommandList { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), allocCount };

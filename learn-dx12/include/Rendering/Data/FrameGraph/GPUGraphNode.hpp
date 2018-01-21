@@ -10,7 +10,7 @@ class GPUGraphNode
 {
 public:
     GPUGraphNode();
-    GPUGraphNode(GPUEngine* engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState);
+    GPUGraphNode(GPUEngine& engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState);
     GPUGraphNode(GPUGraphNode const&) = delete;
     GPUGraphNode(GPUGraphNode&& rhs);
 

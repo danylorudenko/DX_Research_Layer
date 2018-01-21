@@ -133,42 +133,42 @@ GPUResourceViewHandle GPUFoundation::AllocRTV(std::size_t frames, GPUResourceHan
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHandle const* resource, D3D12_DEPTH_STENCIL_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
+GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles{ frames };
     for (size_t i = 0; i < frames; i++) {
-        directHandles[i] = viewAllocator_.AllocDSV(resource[i], desc[i], targetState);
+        directHandles[i] = viewAllocator_.AllocDSV(resources[i], desc[i], targetState);
     }
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocCBV(std::size_t frames, GPUResourceHandle const* resource, D3D12_CONSTANT_BUFFER_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
+GPUResourceViewHandle GPUFoundation::AllocCBV(std::size_t frames, GPUResourceHandle const* resources, D3D12_CONSTANT_BUFFER_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles{ frames };
     for (size_t i = 0; i < frames; i++) {
-        directHandles[i] = viewAllocator_.AllocCBV(resource[i], desc[i], targetState);
+        directHandles[i] = viewAllocator_.AllocCBV(resources[i], desc[i], targetState);
     }
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocSRV(std::size_t frames, GPUResourceHandle const* resource, D3D12_SHADER_RESOURCE_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
+GPUResourceViewHandle GPUFoundation::AllocSRV(std::size_t frames, GPUResourceHandle const* resources, D3D12_SHADER_RESOURCE_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles{ frames };
     for (size_t i = 0; i < frames; i++) {
-        directHandles[i] = viewAllocator_.AllocSRV(resource[i], desc[i], targetState);
+        directHandles[i] = viewAllocator_.AllocSRV(resources[i], desc[i], targetState);
     }
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocUAV(std::size_t frames, GPUResourceHandle const* resource, D3D12_UNORDERED_ACCESS_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
+GPUResourceViewHandle GPUFoundation::AllocUAV(std::size_t frames, GPUResourceHandle const* resources, D3D12_UNORDERED_ACCESS_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles{ frames };
     for (size_t i = 0; i < frames; i++) {
-        directHandles[i] = viewAllocator_.AllocUAV(resource[i], desc[i], targetState);
+        directHandles[i] = viewAllocator_.AllocUAV(resources[i], desc[i], targetState);
     }
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
@@ -180,13 +180,13 @@ GPUResourceViewTable GPUFoundation::BuildViewTable(std::size_t tableSize, GPUSha
         GPUShaderVisibleResourceViewDesc const& currentDesc = descriptions[i];
         switch (currentDesc.type_) {
         case GPU_SHADER_VISIBLE_RESOURCE_VIEW_TYPE_CBV:
-            handles[i] = AllocCBV(currentDesc.frames_, currentDesc.resources_, currentDesc.cbvDesc_, currentDesc.targetState_);
+            handles[i] = AllocCBV(currentDesc.frames_, currentDesc.resources_, currentDesc.cbvDescs_, currentDesc.targetState_);
             break;
         case GPU_SHADER_VISIBLE_RESOURCE_VIEW_TYPE_SRV:
-            handles[i] = AllocSRV(currentDesc.frames_, currentDesc.resources_, currentDesc.srvDesc_, currentDesc.targetState_);
+            handles[i] = AllocSRV(currentDesc.frames_, currentDesc.resources_, currentDesc.srvDescs_, currentDesc.targetState_);
             break;
         case GPU_SHADER_VISIBLE_RESOURCE_VIEW_TYPE_UAV:
-            handles[i] = AllocUAV(currentDesc.frames_, currentDesc.resources_, currentDesc.uavDesc_, currentDesc.targetState_);
+            handles[i] = AllocUAV(currentDesc.frames_, currentDesc.resources_, currentDesc.uavDescs_, currentDesc.targetState_);
             break;
         }
     }

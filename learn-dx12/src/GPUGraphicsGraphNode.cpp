@@ -6,7 +6,7 @@ Color::Color(float r, float g, float b, float a) :
 
 GPUGraphicsGraphNode::GPUGraphicsGraphNode() = default;
 
-GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUEngine* engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState) :
+GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUEngine& engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState) :
     GPUGraphNode{ engine, std::move(rootSignature), std::move(pipelineState) }
 { }
 
@@ -154,7 +154,7 @@ void GPUGraphicsGraphNode::ClearDepthStencilTargets(std::size_t frameIndex)
 
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, std::size_t frameIndex)
 {
-    executionEngine_->Commit().SetGraphicsRootDescriptorTable(item.dynamicArg_.bindSlot_, item.dynamicArg_.itemTable_.GPUHandle(frameIndex));
+    executionEngine_->Commit().SetGraphicsRootDescriptorTable(static_cast<UINT>(item.dynamicArg_.bindSlot_), item.dynamicArg_.itemTable_.GPUHandle(frameIndex));
 }
 
 void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)

@@ -19,9 +19,9 @@ struct GPUShaderVisibleResourceViewDesc
 
     GPU_SHADER_VISIBLE_RESOURCE_VIEW_TYPE type_;
     union {
-        D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc_;
-        D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc_;
-        D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc_;
+        D3D12_CONSTANT_BUFFER_VIEW_DESC* cbvDescs_;
+        D3D12_SHADER_RESOURCE_VIEW_DESC* srvDescs_;
+        D3D12_UNORDERED_ACCESS_VIEW_DESC* uavDescs_;
     };
 };
 
