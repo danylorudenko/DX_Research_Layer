@@ -63,6 +63,11 @@ void DirectAppDelegate::start(Application& application)
     auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
     triangleMesh_ = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
     
+    void* uploadBufferPtr = nullptr;
+    uploadBuffer.Resource().Get()->Map(0, nullptr, &uploadBufferPtr);
+    std::memcpy(uploadBufferPtr, verticesData, verticesDataSize);
+    uploadBuffer.Resource().Get()->Unmap(0, nullptr);
+
     triangleMesh_.Resource().UpdateData(initializationEngine, uploadBuffer.Resource(), 0, verticesDataSize);
     triangleMesh_.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
@@ -237,14 +242,14 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
         constantBufferData_.offset.x -= 2 * offsetBounds;
     }
 
-    //static D3D12_RANGE readRange{ 0, 0 };
+    static D3D12_RANGE readRange{ 0, 0 };
 
 
     void* mappedData = nullptr;
-    //constantBuffer_.Map(frameIndex, &mappedData, nullptr);
+    constBuffer_.View(frameIndex).Resource().Get()->Map(0, nullptr, &mappedData);
 
-    //std::memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
+    std::memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
 
     static D3D12_RANGE writeRange{ 0, sizeof(constantBufferData_) };
-    //constantBuffer_.Unmap(frameIndex, &writeRange);
+    constBuffer_.View(frameIndex).Resource().Get()->Unmap(0, &writeRange);
 }
