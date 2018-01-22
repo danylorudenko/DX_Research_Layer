@@ -42,6 +42,11 @@ GPUResourceViewHandle& GPUResourceViewHandle::operator=(GPUResourceViewHandle&& 
 
 std::size_t GPUResourceViewHandle::ID() const { return ID_; }
 
+bool GPUResourceViewHandle::IsValid() const
+{
+    return ID_ != (std::numeric_limits<std::size_t>::max)();
+}
+
 GPUResourceView& GPUResourceViewHandle::View(std::size_t frameIndex) const
 {
     auto directHandle = viewContextTable_->FetchDirectHandle(frameIndex, *this);
@@ -65,3 +70,8 @@ GPUResourceViewDirectHandle& GPUResourceViewDirectHandle::operator=(GPUResourceV
 GPUResourceViewDirectHandle& GPUResourceViewDirectHandle::operator=(GPUResourceViewDirectHandle&& rhs) = default;
 
 std::size_t GPUResourceViewDirectHandle::ID() const { return ID_; }
+
+bool GPUResourceViewDirectHandle::IsValid() const
+{
+    return ID_ != (std::numeric_limits<std::size_t>::max)();
+}

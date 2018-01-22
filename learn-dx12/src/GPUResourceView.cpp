@@ -15,6 +15,11 @@ D3D12_CPU_DESCRIPTOR_HANDLE GPUResourceView::CPUHandle() const
     return CD3DX12_CPU_DESCRIPTOR_HANDLE{ parentHeap_->CPUHeapStart(), static_cast<INT>(offsetInHeap_), static_cast<UINT>(parentHeap_->DescriptorSize()) };
 }
 
+bool GPUResourceView::IsValid() const
+{
+    return offsetInHeap_ != (std::numeric_limits<std::size_t>::max)();
+}
+
 GPUResourceView::~GPUResourceView() = default;
 
 ////////////////////////////////////////////////////////////////////////////////

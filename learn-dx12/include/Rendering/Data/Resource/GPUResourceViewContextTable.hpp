@@ -24,5 +24,5 @@ private:
     using FrameContext = std::vector<GPUResourceViewDirectHandle>;
 
     std::vector<FrameContext> frameList_;
-    
+    std::size_t virtualHandleCounter_ = 0;
 };

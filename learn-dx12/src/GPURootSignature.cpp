@@ -46,9 +46,13 @@ void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, std::
         auto const tableSize = rootArguments_[i].table_.Size();
         for (size_t j = 0; j < tableSize; j++) {
             auto& rootView = rootArguments_[i].table_.TableMember(j).View(frameIndex);
-            rootView.Resource().PrepareTransition(rootView.TargetState(), transitions[transitionsCounter++]);
+            if (rootView.Resource().State() != rootView.TargetState()) {
+                rootView.Resource().PrepareTransition(rootView.TargetState(), transitions[transitionsCounter++]);
+            }
         }
     }
 
-    executionEngine->Commit().ResourceBarrier(static_cast<UINT>(transitionsCounter), transitions);
+    if (transitionsCounter > 0) {
+        executionEngine->Commit().ResourceBarrier(static_cast<UINT>(transitionsCounter), transitions);
+    }
 }

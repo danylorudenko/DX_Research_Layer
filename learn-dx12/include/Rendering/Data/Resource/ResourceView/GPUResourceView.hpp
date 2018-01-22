@@ -22,11 +22,12 @@ public:
     virtual GPUResource& Resource() const = 0;
     virtual D3D12_RESOURCE_STATES TargetState() const = 0;
     D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle() const;
+    bool IsValid() const;
 
     virtual ~GPUResourceView();
 
 protected:
-    std::size_t offsetInHeap_ = 0;
+    std::size_t offsetInHeap_ = (std::numeric_limits<std::size_t>::max)();
     GPUResourceViewHeap const* parentHeap_ = nullptr;
 };
 

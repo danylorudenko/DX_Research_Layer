@@ -22,15 +22,14 @@ GPUGraphicsGraphNode& GPUGraphicsGraphNode::operator=(GPUGraphicsGraphNode&& rhs
 
 void GPUGraphicsGraphNode::Process(std::size_t frameIndex)
 {
-    BindPipelineState();
-    BindViewportScissor();
-    BindPassRoot(frameIndex);
-
-    BindRenderDepthStencilTargets(frameIndex);
-    
     TransitionRenderTargets(frameIndex);
     TransitionPassResources(frameIndex);
 
+    BindPipelineState();
+    BindViewportScissor();
+    BindPassRoot(frameIndex);
+    BindRenderDepthStencilTargets(frameIndex);
+    
     ClearRenderTargets(frameIndex);
     ClearDepthStencilTargets(frameIndex);
 
@@ -41,7 +40,7 @@ void GPUGraphicsGraphNode::IterateRenderItems(std::size_t frameIndex)
 {
     auto const itemCount = renderItems_.size();
     for (std::size_t i = 0; i < itemCount; i++) {
-        auto item = renderItems_[i];
+        auto& item = renderItems_[i];
         BindRenderItemVertexBuffer(item);
         BindRenderItemIndexBuffer(item);
         BindRenderItemRootResources(item, frameIndex);
@@ -90,7 +89,7 @@ void GPUGraphicsGraphNode::ImportViewportScissor(D3D12_VIEWPORT const& viewport,
 
 void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(std::size_t frameIndex)
 {    
-    auto const renderTargetsCount = static_cast<int>(renderTargets_.size());
+    auto const renderTargetsCount = renderTargets_.size();
     assert(renderTargetsCount <= 5 && "More than 5 render targets is not currently supported.");
 
     D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[5];
@@ -98,11 +97,13 @@ void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(std::size_t frameIndex)
         renderTargetHandles[i] = renderTargets_[i].View(frameIndex).CPUHandle();
     }
 
-    D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle = depthStencilTarget_.View(frameIndex).CPUHandle();
-    
-    if (renderTargetsCount > 0) {
-        executionEngine_->Commit().OMSetRenderTargets(renderTargetsCount, renderTargetHandles, false, depthStencilHandle.ptr != 0 ? &depthStencilHandle : nullptr);
+    D3D12_CPU_DESCRIPTOR_HANDLE depthStencilHandle{};
+    D3D12_CPU_DESCRIPTOR_HANDLE* depthStencilHandlePtr = nullptr;
+    if (depthStencilTarget_.IsValid()) {
+        depthStencilHandle = depthStencilTarget_.View(frameIndex).CPUHandle();
     }
+    executionEngine_->Commit().OMSetRenderTargets(static_cast<UINT>(renderTargetsCount), renderTargetHandles, false, depthStencilHandlePtr);
+
 }
 
 void GPUGraphicsGraphNode::BindPipelineState()
@@ -130,12 +131,14 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(std::size_t frameIndex)
         }
     }
 
-    auto& depthStencilView = depthStencilTarget_.View(frameIndex);
-    if (depthStencilView.CPUHandle().ptr != 0) {
-        depthStencilView.Resource().PrepareTransition(depthStencilView.TargetState(), transitions[transitionsCounter++]);
+    if (depthStencilTarget_.IsValid()) {
+        auto& view = depthStencilTarget_.View(frameIndex);
+        view.Resource().PrepareTransition(view.TargetState(), transitions[transitionsCounter++]);
     }
 
-    executionEngine_->Commit().ResourceBarrier(static_cast<UINT>(transitionsCounter), transitions);
+    if (transitionsCounter > 0) {
+        executionEngine_->Commit().ResourceBarrier(static_cast<UINT>(transitionsCounter), transitions);
+    }
 }
 
 
@@ -154,7 +157,9 @@ void GPUGraphicsGraphNode::ClearDepthStencilTargets(std::size_t frameIndex)
 
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, std::size_t frameIndex)
 {
-    executionEngine_->Commit().SetGraphicsRootDescriptorTable(static_cast<UINT>(item.dynamicArg_.bindSlot_), item.dynamicArg_.itemTable_.GPUHandle(frameIndex));
+    if (item.dynamicArg_.itemTable_.Size() > 0) {
+        executionEngine_->Commit().SetGraphicsRootDescriptorTable(static_cast<UINT>(item.dynamicArg_.bindSlot_), item.dynamicArg_.itemTable_.GPUHandle(frameIndex));
+   }
 }
 
 void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)

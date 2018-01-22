@@ -22,7 +22,7 @@ public:
     GPUResource& Resource() const;
 
 private:
-    std::size_t ID_ = 0;
+    std::size_t ID_ = (std::numeric_limits<std::size_t>::max)();
     GPUStaticResourceAllocator* allocator_ = nullptr;
 };
 
@@ -45,10 +45,11 @@ public:
     GPUResourceViewHandle& operator=(GPUResourceViewHandle&& rhs);
 
     std::size_t ID() const;
+    bool IsValid() const;
     GPUResourceView& View(std::size_t frameIndex) const;
 
 private:
-    std::size_t ID_ = 0;
+    std::size_t ID_ = (std::numeric_limits<std::size_t>::max)();
     GPUResourceViewContextTable* viewContextTable_;
     GPUResourceViewAllocator* viewAllocator_;
 };
@@ -67,8 +68,9 @@ public:
     GPUResourceViewDirectHandle& operator=(GPUResourceViewDirectHandle&& rhs);
 
     std::size_t ID() const;
+    bool IsValid() const;
 
 private:
-    std::size_t ID_ = 0;
+    std::size_t ID_ = (std::numeric_limits<std::size_t>::max)();
 };
 

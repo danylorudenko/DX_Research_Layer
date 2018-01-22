@@ -74,7 +74,6 @@ void DirectAppDelegate::start(Application& application)
     auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
     triangleMesh_ = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
     
-    // I'M HERE
     triangleMesh_.Resource().UpdateData(initializationEngine, uploadBuffer.Resource(), 0, verticesDataSize);
     triangleMesh_.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
     initializationEngine.FlushReset();
@@ -95,12 +94,10 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.hasIndexBuffer_ = false;
 
 
-
-
     triangleGraphNode_ = GPUGraphicsGraphNode{ gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>(), std::move(triangleRootSignature_), std::move(trianglePipelineState_) };
     triangleGraphNode_.ImportRenderItem(triangleRenderItem);
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
-    triangleGraphNode_.ImportRenderTargets(1, &gpuFoundation_->SwapChainRTV());
+    triangleGraphNode_.ImportRenderTargets(1, &swapChainRTV);
 
     Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
     triangleGraphNode_.ImportClearColors(&clearColor, 1);
@@ -117,7 +114,7 @@ void DirectAppDelegate::start(Application& application)
 
 
     presentNode_ = GPUPresentGraphNode{ gpuFoundation_->SwapChain(), gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>() };
-    presentNode_.ImportRenderTarget(gpuFoundation_->SwapChainRTV());
+    presentNode_.ImportRenderTarget(swapChainRTV);
     
 
     triangleGraphNode_.ImportChildNode(&presentNode_);
@@ -172,7 +169,7 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
     windowText_ += std::to_wstring(1 / drawTime);
 
     HWND windowHandle = application.window().nativeHandle();
-    //SetWindowText(windowHandle, windowText_.c_str());
+    SetWindowText(windowHandle, windowText_.c_str());
 }
 
 Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignature()
@@ -252,8 +249,6 @@ void DirectAppDelegate::Draw(int frameIndex)
         (*graphIterator)->Process(frameIndex);
         ++graphIterator;
     }
-
-    
 }
 
 void DirectAppDelegate::CustomAction(int frameIndex)

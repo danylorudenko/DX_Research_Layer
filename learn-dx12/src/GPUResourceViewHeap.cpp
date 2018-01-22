@@ -14,7 +14,7 @@ GPUResourceViewHeap::GPUResourceViewHeap(GPUFoundation& foundation, D3D12_DESCRI
     heapDesc.NumDescriptors = static_cast<UINT>(heapCapacity_);
     heapDesc.Type = type_;
     heapDesc.NodeMask = 0;
-    heapDesc.Flags = (type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    heapDesc.Flags = ((type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) || (type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER)) ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     {
         auto const result = device->CreateDescriptorHeap(
             &heapDesc,
@@ -30,7 +30,7 @@ GPUResourceViewHeap& GPUResourceViewHeap::operator=(GPUResourceViewHeap&& rhs) =
 
 std::size_t GPUResourceViewHeap::ProvideNextOffset()
 {
-    return currentHeapOffset_;
+    return currentHeapOffset_++;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE GPUResourceViewHeap::CPUHeapStart() const

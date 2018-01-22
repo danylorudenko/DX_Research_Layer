@@ -31,7 +31,7 @@ GPUResourceViewHandle GPUResourceViewContextTable::InsertView(std::size_t frameC
         }
     }
     
-    return GPUResourceViewHandle{ frameList_.size() - 1, *this, viewAllocator };
+    return GPUResourceViewHandle{ virtualHandleCounter_++, *this, viewAllocator };
 }
 
 GPUResourceViewDirectHandle GPUResourceViewContextTable::FetchDirectHandle(std::size_t frameIndex, GPUResourceViewHandle const& virtualHandle)
