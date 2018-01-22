@@ -36,7 +36,6 @@ void DirectAppDelegate::start(Application& application)
     trianglePipelineState_ = GPUPipelineState{ pipelineState };
 
 
-
     auto constexpr framesCount = GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
 
 
@@ -57,9 +56,6 @@ void DirectAppDelegate::start(Application& application)
     triangleRootSignature_.PushRootArgument(0, GPUResourceViewTable{ 1, &constBuffer_ });
 
 
-
-    
-
     auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
     triangleMesh_ = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
     
@@ -78,8 +74,6 @@ void DirectAppDelegate::start(Application& application)
     triangleView.StrideInBytes = sizeof(Vertex);
 
 
-
-    
     GPURenderItem triangleRenderItem{};
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;

@@ -20,10 +20,9 @@ public:
     void ImportRootSignature(GPURootSignature&& rootSignature);
     void ImportPipelineState(GPUPipelineState&& pipelineState);
 
-    // For now, only one child is available.
     void ImportChildNode(GPUGraphNode* outputNode);
 
-    GPUGraphNode* GetChild(std::size_t childIndex);
+    GPUGraphNode& GetChild(std::size_t childIndex);
     int ChildCount() const;
 
     virtual void Process(std::size_t frameIndex) = 0;

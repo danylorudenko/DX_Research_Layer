@@ -29,9 +29,9 @@ void GPUGraphNode::ImportPipelineState(GPUPipelineState&& pipelineState)
     pipelineState_ = std::move(pipelineState);
 }
 
-GPUGraphNode* GPUGraphNode::GetChild(std::size_t childIndex)
+GPUGraphNode& GPUGraphNode::GetChild(std::size_t childIndex)
 {
-    return childNodes_[childIndex];
+    return *(childNodes_[childIndex]);
 }
 
 int GPUGraphNode::ChildCount() const

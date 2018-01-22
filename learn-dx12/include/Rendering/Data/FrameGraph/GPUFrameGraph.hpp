@@ -2,7 +2,9 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
+#include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
+#include <Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp>
+#include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 
 class GPUFrameGraph
 {
@@ -17,7 +19,9 @@ public:
     GPUFrameGraph& operator=(GPUFrameGraph const&) = delete;
     GPUFrameGraph& operator=(GPUFrameGraph&& rhs);
 
-    void AddParentNode(GPUGraphNode* parentNode);
+    GPUGraphicsGraphNode& AddGraphicsNode(GPUGraphNode* parent);
+    GPUComputeGraphNode& AddComputeNode(GPUGraphNode* parent);
+    GPUPresentGraphNode& AddPresentNode(GPUGraphNode* parent);
 
     void ParseGraphToQueue();
 
@@ -28,6 +32,8 @@ public:
 private:
     void RecursiveNodeParserService(GPUGraphNode* node, std::set<GPUGraphNode*>& visitedNodes);
 
+    std::vector<std::unique_ptr<GPUGraphNode>> nodes_;
     std::vector<GPUGraphNode*> parentNodes_;
+
     GraphQueue parsedGraphList_;
 };
