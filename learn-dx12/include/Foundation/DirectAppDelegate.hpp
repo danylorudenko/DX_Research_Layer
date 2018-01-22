@@ -23,8 +23,8 @@ public:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRootSignature();
     Microsoft::WRL::ComPtr<ID3D12PipelineState> CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature);
 
-    void Draw(int frameIndex);
-    void CustomAction(int frameIndex);
+    void Draw(std::size_t frameIndex);
+    void CustomAction(std::size_t frameIndex);
 
 private:
     // FOUNDATION DATA

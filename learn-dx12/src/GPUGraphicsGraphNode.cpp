@@ -22,11 +22,12 @@ GPUGraphicsGraphNode& GPUGraphicsGraphNode::operator=(GPUGraphicsGraphNode&& rhs
 
 void GPUGraphicsGraphNode::Process(std::size_t frameIndex)
 {
-    TransitionRenderTargets(frameIndex);
     TransitionPassResources(frameIndex);
+    TransitionRenderTargets(frameIndex);
+
+    BindViewportScissor();
 
     BindPipelineState();
-    BindViewportScissor();
     BindPassRoot(frameIndex);
     BindRenderDepthStencilTargets(frameIndex);
     
@@ -170,7 +171,9 @@ void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)
 
 void GPUGraphicsGraphNode::BindRenderItemIndexBuffer(GPURenderItem& item)
 {
-    executionEngine_->Commit().IASetIndexBuffer(&item.indexBufferDescriptor_);
+    if (item.hasIndexBuffer_) {
+        executionEngine_->Commit().IASetIndexBuffer(&item.indexBufferDescriptor_);
+    }
 }
 
 void GPUGraphicsGraphNode::DrawCallRenderItem(GPURenderItem& item)

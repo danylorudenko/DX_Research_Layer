@@ -9,17 +9,6 @@
 
 void DirectAppDelegate::start(Application& application)
 {
-    /*{
-        auto const result = DXGIGetDebugInterface1(0, IID_PPV_ARGS(&graphicsAnalysis_));
-        if (SUCCEEDED(result)) {
-            graphicsAnalysis_->BeginCapture();
-        }
-        else {
-            graphicsAnalysis_ = nullptr;
-        }
-        
-    }*/
-
     /////////////////////////////////////////////////////////////////////////////
     // TESTING CONSTANT VERTEX DATA
     /////////////////////////////////////////////////////////////////////////////
@@ -76,7 +65,6 @@ void DirectAppDelegate::start(Application& application)
     
     triangleMesh_.Resource().UpdateData(initializationEngine, uploadBuffer.Resource(), 0, verticesDataSize);
     triangleMesh_.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-    initializationEngine.FlushReset();
 
 
     D3D12_VERTEX_BUFFER_VIEW triangleView{};
@@ -123,28 +111,16 @@ void DirectAppDelegate::start(Application& application)
     gpuFoundation_->FrameGraph().ParseGraphToQueue();
 
     initializationEngine.FlushReset();
-
-    /*if (graphicsAnalysis_ != nullptr) {
-        graphicsAnalysis_->EndCapture();
-    }*/
 }
 
 void DirectAppDelegate::update(Application& application)
 {
-    if (frameIndex_ < 3 && frameIndex_ > 0 && graphicsAnalysis_ != nullptr) {
-        graphicsAnalysis_->BeginCapture();
-    }
-    
-    int const normalizedFrameIndex = frameIndex_ % GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
+    std::size_t const normalizedFrameIndex = frameIndex_ % GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
     CustomAction(normalizedFrameIndex);
     Draw(normalizedFrameIndex);
 
     gameTimer_.Tick();
     DisplayFrameTime(application, Timer().DeltaTime());
-
-    if (frameIndex_ < 3 && graphicsAnalysis_ != nullptr) {
-        graphicsAnalysis_->EndCapture();
-    }
 
     ++frameIndex_;
 }
@@ -235,7 +211,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     return pipelineState;
 }
 
-void DirectAppDelegate::Draw(int frameIndex)
+void DirectAppDelegate::Draw(std::size_t frameIndex)
 {
     auto& graph = gpuFoundation_->FrameGraph();
     auto& graphIterator = graph.GraphQueueStart();
@@ -251,7 +227,7 @@ void DirectAppDelegate::Draw(int frameIndex)
     }
 }
 
-void DirectAppDelegate::CustomAction(int frameIndex)
+void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 {
     constexpr float offset = 0.0005f;
     constexpr float offsetBounds = 1.25f;
