@@ -6,8 +6,8 @@ Color::Color(float r, float g, float b, float a) :
 
 GPUGraphicsGraphNode::GPUGraphicsGraphNode() = default;
 
-GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUEngine& engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState) :
-    GPUGraphNode{ engine, std::move(rootSignature), std::move(pipelineState) }
+GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUEngine& engine, GPUPipelineState&& pipelineState, GPURootSignature&& rootSignature) :
+    GPUGraphNode{ engine }, pipelineState_{ std::move(pipelineState) }, rootSignature_{ std::move(rootSignature) }
 { }
 
 GPUGraphicsGraphNode::GPUGraphicsGraphNode(GPUGraphicsGraphNode&& rhs) :
@@ -88,6 +88,12 @@ void GPUGraphicsGraphNode::ImportViewportScissor(D3D12_VIEWPORT const& viewport,
     scissorRect_ = scissorRect;
 }
 
+void GPUGraphicsGraphNode::BindPassRoot(std::size_t frameIndex)
+{
+    rootSignature_.BindPassRootSignature(executionEngine_);
+    rootSignature_.BindPassDescriptorTables(executionEngine_, frameIndex);
+}
+
 void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(std::size_t frameIndex)
 {    
     auto const renderTargetsCount = renderTargets_.size();
@@ -116,6 +122,11 @@ void GPUGraphicsGraphNode::BindViewportScissor()
 {
     executionEngine_->Commit().RSSetViewports(1, &viewportRect_);
     executionEngine_->Commit().RSSetScissorRects(1, &scissorRect_);
+}
+
+void GPUGraphicsGraphNode::TransitionPassResources(std::size_t frameIndex)
+{
+    rootSignature_.TransitionRootResources(executionEngine_, frameIndex);
 }
 
 void GPUGraphicsGraphNode::TransitionRenderTargets(std::size_t frameIndex)

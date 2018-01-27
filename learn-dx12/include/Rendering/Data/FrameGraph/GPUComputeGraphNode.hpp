@@ -14,5 +14,10 @@ public:
     GPUComputeGraphNode& operator=(GPUComputeGraphNode const&) = delete;
     GPUComputeGraphNode& operator=(GPUComputeGraphNode&& rhs);
 
-    
+    virtual void Process(std::size_t frameIndex) override;
+
+private:
+
+    GPURootSignature rootSignature_;
+    GPUPipelineState pipelineState_;
 };

@@ -6,9 +6,25 @@ GPUFrameGraph::GPUFrameGraph(GPUFrameGraph&& rhs) = default;
 
 GPUFrameGraph& GPUFrameGraph::operator=(GPUFrameGraph&& rhs) = default;
 
-void GPUFrameGraph::AddParentNode(GPUGraphNode* parentNode)
+GPUGraphicsGraphNode& GPUFrameGraph::AddGraphicsNode(GPUGraphNode* parent, GPUEngine& executionEngine, GPUPipelineState&& pipelineState, GPURootSignature&& rootSignature)
 {
-    parentNodes_.push_back(parentNode);
+    auto* newNode = new GPUGraphicsGraphNode{ executionEngine, std::move(pipelineState), std::move(rootSignature) };
+    nodes_.emplace_back(std::unique_ptr<GPUGraphicsGraphNode>{ newNode });
+    InsertNodeToHierarchy(parent, newNode);
+    return *newNode;
+}
+
+GPUComputeGraphNode& GPUFrameGraph::AddComputeNode(GPUGraphNode* parent, GPUEngine& executionEngine)
+{
+    return GPUComputeGraphNode{};
+}
+
+GPUPresentGraphNode& GPUFrameGraph::AddPresentNode(GPUGraphNode& parent, GPUSwapChain& swapChain, GPUEngine& executionEngine)
+{
+    auto* newNode = new GPUPresentGraphNode{ swapChain, executionEngine };
+    nodes_.emplace_back(std::unique_ptr<GPUPresentGraphNode>{ newNode });
+    InsertNodeToHierarchy(&parent, newNode);
+    return *newNode;
 }
 
 void GPUFrameGraph::ParseGraphToQueue()
@@ -55,5 +71,15 @@ void GPUFrameGraph::RecursiveNodeParserService(GPUGraphNode* node, std::set<GPUG
     // so the node is the dead end.
     if (nonVisitedChildren > 0 || nodeChildCount == 0) {
         parsedGraphList_.push_back(node);
+    }
+}
+
+void GPUFrameGraph::InsertNodeToHierarchy(GPUGraphNode* parent, GPUGraphNode* node)
+{
+    if (parent != nullptr) {
+        parent->ImportChildNode(node);
+    }
+    else {
+        parentNodes_.push_back(node);
     }
 }

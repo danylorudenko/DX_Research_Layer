@@ -19,9 +19,9 @@ public:
     GPUFrameGraph& operator=(GPUFrameGraph const&) = delete;
     GPUFrameGraph& operator=(GPUFrameGraph&& rhs);
 
-    GPUGraphicsGraphNode& AddGraphicsNode(GPUGraphNode* parent);
-    GPUComputeGraphNode& AddComputeNode(GPUGraphNode* parent);
-    GPUPresentGraphNode& AddPresentNode(GPUGraphNode* parent);
+    GPUGraphicsGraphNode& AddGraphicsNode(GPUGraphNode* parent, GPUEngine& executionEngine, GPUPipelineState&& pipelineState, GPURootSignature&& rootSignature);
+    GPUComputeGraphNode& AddComputeNode(GPUGraphNode* parent, GPUEngine& executionEngine);
+    GPUPresentGraphNode& AddPresentNode(GPUGraphNode& parent, GPUSwapChain& swapChain, GPUEngine& executionEngine);
 
     void ParseGraphToQueue();
 
@@ -31,6 +31,7 @@ public:
 
 private:
     void RecursiveNodeParserService(GPUGraphNode* node, std::set<GPUGraphNode*>& visitedNodes);
+    void InsertNodeToHierarchy(GPUGraphNode* parent, GPUGraphNode* node);
 
     std::vector<std::unique_ptr<GPUGraphNode>> nodes_;
     std::vector<GPUGraphNode*> parentNodes_;

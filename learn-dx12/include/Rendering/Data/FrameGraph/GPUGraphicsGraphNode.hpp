@@ -17,7 +17,7 @@ class GPUGraphicsGraphNode : public GPUGraphNode
 {
 public:
     GPUGraphicsGraphNode();
-    GPUGraphicsGraphNode(GPUEngine& engine, GPURootSignature&& rootSignature, GPUPipelineState&& pipelineState);
+    GPUGraphicsGraphNode(GPUEngine& engine, GPUPipelineState&& pipelineState, GPURootSignature&& rootSignature);
     GPUGraphicsGraphNode(GPUGraphicsGraphNode const&) = delete;
     GPUGraphicsGraphNode(GPUGraphicsGraphNode&& rhs);
 
@@ -35,10 +35,12 @@ public:
     virtual void Process(std::size_t frameIndex) override;
 
 private:
+    void BindPassRoot(std::size_t frameIndex);
     void BindRenderDepthStencilTargets(std::size_t frameIndex);
     void BindPipelineState();
     void BindViewportScissor();
 
+    void TransitionPassResources(std::size_t frameIndex);
     void TransitionRenderTargets(std::size_t frameIndex);
 
     void ClearRenderTargets(std::size_t frameIndex);
@@ -49,6 +51,10 @@ private:
     void BindRenderItemVertexBuffer(GPURenderItem& item);
     void BindRenderItemIndexBuffer(GPURenderItem& item);
     void DrawCallRenderItem(GPURenderItem& item);
+
+
+    GPURootSignature rootSignature_;
+    GPUPipelineState pipelineState_;
 
     std::vector<GPURenderItem> renderItems_;
 

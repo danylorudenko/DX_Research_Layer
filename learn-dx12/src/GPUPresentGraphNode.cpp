@@ -4,7 +4,7 @@
 GPUPresentGraphNode::GPUPresentGraphNode() = default;
 
 GPUPresentGraphNode::GPUPresentGraphNode(GPUSwapChain& swapChain, GPUEngine& executionEngine) :
-    GPUGraphNode{ executionEngine, GPURootSignature{}, GPUPipelineState{} }, swapChain_{ &swapChain }
+    GPUGraphNode{ executionEngine }, swapChain_{ &swapChain }
 { }
 
 GPUPresentGraphNode::GPUPresentGraphNode(GPUPresentGraphNode&& rhs) = default;

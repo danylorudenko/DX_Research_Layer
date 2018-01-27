@@ -38,12 +38,6 @@ private:
 
     // CUSTOM APPLICATION DATA
 
-    GPURootSignature triangleRootSignature_;
-    GPUPipelineState trianglePipelineState_;
-
-    GPUGraphicsGraphNode triangleGraphNode_;
-    GPUPresentGraphNode presentNode_;
-
     SceneConstantBuffer constantBufferData_;
     GPUResourceViewHandle constBuffer_;
 

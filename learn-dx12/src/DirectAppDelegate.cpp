@@ -32,8 +32,8 @@ void DirectAppDelegate::start(Application& application)
     auto rootSignature = CreateRootSignature();
     auto pipelineState = CreatePipelineState(rootSignature);
 
-    triangleRootSignature_ = GPURootSignature{ rootSignature };
-    trianglePipelineState_ = GPUPipelineState{ pipelineState };
+    GPURootSignature triangleRootSignature_{ rootSignature };
+    GPUPipelineState trianglePipelineState_{ pipelineState };
 
 
     auto constexpr framesCount = GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
@@ -81,7 +81,7 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.hasIndexBuffer_ = false;
 
 
-    triangleGraphNode_ = GPUGraphicsGraphNode{ gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>(), std::move(triangleRootSignature_), std::move(trianglePipelineState_) };
+    auto& triangleGraphNode_ = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature_));
     triangleGraphNode_.ImportRenderItem(triangleRenderItem);
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
     triangleGraphNode_.ImportRenderTargets(1, &swapChainRTV);
@@ -100,13 +100,10 @@ void DirectAppDelegate::start(Application& application)
     triangleGraphNode_.ImportViewportScissor(viewport, scissorRect);
 
 
-    presentNode_ = GPUPresentGraphNode{ gpuFoundation_->SwapChain(), gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>() };
+    auto& presentNode_ = gpuFoundation_->FrameGraph().AddPresentNode(triangleGraphNode_, gpuFoundation_->SwapChain(), gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>());
     presentNode_.ImportRenderTarget(swapChainRTV);
     
 
-    triangleGraphNode_.ImportChildNode(&presentNode_);
-
-    gpuFoundation_->FrameGraph().AddParentNode(&triangleGraphNode_);
     gpuFoundation_->FrameGraph().ParseGraphToQueue();
 
     initializationEngine.FlushReset();

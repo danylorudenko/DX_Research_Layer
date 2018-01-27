@@ -171,6 +171,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\DirectAppDelegate.cpp" />
     <ClCompile Include="src\GPUCapabilities.cpp" />
+    <ClCompile Include="src\GPUComputeGraphNode.cpp" />
     <ClCompile Include="src\GPUDynamicResourceAllocator.cpp" />
     <ClCompile Include="src\GPUFrameGraph.cpp" />
     <ClCompile Include="src\GPUFoundation.cpp" />
