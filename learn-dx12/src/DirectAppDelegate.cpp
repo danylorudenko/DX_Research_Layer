@@ -9,6 +9,8 @@
 
 void DirectAppDelegate::start(Application& application)
 {
+    auto constexpr framesCount = GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
+
     /////////////////////////////////////////////////////////////////////////////
     // TESTING CONSTANT VERTEX DATA
     /////////////////////////////////////////////////////////////////////////////
@@ -32,12 +34,10 @@ void DirectAppDelegate::start(Application& application)
     auto rootSignature = CreateRootSignature();
     auto pipelineState = CreatePipelineState(rootSignature);
 
+
+
+
     GPURootSignature triangleRootSignature_{ rootSignature };
-    GPUPipelineState trianglePipelineState_{ pipelineState };
-
-
-    auto constexpr framesCount = GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
-
 
     auto constexpr constBufferSize = (sizeof(constantBufferData_) + 255) & ~255;
     GPUResourceHandle constBufferHandles[framesCount];
@@ -52,7 +52,6 @@ void DirectAppDelegate::start(Application& application)
     }
     
     constBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
-
     triangleRootSignature_.PushRootArgument(0, GPUResourceViewTable{ 1, &constBuffer_ });
 
 
@@ -81,6 +80,7 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.hasIndexBuffer_ = false;
 
 
+    GPUPipelineState trianglePipelineState_{ pipelineState };
     auto& triangleGraphNode_ = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature_));
     triangleGraphNode_.ImportRenderItem(triangleRenderItem);
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
