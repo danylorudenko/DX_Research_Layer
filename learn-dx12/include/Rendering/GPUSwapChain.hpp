@@ -4,6 +4,9 @@
 
 #include <Rendering\Data\Resource\GPUResource.hpp>
 
+namespace DXRL
+{
+
 class GPUFoundation;
 
 class GPUSwapChain
@@ -28,3 +31,5 @@ private:
 
     std::vector<GPUResource> renderBuffers_;
 };
+
+}

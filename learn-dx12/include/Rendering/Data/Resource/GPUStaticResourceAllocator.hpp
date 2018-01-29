@@ -5,6 +5,9 @@
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 #include <Rendering\Data\Resource\GPUResource.hpp>
 
+namespace DXRL
+{
+
 class GPUFoundation;
 
 class GPUStaticResourceAllocator
@@ -30,3 +33,5 @@ private:
 
     std::vector<std::unique_ptr<GPUResource>> committedResources_;
 };
+
+}

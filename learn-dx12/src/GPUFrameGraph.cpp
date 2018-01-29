@@ -1,5 +1,8 @@
 #include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
 
+namespace DXRL
+{
+
 GPUFrameGraph::GPUFrameGraph() = default;
 
 GPUFrameGraph::GPUFrameGraph(GPUFrameGraph&& rhs) = default;
@@ -82,4 +85,6 @@ void GPUFrameGraph::InsertNodeToHierarchy(GPUGraphNode* parent, GPUGraphNode* no
     else {
         parentNodes_.push_back(node);
     }
+}
+
 }

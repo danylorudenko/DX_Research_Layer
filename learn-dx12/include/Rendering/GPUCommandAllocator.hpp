@@ -4,6 +4,9 @@
 
 #include <Rendering\GPUFence.hpp>
 
+namespace DXRL
+{
+
 class GPUCommandAllocator
 {
 public:
@@ -26,3 +29,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
     UINT64 fenceTargetValue_ = 0U;
 };
+
+}

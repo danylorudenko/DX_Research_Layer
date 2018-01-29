@@ -6,12 +6,15 @@
 #include <Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 
+namespace DXRL
+{
+
 class GPUFrameGraph
 {
 public:
     using GraphQueue = std::vector<GPUGraphNode*>;
     using GraphIterator = GraphQueue::iterator;
-    
+
     GPUFrameGraph();
     GPUFrameGraph(GPUFrameGraph const&) = delete;
     GPUFrameGraph(GPUFrameGraph&& rhs);
@@ -38,3 +41,5 @@ private:
 
     GraphQueue parsedGraphList_;
 };
+
+}

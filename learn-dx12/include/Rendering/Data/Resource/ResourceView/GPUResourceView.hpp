@@ -8,6 +8,9 @@
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp>
 
+namespace DXRL
+{
+
 class GPUResourceView
 {
 public:
@@ -172,7 +175,9 @@ public:
     GPUGenericRenderTargetView& operator=(GPUGenericRenderTargetView&& rhs);
 
     virtual GPUResource& Resource() const override;
-    
+
 protected:
     GPUResourceHandle resourceID_;
 };
+
+}

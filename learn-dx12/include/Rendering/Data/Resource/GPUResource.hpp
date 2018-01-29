@@ -4,6 +4,9 @@
 
 #include <Rendering\GPUEngine.hpp>
 
+namespace DXRL
+{
+
 class GPUResource
 {
 public:
@@ -26,8 +29,10 @@ public:
     void UpdateData(GPUEngine& executionEngine, GPUResource const& source, std::size_t offset, std::size_t size);
 
     virtual ~GPUResource();
-    
+
 protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> resourcePtr_;
     D3D12_RESOURCE_STATES state_;
 };
+
+}

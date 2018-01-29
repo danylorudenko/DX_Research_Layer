@@ -1,5 +1,8 @@
 #include <Rendering\Data\GPUPipelineState.hpp>
 
+namespace DXRL
+{
+
 GPUPipelineState::GPUPipelineState() = default;
 
 GPUPipelineState::GPUPipelineState(Microsoft::WRL::ComPtr<ID3D12PipelineState>& state) :
@@ -9,3 +12,5 @@ GPUPipelineState::GPUPipelineState(Microsoft::WRL::ComPtr<ID3D12PipelineState>& 
 GPUPipelineState::GPUPipelineState(GPUPipelineState&& rhs) = default;
 
 GPUPipelineState& GPUPipelineState::operator=(GPUPipelineState&& rhs) = default;
+
+}

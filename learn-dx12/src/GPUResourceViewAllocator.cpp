@@ -1,6 +1,9 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
 #include <Rendering\GPUFoundation.hpp>
 
+namespace DXRL
+{
+
 GPUResourceViewAllocator::GPUResourceViewAllocator() = default;
 
 GPUResourceViewAllocator::GPUResourceViewAllocator(GPUFoundation& foundation) :
@@ -18,7 +21,7 @@ GPUResourceViewAllocator& GPUResourceViewAllocator::operator=(GPUResourceViewAll
 GPUResourceViewDirectHandle GPUResourceViewAllocator::AllocCBV(GPUResourceHandle const& resourceHandle, D3D12_CONSTANT_BUFFER_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState)
 {
     auto& device = foundation_->Device();
-    
+
     auto const offset = cbvSrvUavHeap_.ProvideNextOffset();
     CD3DX12_CPU_DESCRIPTOR_HANDLE handle{ cbvSrvUavHeap_.CPUHeapStart(), static_cast<INT>(offset), static_cast<UINT>(cbvSrvUavHeap_.DescriptorSize()) };
 
@@ -96,4 +99,6 @@ void GPUResourceViewAllocator::SetDefaultHeaps(GPUEngine& executionEngine)
 GPUResourceView& GPUResourceViewAllocator::AccessView(GPUResourceViewDirectHandle handle)
 {
     return *(resourceViewsList_[handle.ID()]);
+}
+
 }

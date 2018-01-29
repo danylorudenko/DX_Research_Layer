@@ -1,6 +1,9 @@
 #include <Rendering\GPUCommandQueue.hpp>
 #include <Rendering\GPUCommandList.hpp>
 
+namespace DXRL
+{
+
 GPUCommandQueue::GPUCommandQueue() = default;
 
 GPUCommandQueue::GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type)
@@ -38,4 +41,6 @@ void GPUCommandQueue::ExecuteCommandLists(ID3D12CommandList* commandLists, std::
 {
     ID3D12CommandList* const lists[] = { commandLists };
     commandQueue_->ExecuteCommandLists(static_cast<UINT>(count), lists);
+}
+
 }

@@ -5,6 +5,9 @@
 #include <Rendering\GPUFoundation.hpp>
 #include <Rendering\Data\Resource\GPUResource.hpp>
 
+namespace DXRL
+{
+
 class GPUDynamicResourcePtr
 {
 public:
@@ -39,9 +42,11 @@ private:
     D3D12_HEAP_TYPE heapType_ = (D3D12_HEAP_TYPE)0;
     std::size_t heapSize_ = 0;
     std::size_t chunkSize_ = 0;
-    
+
     std::size_t headChunk_;
     std::vector<std::size_t> chunksMetadata_;
 
     std::vector<std::unique_ptr<GPUResource>> placedResources_;
 };
+
+}

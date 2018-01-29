@@ -2,6 +2,9 @@
 
 #include <pch.hpp>
 
+namespace DXRL
+{
+
 class GPUPipelineState
 {
 public:
@@ -18,3 +21,5 @@ public:
 private:
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_;
 };
+
+}

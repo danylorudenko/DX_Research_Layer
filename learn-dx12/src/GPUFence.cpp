@@ -1,6 +1,9 @@
 #include <Rendering\GPUFence.hpp>
 #include <Rendering\GPUCommandAllocator.hpp>
 
+namespace DXRL
+{
+
 GPUFence::GPUFence() = default;
 
 GPUFence::GPUFence(ID3D12Device* device)
@@ -37,4 +40,6 @@ void GPUFence::WaitForValue(UINT64 value)
         fence_->SetEventOnCompletion(value, event_);
         WaitForSingleObject(event_, INFINITE);
     }
+}
+
 }

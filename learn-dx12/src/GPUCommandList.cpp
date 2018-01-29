@@ -1,13 +1,15 @@
 #include <Rendering\GPUCommandList.hpp>
 #include <Rendering\GPUCommandQueue.hpp>
 
+namespace DXRL
+{
+
 GPUCommandList::GPUCommandList() = default;
 
 GPUCommandList::GPUCommandList(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type, std::size_t allocatorCount)
 {
     // Create backing allocators
-    for (size_t i = 0; i < allocatorCount; i++)
-    {
+    for (size_t i = 0; i < allocatorCount; i++) {
         commandAllocators_.push_back(GPUCommandAllocator{ device, type });
     }
 
@@ -58,4 +60,6 @@ void GPUCommandList::Execute(GPUCommandQueue& queueContext)
 void GPUCommandList::Close()
 {
     commandList_->Close();
+}
+
 }

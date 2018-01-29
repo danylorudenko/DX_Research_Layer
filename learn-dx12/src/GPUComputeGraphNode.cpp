@@ -1,5 +1,8 @@
 #include <Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp>
 
+namespace DXRL
+{
+
 GPUComputeGraphNode::GPUComputeGraphNode() = default;
 
 GPUComputeGraphNode::GPUComputeGraphNode(GPUComputeGraphNode&& rhs) = default;
@@ -8,5 +11,7 @@ GPUComputeGraphNode& GPUComputeGraphNode::operator=(GPUComputeGraphNode&& rhs) =
 
 void GPUComputeGraphNode::Process(std::size_t frameIndex)
 {
+
+}
 
 }

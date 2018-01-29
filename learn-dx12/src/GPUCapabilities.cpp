@@ -2,6 +2,9 @@
 
 #include <Rendering\GPUFoundation.hpp>
 
+namespace DXRL
+{
+
 std::wstring GPUCapabilities::ListAdapters(GPUFoundation& gpuAccess)
 {
     std::wstringstream output;
@@ -17,7 +20,7 @@ std::wstring GPUCapabilities::ListAdapters(GPUFoundation& gpuAccess)
                 auto const result = D3D12CreateDevice(adapterTemp.Get(), D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), nullptr);
                 output << "D3D12_FATURE_LEVEL_11_0 support: " << (SUCCEEDED(result) ? "TRUE" : "FALSE") << std::endl;
             }
-            
+
 
             auto const result = adapterTemp->GetDesc1(&adapterDesc);
 
@@ -33,7 +36,7 @@ std::wstring GPUCapabilities::ListAdapters(GPUFoundation& gpuAccess)
                 << "System Memory: " << adapterDesc.DedicatedSystemMemory << std::endl
                 << "Video Memory: " << adapterDesc.DedicatedVideoMemory << std::endl << std::endl;
         }
-        
+
     }
 
     return output.str();
@@ -75,5 +78,7 @@ Microsoft::WRL::ComPtr<ID3D12Device> GPUCapabilities::GenerateStandardDeviceQuer
     OutputDebugStringA(criticalErrorMessage);
 
     return Microsoft::WRL::ComPtr<ID3D12Device>{ nullptr };
+
+}
 
 }

@@ -7,6 +7,9 @@
 #include <Rendering\GPUCommandList.hpp>
 #include <Rendering\GPUCommandQueue.hpp>
 
+namespace DXRL
+{
+
 enum GPU_ENGINE_TYPE
 {
     GPU_ENGINE_TYPE_DIRECT = D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -44,3 +47,5 @@ private:
     GPUCommandQueue commandQueue_;
     GPUFence fence_;
 };
+
+}

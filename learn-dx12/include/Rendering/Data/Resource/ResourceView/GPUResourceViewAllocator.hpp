@@ -7,6 +7,9 @@
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewTable.hpp>
 
+namespace DXRL
+{
+
 class GPUFoundation;
 
 class GPUResourceViewAllocator
@@ -32,7 +35,7 @@ public:
     GPUResourceView& AccessView(GPUResourceViewDirectHandle handle);
 
 private:
-    
+
     template<typename TView>
     GPUResourceViewDirectHandle RegisterResourceView(TView&& view)
     {
@@ -53,3 +56,5 @@ private:
 
     std::vector<std::unique_ptr<GPUResourceView>> resourceViewsList_;
 };
+
+}

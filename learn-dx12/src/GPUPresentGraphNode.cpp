@@ -1,6 +1,9 @@
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 
+namespace DXRL
+{
+
 GPUPresentGraphNode::GPUPresentGraphNode() = default;
 
 GPUPresentGraphNode::GPUPresentGraphNode(GPUSwapChain& swapChain, GPUEngine& executionEngine) :
@@ -16,7 +19,7 @@ void GPUPresentGraphNode::ImportRenderTarget(GPUResourceViewHandle const& render
     renderTarget_ = renderTarget;
 }
 
-void GPUPresentGraphNode::Process(std::size_t frameIndex) 
+void GPUPresentGraphNode::Process(std::size_t frameIndex)
 {
     TransitionRenderTargetState(frameIndex);
 
@@ -27,4 +30,6 @@ void GPUPresentGraphNode::Process(std::size_t frameIndex)
 void GPUPresentGraphNode::TransitionRenderTargetState(std::size_t frameIndex)
 {
     renderTarget_.View(frameIndex).Resource().Transition(*executionEngine_, D3D12_RESOURCE_STATE_PRESENT);
+}
+
 }

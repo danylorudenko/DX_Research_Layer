@@ -4,6 +4,9 @@
 
 #include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
 
+namespace DXRL
+{
+
 class GPUComputeGraphNode : public GPUGraphNode
 {
 public:
@@ -21,3 +24,5 @@ private:
     GPURootSignature rootSignature_;
     GPUPipelineState pipelineState_;
 };
+
+}

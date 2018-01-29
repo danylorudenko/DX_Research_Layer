@@ -2,6 +2,9 @@
 
 #include <pch.hpp>
 
+namespace DXRL
+{
+
 class GPUResource;
 class GPUStaticResourceAllocator;
 
@@ -18,7 +21,7 @@ public:
     GPUResourceHandle& operator=(GPUResourceHandle&& rhs);
 
     std::size_t ID() const;
-    
+
     GPUResource& Resource() const;
 
 private:
@@ -74,3 +77,4 @@ private:
     std::size_t ID_ = (std::numeric_limits<std::size_t>::max)();
 };
 
+}

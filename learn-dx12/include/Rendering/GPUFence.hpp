@@ -2,6 +2,9 @@
 
 #include <pch.hpp>
 
+namespace DXRL
+{
+
 class GPUFence
 {
 public:
@@ -25,3 +28,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
     HANDLE event_ = nullptr;
 };
+
+}

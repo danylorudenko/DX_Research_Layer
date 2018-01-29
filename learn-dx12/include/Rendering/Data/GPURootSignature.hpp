@@ -4,6 +4,9 @@
 
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewTable.hpp>
 
+namespace DXRL
+{
+
 class GPUEngine;
 
 class GPURootSignature
@@ -21,7 +24,7 @@ public:
 
     // This is done during graph setup.
     void PushRootArgument(std::size_t bindSlot, GPUResourceViewTable const& table);
-    
+
     void BindPassRootSignature(GPUEngine* executionEngine);
     void BindPassDescriptorTables(GPUEngine* executionEngine, std::size_t frameIndex);
     void TransitionRootResources(GPUEngine* executionEngine, std::size_t frameIndex);
@@ -36,3 +39,5 @@ private:
     };
     std::vector<GPURootArgument> rootArguments_;
 };
+
+}

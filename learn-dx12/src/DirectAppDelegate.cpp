@@ -9,7 +9,7 @@
 
 void DirectAppDelegate::start(Application& application)
 {
-    auto constexpr framesCount = GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
+    auto constexpr framesCount = DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
 
     /////////////////////////////////////////////////////////////////////////////
     // TESTING CONSTANT VERTEX DATA
@@ -26,17 +26,17 @@ void DirectAppDelegate::start(Application& application)
     /////////////////////////////////////////////////////////////////////////////
     
     
-    gpuFoundation_ = std::make_unique<GPUFoundation>(application);
+    gpuFoundation_ = std::make_unique<DXRL::GPUFoundation>(application);
     gameTimer_.Reset();
 
-    auto& initializationEngine = gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>();
+    auto& initializationEngine = gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>();
 
 
     auto rootSignature = CreateRootSignature();
-    GPURootSignature triangleRootSignature_{ rootSignature };
+    DXRL::GPURootSignature triangleRootSignature_{ rootSignature };
 
     auto constexpr constBufferSize = (sizeof(constantBufferData_) + 255) & ~255;
-    GPUResourceHandle constBufferHandles[framesCount];
+    DXRL::GPUResourceHandle constBufferHandles[framesCount];
     for (size_t i = 0; i < framesCount; i++) {
         constBufferHandles[i] = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(constBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
     }
@@ -48,7 +48,7 @@ void DirectAppDelegate::start(Application& application)
     }
     
     constBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
-    triangleRootSignature_.PushRootArgument(0, GPUResourceViewTable{ 1, &constBuffer_ });
+    triangleRootSignature_.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &constBuffer_ });
 
 
     auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
@@ -67,18 +67,18 @@ void DirectAppDelegate::start(Application& application)
     triangleView.SizeInBytes = verticesDataSize;
     triangleView.StrideInBytes = sizeof(Vertex);
 
-    GPURenderItem triangleRenderItem{};
+    DXRL::GPURenderItem triangleRenderItem{};
     triangleRenderItem.InsertVertexView(3, triangleMesh, triangleView, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
     auto pipelineState = CreatePipelineState(rootSignature);
-    GPUPipelineState trianglePipelineState_{ pipelineState };
-    auto& triangleGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature_));
+    DXRL::GPUPipelineState trianglePipelineState_{ pipelineState };
+    auto& triangleGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature_));
     triangleGraphNode.ImportRenderItem(triangleRenderItem);
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
     triangleGraphNode.ImportRenderTargets(1, &swapChainRTV);
 
-    Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
+    DXRL::Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
     triangleGraphNode.ImportClearColors(&clearColor, 1);
 
     D3D12_VIEWPORT viewport{};
@@ -86,13 +86,13 @@ void DirectAppDelegate::start(Application& application)
     viewport.TopLeftY = 0.0f;
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
-    viewport.Width = static_cast<float>(GPUFoundation::WIDTH);
-    viewport.Height = static_cast<float>(GPUFoundation::HEIGHT);
-    CD3DX12_RECT scissorRect{ 0, 0, static_cast<LONG>(GPUFoundation::WIDTH), static_cast<LONG>(GPUFoundation::HEIGHT) };
+    viewport.Width = static_cast<float>(DXRL::GPUFoundation::WIDTH);
+    viewport.Height = static_cast<float>(DXRL::GPUFoundation::HEIGHT);
+    CD3DX12_RECT scissorRect{ 0, 0, static_cast<LONG>(DXRL::GPUFoundation::WIDTH), static_cast<LONG>(DXRL::GPUFoundation::HEIGHT) };
     triangleGraphNode.ImportViewportScissor(viewport, scissorRect);
 
 
-    auto& presentNode_ = gpuFoundation_->FrameGraph().AddPresentNode(triangleGraphNode, gpuFoundation_->SwapChain(), gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>());
+    auto& presentNode_ = gpuFoundation_->FrameGraph().AddPresentNode(triangleGraphNode, gpuFoundation_->SwapChain(), gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>());
     presentNode_.ImportRenderTarget(swapChainRTV);
     
 
@@ -103,7 +103,7 @@ void DirectAppDelegate::start(Application& application)
 
 void DirectAppDelegate::update(Application& application)
 {
-    std::size_t const normalizedFrameIndex = frameIndex_ % GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
+    std::size_t const normalizedFrameIndex = frameIndex_ % DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
     CustomAction(normalizedFrameIndex);
     Draw(normalizedFrameIndex);
 
@@ -190,7 +190,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.SampleMask = UINT_MAX;
     psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     psoDesc.NumRenderTargets = 1;
-    psoDesc.RTVFormats[0] = GPUFoundation::backBufferFormat_;
+    psoDesc.RTVFormats[0] = DXRL::GPUFoundation::backBufferFormat_;
     psoDesc.SampleDesc.Count = 1;
     psoDesc.SampleDesc.Quality = 0;
 
@@ -205,7 +205,7 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
     auto& graphIterator = graph.GraphQueueStart();
     auto& graphEnd = graph.GraphQueueEnd();
     
-    auto& directEngine = gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>();
+    auto& directEngine = gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>();
 
     gpuFoundation_->SetDefaultDescriptorHeaps();
 

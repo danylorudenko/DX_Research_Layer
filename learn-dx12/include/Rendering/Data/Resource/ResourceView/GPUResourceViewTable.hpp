@@ -4,6 +4,9 @@
 
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 
+namespace DXRL
+{
+
 enum GPU_SHADER_VISIBLE_RESOURCE_VIEW_TYPE
 {
     GPU_SHADER_VISIBLE_RESOURCE_VIEW_TYPE_CBV,
@@ -43,3 +46,5 @@ public:
 private:
     std::vector<GPUResourceViewHandle> tableMembers_;
 };
+
+}

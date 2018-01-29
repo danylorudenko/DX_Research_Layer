@@ -1,5 +1,8 @@
 #include <Rendering\Data\Resource\GPUResource.hpp>
 
+namespace DXRL
+{
+
 GPUResource::GPUResource() = default;
 
 GPUResource::GPUResource(Microsoft::WRL::ComPtr<ID3D12Resource>&& resourcePtr, D3D12_RESOURCE_STATES initialState, wchar_t const* name) :
@@ -44,4 +47,6 @@ void GPUResource::PrepareTransition(D3D12_RESOURCE_STATES targetState, D3D12_RES
 void GPUResource::UpdateData(GPUEngine& executionEngine, GPUResource const& source, std::size_t offset, std::size_t size)
 {
     executionEngine.Commit().CopyBufferRegion(resourcePtr_.Get(), 0, source.GetPtr(), static_cast<UINT64>(offset), static_cast<UINT64>(size));
+}
+
 }

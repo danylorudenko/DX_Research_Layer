@@ -2,6 +2,9 @@
 
 #include <pch.hpp>
 
+namespace DXRL
+{
+
 class GPUFoundation;
 
 class GPUCapabilities
@@ -18,3 +21,5 @@ public:
 
     static Microsoft::WRL::ComPtr<ID3D12Device> GenerateStandardDeviceQuery(GPUFoundation& gpuAccess);
 };
+
+}

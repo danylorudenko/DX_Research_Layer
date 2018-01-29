@@ -5,6 +5,9 @@
 #include <Math\Transform.hpp>
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 
+namespace DXRL
+{
+
 class GPURenderItem
 {
 public:
@@ -23,12 +26,12 @@ public:
 private:
     Transform transform_;
     Transform const* parent_ = nullptr;
-    
+
     D3D_PRIMITIVE_TOPOLOGY primitiveTopology_;
 
     GPUResourceHandle vertexBuffer_;
     GPUResourceHandle indexBuffer_;
-     
+
     D3D12_VERTEX_BUFFER_VIEW vertexBufferDescriptor_;
     D3D12_INDEX_BUFFER_VIEW indexBufferDescriptor_;
 
@@ -43,3 +46,5 @@ private:
 
     GPUDynamicRootArgument dynamicArg_;
 };
+
+}

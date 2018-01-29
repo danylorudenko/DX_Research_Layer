@@ -1,6 +1,9 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewTable.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 
+namespace DXRL
+{
+
 GPUResourceViewTable::GPUResourceViewTable() = default;
 
 GPUResourceViewTable::GPUResourceViewTable(std::size_t viewCount, GPUResourceViewHandle* handles)
@@ -32,4 +35,6 @@ std::size_t GPUResourceViewTable::Size() const
 D3D12_GPU_DESCRIPTOR_HANDLE GPUResourceViewTable::GPUHandle(std::size_t frameIndex)
 {
     return reinterpret_cast<GPUShaderVisibleResourceView*>(&(tableMembers_[0].View(frameIndex)))->GPUHandle();
+}
+
 }

@@ -2,6 +2,9 @@
 #include <Rendering\GPUEngine.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 
+namespace DXRL
+{
+
 GPURootSignature::GPURootSignature() = default;
 
 GPURootSignature::GPURootSignature(Microsoft::WRL::ComPtr<ID3D12RootSignature>& signature) :
@@ -28,7 +31,7 @@ void GPURootSignature::BindPassDescriptorTables(GPUEngine* executionEngine, std:
 {
     //ID3D12DescriptorHeap* descriptorHeaps[] = { passRootDescriptorTablesMap_.ParentHeap() };
     //executionEngine->Commit().SetDescriptorHeaps(1, descriptorHeaps);
-    
+
     auto const tablesCount = rootArguments_.size();
     for (std::size_t i = 0; i < tablesCount; i++) {
         executionEngine->Commit().SetGraphicsRootDescriptorTable(static_cast<UINT>(rootArguments_[i].bindSlot_), rootArguments_[i].table_.GPUHandle(frameIndex));
@@ -55,4 +58,6 @@ void GPURootSignature::TransitionRootResources(GPUEngine* executionEngine, std::
     if (transitionsCounter > 0) {
         executionEngine->Commit().ResourceBarrier(static_cast<UINT>(transitionsCounter), transitions);
     }
+}
+
 }

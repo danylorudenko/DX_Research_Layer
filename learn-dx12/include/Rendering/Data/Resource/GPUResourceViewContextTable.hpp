@@ -4,6 +4,9 @@
 
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 
+namespace DXRL
+{
+
 class GPUResourceViewContextTable
 {
 public:
@@ -26,3 +29,5 @@ private:
     std::vector<FrameContext> frameList_;
     std::size_t virtualHandleCounter_ = 0;
 };
+
+}

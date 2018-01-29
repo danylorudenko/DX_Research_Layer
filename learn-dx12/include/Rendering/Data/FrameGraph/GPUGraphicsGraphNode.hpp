@@ -7,6 +7,9 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
 
+namespace DXRL
+{
+
 struct Color
 {
     Color(float r, float g, float b, float a);
@@ -67,3 +70,5 @@ private:
     D3D12_RECT scissorRect_;
 
 };
+
+}

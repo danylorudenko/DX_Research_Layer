@@ -1,11 +1,14 @@
 #include <Rendering\GPUEngine.hpp>
 
+namespace DXRL
+{
+
 GPUEngine::GPUEngine() = default;
 
 GPUEngine::GPUEngine(ID3D12Device* device, GPU_ENGINE_TYPE type, std::size_t allocCount)
 {
-    commandQueue_ = GPUCommandQueue { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type) };
-    commandList_ = GPUCommandList { device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), allocCount };
+    commandQueue_ = GPUCommandQueue{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type) };
+    commandList_ = GPUCommandList{ device, static_cast<D3D12_COMMAND_LIST_TYPE>(type), allocCount };
     fence_ = GPUFence{ device };
 
     Reset();
@@ -54,4 +57,6 @@ void GPUEngine::SendFenceGPUSignal(UINT64 signalValue)
 void GPUEngine::WaitForFenceValue(UINT64 value)
 {
     fence_.WaitForValue(value);
+}
+
 }

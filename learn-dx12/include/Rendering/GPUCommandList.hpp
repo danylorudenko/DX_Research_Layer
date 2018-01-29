@@ -5,6 +5,9 @@
 #include <Rendering\GPUCommandAllocator.hpp>
 #include <Rendering\GPUCommandQueue.hpp>
 
+namespace DXRL
+{
+
 class GPUCommandList
 {
 public:
@@ -31,3 +34,5 @@ private:
     std::vector<GPUCommandAllocator> commandAllocators_;
     int currentAllocator_ = 0ULL;
 };
+
+}

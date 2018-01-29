@@ -1,6 +1,9 @@
 #include <Rendering\GPUSwapChain.hpp>
 #include <Rendering\GPUFoundation.hpp>
 
+namespace DXRL
+{
+
 GPUSwapChain::GPUSwapChain() = default;
 
 GPUSwapChain::GPUSwapChain(GPUFoundation& foundation, HWND windowHandle, DXGI_FORMAT backBufferFormat, std::size_t width, std::size_t height, std::size_t bufferCount)
@@ -61,4 +64,6 @@ GPUResource& GPUSwapChain::AccessRenderBuffer(std::size_t frameIndex)
 void GPUSwapChain::Present(std::size_t syncInterval)
 {
     swapChainHandle_->Present(static_cast<UINT>(syncInterval), 0);
+}
+
 }

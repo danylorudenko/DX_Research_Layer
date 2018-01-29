@@ -1,6 +1,9 @@
 #include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
 #include <Rendering\GPUFoundation.hpp>
 
+namespace DXRL
+{
+
 GPUStaticResourceAllocator::GPUStaticResourceAllocator() = default;
 
 GPUStaticResourceAllocator::GPUStaticResourceAllocator(GPUFoundation& foundation) :
@@ -61,3 +64,4 @@ GPUResource& GPUStaticResourceAllocator::AccessResource(GPUResourceHandle const&
     return *(committedResources_[id.ID()]);
 }
 
+}

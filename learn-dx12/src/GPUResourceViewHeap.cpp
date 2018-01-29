@@ -1,6 +1,9 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp>
 #include <Rendering\GPUFoundation.hpp>
 
+namespace DXRL
+{
+
 GPUResourceViewHeap::GPUResourceViewHeap() = default;
 
 GPUResourceViewHeap::GPUResourceViewHeap(GPUFoundation& foundation, D3D12_DESCRIPTOR_HEAP_TYPE type, std::size_t capacity) :
@@ -62,4 +65,6 @@ ID3D12DescriptorHeap* GPUResourceViewHeap::Get() const
 void GPUResourceViewHeap::Reset()
 {
     currentHeapOffset_ = 0;
+}
+
 }

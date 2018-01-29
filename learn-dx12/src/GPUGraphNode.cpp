@@ -1,5 +1,8 @@
 #include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
 
+namespace DXRL
+{
+
 GPUGraphNode::GPUGraphNode() = default;
 
 GPUGraphNode::GPUGraphNode(GPUEngine& engine) :
@@ -25,4 +28,6 @@ GPUGraphNode* GPUGraphNode::GetChild(std::size_t childIndex)
 int GPUGraphNode::ChildCount() const
 {
     return static_cast<int>(childNodes_.size());
+}
+
 }

@@ -1,6 +1,9 @@
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 
-Color::Color(float r, float g, float b, float a) : 
+namespace DXRL
+{
+
+Color::Color(float r, float g, float b, float a) :
     color{ r, g, b, a }
 { }
 
@@ -30,7 +33,7 @@ void GPUGraphicsGraphNode::Process(std::size_t frameIndex)
     BindPipelineState();
     BindPassRoot(frameIndex);
     BindRenderDepthStencilTargets(frameIndex);
-    
+
     ClearRenderTargets(frameIndex);
     ClearDepthStencilTargets(frameIndex);
 
@@ -95,7 +98,7 @@ void GPUGraphicsGraphNode::BindPassRoot(std::size_t frameIndex)
 }
 
 void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(std::size_t frameIndex)
-{    
+{
     auto const renderTargetsCount = renderTargets_.size();
     assert(renderTargetsCount <= 5 && "More than 5 render targets is not currently supported.");
 
@@ -171,7 +174,7 @@ void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, std:
 {
     if (item.dynamicArg_.itemTable_.Size() > 0) {
         executionEngine_->Commit().SetGraphicsRootDescriptorTable(static_cast<UINT>(item.dynamicArg_.bindSlot_), item.dynamicArg_.itemTable_.GPUHandle(frameIndex));
-   }
+    }
 }
 
 void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)
@@ -190,4 +193,6 @@ void GPUGraphicsGraphNode::BindRenderItemIndexBuffer(GPURenderItem& item)
 void GPUGraphicsGraphNode::DrawCallRenderItem(GPURenderItem& item)
 {
     executionEngine_->Commit().DrawInstanced(item.vertexCount_, 1, 0, 0);
+}
+
 }

@@ -1,5 +1,8 @@
 #include <Rendering\GPUCommandAllocator.hpp>
 
+namespace DXRL
+{
+
 GPUCommandAllocator::GPUCommandAllocator() = default;
 
 GPUCommandAllocator::GPUCommandAllocator(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type)
@@ -25,3 +28,4 @@ GPUCommandAllocator& GPUCommandAllocator::operator=(GPUCommandAllocator&& rhs)
     return *this;
 }
 
+}

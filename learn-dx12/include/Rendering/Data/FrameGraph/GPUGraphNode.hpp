@@ -6,6 +6,9 @@
 #include <Rendering\Data\GPURootSignature.hpp>
 #include <Rendering\Data\GPUPipelineState.hpp>
 
+namespace DXRL
+{
+
 class GPUGraphNode
 {
 public:
@@ -29,3 +32,5 @@ protected:
 
     std::vector<GPUGraphNode*> childNodes_;
 };
+
+}

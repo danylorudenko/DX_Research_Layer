@@ -5,6 +5,9 @@
 #include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
 #include <Rendering\GPUSwapChain.hpp>
 
+namespace DXRL
+{
+
 class GPUPresentGraphNode : public GPUGraphNode
 {
 public:
@@ -27,3 +30,5 @@ protected:
     GPUResourceViewHandle renderTarget_;
     GPUSwapChain* swapChain_;
 };
+
+}

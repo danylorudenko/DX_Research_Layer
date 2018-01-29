@@ -1,10 +1,13 @@
 #include <Rendering\GPUFoundation.hpp>
 #include <Foundation\GPUCapabilities.hpp>
 
+namespace DXRL
+{
+
 GPUFoundation::GPUFoundation() = default;
 
 GPUFoundation::GPUFoundation(Application& application)
-{    
+{
     // Create device and dxgiFactory.
     InitializeD3D12();
 
@@ -36,7 +39,7 @@ void GPUFoundation::InitializeD3D12()
         auto const result = D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_));
         ThrowIfFailed(result);
         debugController_->EnableDebugLayer();
-        
+
         {
             Microsoft::WRL::ComPtr<ID3D12Debug1> debugController1{ nullptr };
             auto const result = debugController_->QueryInterface(IID_PPV_ARGS(debugController1.GetAddressOf()));
@@ -199,4 +202,6 @@ GPUResourceViewTable GPUFoundation::BuildViewTable(std::size_t tableSize, GPUSha
     }
 
     return GPUResourceViewTable(tableSize, handles.data());
+}
+
 }

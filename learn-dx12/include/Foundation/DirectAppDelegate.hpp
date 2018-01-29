@@ -29,7 +29,7 @@ private:
     // FOUNDATION DATA
     PerformanceTimer gameTimer_;
     std::wstring windowText_;
-    std::unique_ptr<GPUFoundation> gpuFoundation_;
+    std::unique_ptr<DXRL::GPUFoundation> gpuFoundation_;
     Microsoft::WRL::ComPtr<IDXGraphicsAnalysis> graphicsAnalysis_;
 
     UINT64 frameIndex_ = 0;
@@ -40,5 +40,5 @@ private:
 
 
     SceneConstantBuffer constantBufferData_;
-    GPUResourceViewHandle constBuffer_;
+    DXRL::GPUResourceViewHandle constBuffer_;
 };

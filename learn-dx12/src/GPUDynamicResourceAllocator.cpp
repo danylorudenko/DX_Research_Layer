@@ -1,5 +1,8 @@
 #include <Rendering\Data\Resource\GPUDynamicResourceAllocator.hpp>
 
+namespace DXRL
+{
+
 GPUDynamicResourcePtr::GPUDynamicResourcePtr() = default;
 
 GPUDynamicResourcePtr::GPUDynamicResourcePtr(GPUDynamicResourcePtr const& rhs) = default;
@@ -70,5 +73,7 @@ GPUDynamicResourcePtr GPUDynamicResourceAllocator::AllocDynamicResource(D3D12_RE
 
 void GPUDynamicResourceAllocator::FreeDynamicResource(GPUDynamicResourcePtr ptr)
 {
+
+}
 
 }

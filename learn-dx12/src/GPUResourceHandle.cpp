@@ -3,6 +3,9 @@
 #include <Rendering\Data\Resource\GPUResourceViewContextTable.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
 
+namespace DXRL
+{
+
 GPUResourceHandle::GPUResourceHandle() = default;
 
 GPUResourceHandle::GPUResourceHandle(std::size_t ID, GPUStaticResourceAllocator& allocator) :
@@ -74,4 +77,6 @@ std::size_t GPUResourceViewDirectHandle::ID() const { return ID_; }
 bool GPUResourceViewDirectHandle::IsValid() const
 {
     return ID_ != (std::numeric_limits<std::size_t>::max)();
+}
+
 }

@@ -1,5 +1,8 @@
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 
+namespace DXRL
+{
+
 GPUResourceView::GPUResourceView() = default;
 
 GPUResourceView::GPUResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap) :
@@ -163,4 +166,6 @@ GPUGenericRenderTargetView& GPUGenericRenderTargetView::operator=(GPUGenericRend
 GPUResource& GPUGenericRenderTargetView::Resource() const
 {
     return resourceID_.Resource();
+}
+
 }
