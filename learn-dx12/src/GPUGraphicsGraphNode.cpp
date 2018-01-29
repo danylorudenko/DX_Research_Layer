@@ -167,7 +167,7 @@ void GPUGraphicsGraphNode::ClearRenderTargets(std::size_t frameIndex)
 
 void GPUGraphicsGraphNode::ClearDepthStencilTargets(std::size_t frameIndex)
 {
-
+    
 }
 
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, std::size_t frameIndex)
