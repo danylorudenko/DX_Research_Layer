@@ -68,10 +68,7 @@ void DirectAppDelegate::start(Application& application)
     triangleView.StrideInBytes = sizeof(Vertex);
 
     GPURenderItem triangleRenderItem{};
-    triangleRenderItem.vertexBuffer_ = triangleMesh;
-    triangleRenderItem.vertexBufferDescriptor_ = triangleView;
-    triangleRenderItem.vertexCount_ = 3;
-    triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    triangleRenderItem.InsertVertexView(3, triangleMesh, triangleView, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
     auto pipelineState = CreatePipelineState(rootSignature);
