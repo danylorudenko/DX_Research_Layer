@@ -152,9 +152,6 @@
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\GeometryMesh.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\Data\GPUPipelineState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -222,6 +219,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\Data\Resource\GPUResourceViewContextTable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Data\GPUGeometryMesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

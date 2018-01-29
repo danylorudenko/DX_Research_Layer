@@ -29,7 +29,7 @@ public:
     DirectX::XMMATRIX XM_CALLCONV ViewMatrixSIMD(DirectX::XMFLOAT3A& pos, DirectX::XMFLOAT3A& direction, DirectX::XMFLOAT3A& up) const;
     DirectX::XMMATRIX XM_CALLCONV ViewMatrixSIMD(DirectX::FXMVECTOR pos, DirectX::FXMVECTOR direction, DirectX::FXMVECTOR up) const;
 
-    DirectX::XMFLOAT4X4A PerspectiveMatrix();
+    DirectX::XMFLOAT4X4A const& PerspectiveMatrix();
     DirectX::XMMATRIX XM_CALLCONV PerspectiveMatrixSIMD() const;
 
 private:

@@ -2,22 +2,17 @@
 
 #include <pch.hpp>
 
-#include <map>
-
-namespace
-{
-struct SubmeshInfo
+struct GPUSubmeshInfo
 {
     UINT geometryLocation;
     UINT indexLocation;
 
 }; // struct SubmeshInfo
-} // namespace
 
-class GeometryMesh
+class GPUGeometryMesh
 {
 public:
-    using SubmeshMap = std::map<std::string, SubmeshInfo>;
+    using SubmeshMap = std::map<std::string, GPUSubmeshInfo>;
 
     //GPUFrameResource vertices;
     D3D12_VERTEX_BUFFER_VIEW verticesView;

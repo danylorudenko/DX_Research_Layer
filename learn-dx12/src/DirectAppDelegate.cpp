@@ -31,12 +31,8 @@ void DirectAppDelegate::start(Application& application)
 
     auto& initializationEngine = gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>();
 
+
     auto rootSignature = CreateRootSignature();
-    auto pipelineState = CreatePipelineState(rootSignature);
-
-
-
-
     GPURootSignature triangleRootSignature_{ rootSignature };
 
     auto constexpr constBufferSize = (sizeof(constantBufferData_) + 255) & ~255;
@@ -56,38 +52,37 @@ void DirectAppDelegate::start(Application& application)
 
 
     auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
-    triangleMesh_ = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
+    auto triangleMesh = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
     
     void* uploadBufferPtr = nullptr;
     uploadBuffer.Resource().Get()->Map(0, nullptr, &uploadBufferPtr);
     std::memcpy(uploadBufferPtr, verticesData, verticesDataSize);
     uploadBuffer.Resource().Get()->Unmap(0, nullptr);
 
-    triangleMesh_.Resource().UpdateData(initializationEngine, uploadBuffer.Resource(), 0, verticesDataSize);
-    triangleMesh_.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
+    triangleMesh.Resource().UpdateData(initializationEngine, uploadBuffer.Resource(), 0, verticesDataSize);
+    triangleMesh.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
     D3D12_VERTEX_BUFFER_VIEW triangleView{};
-    triangleView.BufferLocation = triangleMesh_.Resource().Get()->GetGPUVirtualAddress();
+    triangleView.BufferLocation = triangleMesh.Resource().Get()->GetGPUVirtualAddress();
     triangleView.SizeInBytes = verticesDataSize;
     triangleView.StrideInBytes = sizeof(Vertex);
 
-
     GPURenderItem triangleRenderItem{};
+    triangleRenderItem.vertexBuffer_ = triangleMesh;
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    triangleRenderItem.hasIndexBuffer_ = false;
 
 
+    auto pipelineState = CreatePipelineState(rootSignature);
     GPUPipelineState trianglePipelineState_{ pipelineState };
-    auto& triangleGraphNode_ = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature_));
-    triangleGraphNode_.ImportRenderItem(triangleRenderItem);
+    auto& triangleGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature_));
+    triangleGraphNode.ImportRenderItem(triangleRenderItem);
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
-    triangleGraphNode_.ImportRenderTargets(1, &swapChainRTV);
+    triangleGraphNode.ImportRenderTargets(1, &swapChainRTV);
 
     Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
-    triangleGraphNode_.ImportClearColors(&clearColor, 1);
+    triangleGraphNode.ImportClearColors(&clearColor, 1);
 
     D3D12_VIEWPORT viewport{};
     viewport.TopLeftX = 0.0f;
@@ -97,10 +92,10 @@ void DirectAppDelegate::start(Application& application)
     viewport.Width = static_cast<float>(GPUFoundation::WIDTH);
     viewport.Height = static_cast<float>(GPUFoundation::HEIGHT);
     CD3DX12_RECT scissorRect{ 0, 0, static_cast<LONG>(GPUFoundation::WIDTH), static_cast<LONG>(GPUFoundation::HEIGHT) };
-    triangleGraphNode_.ImportViewportScissor(viewport, scissorRect);
+    triangleGraphNode.ImportViewportScissor(viewport, scissorRect);
 
 
-    auto& presentNode_ = gpuFoundation_->FrameGraph().AddPresentNode(triangleGraphNode_, gpuFoundation_->SwapChain(), gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>());
+    auto& presentNode_ = gpuFoundation_->FrameGraph().AddPresentNode(triangleGraphNode, gpuFoundation_->SwapChain(), gpuFoundation_->Engine<GPU_ENGINE_TYPE_DIRECT>());
     presentNode_.ImportRenderTarget(swapChainRTV);
     
 

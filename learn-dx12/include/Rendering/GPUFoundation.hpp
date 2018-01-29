@@ -89,13 +89,4 @@ private:
     GPUResourceViewContextTable viewContextTable_;
     
     GPUStaticResourceAllocator staticResourceAllocator_;
-
-
-
-    //Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain_;
-    //GPUFrameResource* renderTargetBuffers_ = nullptr;
-    //GPUFrameResource* depthStencilBuffers_ = nullptr;
-    //GPUFrameResourceDescriptor* finalRenderTargetViews_ = nullptr;
-    //GPUFrameResourceDescriptor* finalDepthStencilViews_ = nullptr;
-    //GPUDescriptorHeap* descriptorHeap_ = nullptr;
 };

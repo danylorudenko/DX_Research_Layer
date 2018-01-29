@@ -42,7 +42,7 @@ DirectX::XMMATRIX Camera::ViewMatrixSIMD(DirectX::XMFLOAT3A& pos, DirectX::XMFLO
     return ViewMatrixSIMD(DirectX::XMLoadFloat3A(&pos), DirectX::XMLoadFloat3A(&direction), DirectX::XMLoadFloat3A(&up));
 }
 
-DirectX::XMFLOAT4X4A Camera::PerspectiveMatrix()
+DirectX::XMFLOAT4X4A const& Camera::PerspectiveMatrix()
 {
     if (perspectiveMatrixDirty_) {
         DirectX::XMStoreFloat4x4A(&perspectiveMatrix_, PerspectiveMatrixSIMD());

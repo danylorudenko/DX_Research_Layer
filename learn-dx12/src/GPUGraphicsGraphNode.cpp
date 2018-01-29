@@ -182,7 +182,7 @@ void GPUGraphicsGraphNode::BindRenderItemVertexBuffer(GPURenderItem& item)
 
 void GPUGraphicsGraphNode::BindRenderItemIndexBuffer(GPURenderItem& item)
 {
-    if (item.hasIndexBuffer_) {
+    if (item.indexCount_ > 0) {
         executionEngine_->Commit().IASetIndexBuffer(&item.indexBufferDescriptor_);
     }
 }

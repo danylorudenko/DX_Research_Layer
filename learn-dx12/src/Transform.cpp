@@ -31,17 +31,17 @@ DirectX::XMVECTOR Transform::ScaleSIMD() const
     return DirectX::XMLoadFloat3A(&scale_);
 }
 
-DirectX::XMFLOAT3A Transform::Position() const
+DirectX::XMFLOAT3A const& Transform::Position() const
 {
     return position_;
 }
 
-DirectX::XMFLOAT4A Transform::Rotation() const
+DirectX::XMFLOAT4A const& Transform::Rotation() const
 {
     return rotation_;
 }
 
-DirectX::XMFLOAT3A Transform::Scale() const
+DirectX::XMFLOAT3A const& Transform::Scale() const
 {
     return scale_;
 }
@@ -135,7 +135,7 @@ DirectX::XMVECTOR Transform::UpSIMD() const
     return DirectX::XMVector2Transform(unitUp, DirectX::XMMatrixRotationQuaternion(RotationSIMD()));
 }
 
-DirectX::XMFLOAT4X4A Transform::WorldMatrix()
+DirectX::XMFLOAT4X4A const& Transform::WorldMatrix()
 {
     if (worldMatrixDirty_) {
         DirectX::XMStoreFloat4x4A(&worldMatrix_, WorldMatrixSIMD());

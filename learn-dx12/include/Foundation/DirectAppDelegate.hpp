@@ -5,7 +5,6 @@
 #include <Foundation\Application.hpp>
 #include <Foundation\PerformanceTimer.hpp>
 #include <Rendering\GPUFoundation.hpp>
-#include <Rendering\Data\GeometryMesh.hpp>
 #include <Rendering\Data\SceneConstantBuffer.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
@@ -38,8 +37,8 @@ private:
 
     // CUSTOM APPLICATION DATA
 
+
+
     SceneConstantBuffer constantBufferData_;
     GPUResourceViewHandle constBuffer_;
-
-    GPUResourceHandle triangleMesh_;
 };

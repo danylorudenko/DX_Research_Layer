@@ -206,7 +206,7 @@
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUFrameGraph.hpp" />
-    <ClInclude Include="include\Rendering\Data\GeometryMesh.hpp" />
+    <ClInclude Include="include\Rendering\Data\GPUGeometryMesh.hpp" />
     <ClInclude Include="include\Rendering\Data\GPUPipelineState.hpp" />
     <ClInclude Include="include\Rendering\Data\GPURenderItem.hpp" />
     <ClInclude Include="include\Rendering\Data\GPURootSignature.hpp" />

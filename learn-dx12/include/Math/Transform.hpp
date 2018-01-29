@@ -16,9 +16,9 @@ public:
     DirectX::XMVECTOR XM_CALLCONV RotationSIMD() const;
     DirectX::XMVECTOR XM_CALLCONV ScaleSIMD() const;
 
-    DirectX::XMFLOAT3A Position() const;
-    DirectX::XMFLOAT4A Rotation() const;
-    DirectX::XMFLOAT3A Scale() const;
+    DirectX::XMFLOAT3A const& Position() const;
+    DirectX::XMFLOAT4A const& Rotation() const;
+    DirectX::XMFLOAT3A const& Scale() const;
 
     void XM_CALLCONV Position(DirectX::FXMVECTOR newPos);
     void XM_CALLCONV Rotation(DirectX::FXMVECTOR newOrientation);
@@ -38,7 +38,7 @@ public:
     DirectX::XMVECTOR XM_CALLCONV RightSIMD() const;
     DirectX::XMVECTOR XM_CALLCONV UpSIMD() const;
 
-    DirectX::XMFLOAT4X4A WorldMatrix();
+    DirectX::XMFLOAT4X4A const& WorldMatrix();
     DirectX::XMMATRIX XM_CALLCONV WorldMatrixSIMD() const;
 
 private:
