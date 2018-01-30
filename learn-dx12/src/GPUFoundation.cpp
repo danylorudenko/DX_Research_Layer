@@ -138,13 +138,13 @@ GPUResourceViewHandle GPUFoundation::AllocRTV(std::size_t frames, GPUResourceHan
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
+GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles;
     directHandles.resize(frames);
     for (size_t i = 0; i < frames; i++) {
-        directHandles[i] = viewAllocator_.AllocDSV(resources[i], desc[i], targetState);
+        directHandles[i] = viewAllocator_.AllocDSV(resources[i], desc, targetState);
     }
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }

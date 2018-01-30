@@ -51,7 +51,7 @@ public:
 
     GPUResourceViewHandle SwapChainRTV();
     GPUResourceViewHandle AllocRTV(std::size_t frames, GPUResourceHandle const* resources, D3D12_RENDER_TARGET_VIEW_DESC const* desc);
-    GPUResourceViewHandle AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState);
+    GPUResourceViewHandle AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState);
     GPUResourceViewHandle AllocCBV(std::size_t frames, GPUResourceHandle const* resources, D3D12_CONSTANT_BUFFER_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState);
     GPUResourceViewHandle AllocSRV(std::size_t frames, GPUResourceHandle const* resources, D3D12_SHADER_RESOURCE_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState);
     GPUResourceViewHandle AllocUAV(std::size_t frames, GPUResourceHandle const* resources, D3D12_UNORDERED_ACCESS_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState);

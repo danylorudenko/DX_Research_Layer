@@ -101,14 +101,12 @@ void DirectAppDelegate::start(Application& application)
         depthStencilBuffers_[i] = gpuFoundation_->AllocDefaultResource(depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
     }
 
-    initializationEngine.FlushReset();
-
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
     dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
     dsvDesc.Texture2D.MipSlice = 0;
-    auto depthStencilView = gpuFoundation_->AllocDSV(framesCount, depthStencilBuffers_, &dsvDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    auto depthStencilView = gpuFoundation_->AllocDSV(framesCount, depthStencilBuffers_, dsvDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
     DXRL::GPUDepthStencilSettings dsSettings{};
     dsSettings.ActivateDepth();

@@ -151,9 +151,13 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(std::size_t frameIndex)
         }
     }
 
+    
+
     if (depthStencilSettings_.DepthActive() | depthStencilSettings_.StencilActive()) {
-        auto& view = depthStencilTarget_.View(frameIndex);
-        view.Resource().PrepareTransition(view.TargetState(), transitions[transitionsCounter++]);
+        auto& dsv = depthStencilTarget_.View(frameIndex);
+        if (dsv.Resource().State() != dsv.TargetState()) {
+            dsv.Resource().PrepareTransition(dsv.TargetState(), transitions[transitionsCounter++]);
+        }
     }
 
     if (transitionsCounter > 0) {
