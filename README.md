@@ -9,5 +9,5 @@ DirectX 12 was taken as a foundation for the DX Research Layer. It is complex a 
 
 ## How to use it?
 
-Unfortunately, author haven't yer formed a complex view on how DXRL should be structured, many changes are to come, so author believes it's not the best time for any solid tutorial.
+Unfortunately, author haven't yet formed a complex view on how DXRL should be structured, many changes are to come, so author believes it's not the best time for any solid tutorial.
 
