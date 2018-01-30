@@ -48,7 +48,6 @@ void DirectAppDelegate::start(Application& application)
     }
     
     constBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
-    triangleRootSignature_.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &constBuffer_ });
 
 
     auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
@@ -72,17 +71,52 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
+    triangleRenderItem.dynamicArg_ = DXRL::GPURenderItem::GPUDynamicRootArgument{ 0, DXRL::GPUResourceViewTable{1, &constBuffer_} };
 
     auto pipelineState = CreatePipelineState(rootSignature);
     DXRL::GPUPipelineState trianglePipelineState_{ pipelineState };
     auto& triangleGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature_));
     triangleGraphNode.ImportRenderItem(triangleRenderItem);
+
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
     triangleGraphNode.ImportRenderTargets(1, &swapChainRTV);
-
     DXRL::Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
     triangleGraphNode.ImportClearColors(&clearColor, 1);
+
+    D3D12_RESOURCE_DESC depthStencilDesc;
+    //depthStencilDesc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D24_UNORM_S8_UINT, DXRL::GPUFoundation::WIDTH, DXRL::GPUFoundation::HEIGHT, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+    depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depthStencilDesc.Height = DXRL::GPUFoundation::HEIGHT;
+    depthStencilDesc.Width = DXRL::GPUFoundation::WIDTH;
+    depthStencilDesc.DepthOrArraySize = 1;
+    depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    depthStencilDesc.Alignment = 0;
+    depthStencilDesc.MipLevels = 1;
+    depthStencilDesc.SampleDesc.Quality = 0;
+    depthStencilDesc.SampleDesc.Count = 1;
+    depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+    DXRL::GPUResourceHandle depthStencilBuffers_[framesCount];
+    for (size_t i = 0; i < framesCount; i++) {
+        depthStencilBuffers_[i] = gpuFoundation_->AllocDefaultResource(depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    }
+
+    initializationEngine.FlushReset();
+
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+    dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+    dsvDesc.Texture2D.MipSlice = 0;
+    auto depthStencilView = gpuFoundation_->AllocDSV(framesCount, depthStencilBuffers_, &dsvDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+    DXRL::GPUDepthStencilSettings dsSettings{};
+    dsSettings.ActivateDepth();
+    dsSettings.depthStencilClearFlags_ = D3D12_CLEAR_FLAG_DEPTH;
+
+    triangleGraphNode.ImportDepthStencilTarget(depthStencilView);
+    triangleGraphNode.ImportDepthStencilSettings(dsSettings);
+    
 
     D3D12_VIEWPORT viewport{};
     viewport.TopLeftX = 0.0f;

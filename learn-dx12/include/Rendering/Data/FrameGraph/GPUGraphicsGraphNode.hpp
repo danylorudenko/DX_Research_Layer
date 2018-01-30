@@ -6,6 +6,7 @@
 #include <Rendering\Data\GPURenderItem.hpp>
 #include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
+#include <Rendering\Data\GPUDepthStencilSettings.hpp>
 
 namespace DXRL
 {
@@ -29,6 +30,7 @@ public:
 
     void ImportRenderTargets(std::size_t count, GPUResourceViewHandle const* renderTargets);
     void ImportDepthStencilTarget(GPUResourceViewHandle const& depthStencilView);
+    void ImportDepthStencilSettings(GPUDepthStencilSettings const& settings);
     void ImportClearColors(Color const* clearColors, std::size_t colorCount);
     void ImportViewportScissor(D3D12_VIEWPORT const& viewport, D3D12_RECT const& scissorRect);
 
@@ -65,6 +67,7 @@ private:
     std::vector<Color> clearColors_;
 
     GPUResourceViewHandle depthStencilTarget_;
+    GPUDepthStencilSettings depthStencilSettings_;
 
     D3D12_VIEWPORT viewportRect_;
     D3D12_RECT scissorRect_;

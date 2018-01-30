@@ -65,6 +65,11 @@ void GPUGraphicsGraphNode::ImportDepthStencilTarget(GPUResourceViewHandle const&
     depthStencilTarget_ = depthStencilDescriptor;
 }
 
+void GPUGraphicsGraphNode::ImportDepthStencilSettings(GPUDepthStencilSettings const& settings)
+{
+    depthStencilSettings_ = settings;
+}
+
 void GPUGraphicsGraphNode::ImportRenderItem(GPURenderItem const& renderItem)
 {
     renderItems_.push_back(renderItem);
@@ -146,7 +151,7 @@ void GPUGraphicsGraphNode::TransitionRenderTargets(std::size_t frameIndex)
         }
     }
 
-    if (depthStencilTarget_.IsValid()) {
+    if (depthStencilSettings_.DepthActive() | depthStencilSettings_.StencilActive()) {
         auto& view = depthStencilTarget_.View(frameIndex);
         view.Resource().PrepareTransition(view.TargetState(), transitions[transitionsCounter++]);
     }
@@ -167,7 +172,9 @@ void GPUGraphicsGraphNode::ClearRenderTargets(std::size_t frameIndex)
 
 void GPUGraphicsGraphNode::ClearDepthStencilTargets(std::size_t frameIndex)
 {
-    
+    if (depthStencilSettings_.depthStencilClearFlags_ != 0) {
+        executionEngine_->Commit().ClearDepthStencilView(depthStencilTarget_.View(frameIndex).CPUHandle(), depthStencilSettings_.depthStencilClearFlags_, 0.0f, 0, 0, nullptr);
+    }
 }
 
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, std::size_t frameIndex)
