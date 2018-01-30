@@ -1,7 +1,7 @@
 # DX Research Layer
 
 Short for DirectX Research layer.
-The project is intended to help it's creator with research of modern graphics algorythms and technologies, it is not a rendering engine, though it has some similarities.
+The project is intended to help it's creator with research of modern graphics algorithms and technologies, it is not a rendering engine, though it has some similarities.
 
 ## Graphics API
 
