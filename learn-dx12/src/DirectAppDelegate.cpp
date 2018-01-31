@@ -7,6 +7,19 @@
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Rendering\Data\GPURenderItem.hpp>
 
+struct VertHeader
+{
+    std::uint32_t vertexCount_ = 0;
+    std::uint32_t vertexSize_ = 0;
+    std::uint32_t indexCount_ = 0;
+    std::uint32_t indexSize_ = 0;
+};
+
+struct Pos
+{
+    float x, y, z;
+};
+
 void DirectAppDelegate::start(Application& application)
 {
     auto constexpr framesCount = DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
@@ -15,13 +28,13 @@ void DirectAppDelegate::start(Application& application)
     // TESTING CONSTANT VERTEX DATA
     /////////////////////////////////////////////////////////////////////////////
 
-    Vertex verticesData[] = {
+    /*Vertex verticesData[] = {
         { { 0.0f, 0.25f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
         { { 0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
         { { -0.25f, -0.25f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
-    };
+    };*/
 
-    auto const verticesDataSize = sizeof(verticesData);
+    //auto const verticesDataSize = sizeof(verticesData);
 
     /////////////////////////////////////////////////////////////////////////////
     
@@ -30,6 +43,30 @@ void DirectAppDelegate::start(Application& application)
     gameTimer_.Reset();
 
     auto& initializationEngine = gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>();
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    std::ifstream ifstream("stanford_dragon.vert", std::ios_base::binary);
+    if (!ifstream.is_open()) {
+        assert(false);
+    }
+    ifstream.seekg(0);
+    VertHeader header;
+    ifstream.read(reinterpret_cast<char*>(&header), sizeof(VertHeader));
+
+    std::size_t const vertexSize = header.vertexSize_;
+    std::size_t const indexSize = header.indexSize_;
+
+    std::size_t const vertexBytes = vertexSize * header.vertexCount_;
+    std::size_t const indexBytes = indexSize * header.indexCount_;
+
+    char* vertexData = new char[vertexBytes];
+    char* indexData = new char[indexBytes];
+
+    ifstream.read(vertexData, vertexBytes);
+    ifstream.read(indexData, indexBytes);
+
+    /////////////////////////////////////////////////////////////////////////////
 
 
     auto rootSignature = CreateRootSignature();
@@ -50,24 +87,24 @@ void DirectAppDelegate::start(Application& application)
     constBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
 
-    auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
-    auto triangleMesh = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
+    //auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+    //auto triangleMesh = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
     
     void* uploadBufferPtr = nullptr;
-    uploadBuffer.Resource().Get()->Map(0, nullptr, &uploadBufferPtr);
-    std::memcpy(uploadBufferPtr, verticesData, verticesDataSize);
-    uploadBuffer.Resource().Get()->Unmap(0, nullptr);
+    //uploadBuffer.Resource().Get()->Map(0, nullptr, &uploadBufferPtr);
+    //std::memcpy(uploadBufferPtr, verticesData, verticesDataSize);
+    //uploadBuffer.Resource().Get()->Unmap(0, nullptr);
 
-    triangleMesh.Resource().UpdateData(initializationEngine, uploadBuffer.Resource(), 0, verticesDataSize);
-    triangleMesh.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+    //triangleMesh.Resource().UpdateData(initializationEngine, uploadBuffer.Resource(), 0, verticesDataSize);
+    //triangleMesh.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
     D3D12_VERTEX_BUFFER_VIEW triangleView{};
-    triangleView.BufferLocation = triangleMesh.Resource().Get()->GetGPUVirtualAddress();
-    triangleView.SizeInBytes = verticesDataSize;
+    //triangleView.BufferLocation = triangleMesh.Resource().Get()->GetGPUVirtualAddress();
+    //triangleView.SizeInBytes = verticesDataSize;
     triangleView.StrideInBytes = sizeof(Vertex);
 
     DXRL::GPURenderItem triangleRenderItem{};
-    triangleRenderItem.vertexBuffer_ = triangleMesh;
+    //triangleRenderItem.vertexBuffer_ = triangleMesh;
     triangleRenderItem.vertexBufferDescriptor_ = triangleView;
     triangleRenderItem.vertexCount_ = 3;
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -84,7 +121,6 @@ void DirectAppDelegate::start(Application& application)
     triangleGraphNode.ImportClearColors(&clearColor, 1);
 
     D3D12_RESOURCE_DESC depthStencilDesc;
-    //depthStencilDesc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D24_UNORM_S8_UINT, DXRL::GPUFoundation::WIDTH, DXRL::GPUFoundation::HEIGHT, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
     depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     depthStencilDesc.Height = DXRL::GPUFoundation::HEIGHT;
