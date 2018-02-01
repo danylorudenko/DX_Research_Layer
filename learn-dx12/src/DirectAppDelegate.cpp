@@ -46,11 +46,11 @@ void DirectAppDelegate::start(Application& application)
 
 
     ////////////////////////////////////////////////////////////////////////////
-    std::ifstream ifstream("stanford_dragon.vert", std::ios_base::binary);
+    std::ifstream ifstream("header.vert", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
-    ifstream.seekg(0);
+    ifstream.seekg(std::ios_base::beg);
     VertHeader header;
     ifstream.read(reinterpret_cast<char*>(&header), sizeof(VertHeader));
 
@@ -66,49 +66,86 @@ void DirectAppDelegate::start(Application& application)
     ifstream.read(vertexData, vertexBytes);
     ifstream.read(indexData, indexBytes);
 
+    auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes > indexBytes ? vertexBytes : indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
+    auto vertexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
+    auto indexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
+
+    void* mappedData = nullptr;
+    uploadBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
+    std::memcpy(mappedData, vertexData, vertexBytes);
+    D3D12_RANGE writtenVertexRangle{ 0, vertexBytes };
+    uploadBuffer.Resource().Get()->Unmap(0, &writtenVertexRangle);
+    mappedData = nullptr;
+    initializationEngine.Commit().CopyBufferRegion(vertexBuffer.Resource().GetPtr(), 0, uploadBuffer.Resource().GetPtr(), 0, vertexBytes);
+
+    uploadBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
+    std::memcpy(mappedData, indexData, indexBytes);
+    D3D12_RANGE writtenIndexRange{ 0, indexBytes };
+    uploadBuffer.Resource().Get()->Unmap(0, &writtenIndexRange);
+    mappedData = nullptr;
+    initializationEngine.Commit().CopyBufferRegion(indexBuffer.Resource().GetPtr(), 0, uploadBuffer.Resource().GetPtr(), 0, indexBytes);
+
+
+    vertexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+    indexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_INDEX_BUFFER);
+
+    initializationEngine.FlushReset();
+
+    D3D12_VERTEX_BUFFER_VIEW vbView{};
+    vbView.BufferLocation = vertexBuffer.Resource().Get()->GetGPUVirtualAddress();
+    vbView.SizeInBytes = vertexBytes;
+    vbView.StrideInBytes = sizeof(Pos);
+
+    D3D12_INDEX_BUFFER_VIEW ibView{};
+    ibView.BufferLocation = indexBuffer.Resource().Get()->GetGPUVirtualAddress();
+    ibView.Format = DXGI_FORMAT_R32_UINT;
+    ibView.SizeInBytes = indexBytes;
+
+
     /////////////////////////////////////////////////////////////////////////////
 
 
     auto rootSignature = CreateRootSignature();
     DXRL::GPURootSignature triangleRootSignature_{ rootSignature };
 
-    auto constexpr constBufferSize = (sizeof(constantBufferData_) + 255) & ~255;
+    auto constexpr sceneConstBufferSize = (sizeof(sceneBufferData_) + 255) & ~255;
     DXRL::GPUResourceHandle constBufferHandles[framesCount];
+    for (std::size_t i = 0; i < framesCount; i++) {
+        constBufferHandles[i] = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(sceneConstBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+    }
+
+    D3D12_CONSTANT_BUFFER_VIEW_DESC sceneCbvDesc[framesCount];
     for (size_t i = 0; i < framesCount; i++) {
-        constBufferHandles[i] = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(constBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+        sceneCbvDesc[i].BufferLocation = constBufferHandles[i].Resource().Get()->GetGPUVirtualAddress();
+        sceneCbvDesc[i].SizeInBytes = sceneConstBufferSize;
     }
     
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc[framesCount];
-    for (size_t i = 0; i < framesCount; i++) {
-        cbvDesc[i].BufferLocation = constBufferHandles[i].Resource().Get()->GetGPUVirtualAddress();
-        cbvDesc[i].SizeInBytes = constBufferSize;
+    sceneBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, sceneCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
+    triangleRootSignature_.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &sceneBuffer_ });
+
+    auto constexpr transformBufferSize = (sizeof(DirectX::XMFLOAT4X4A) + 255) & ~255;
+    DXRL::GPUResourceHandle transformBufferHandles[framesCount];
+    for (std::size_t i = 0; i < framesCount; i++) {
+        transformBufferHandles[i] = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(transformBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
     }
-    
-    constBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, cbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
+    D3D12_CONSTANT_BUFFER_VIEW_DESC transformCbvDesc[framesCount];
+    for (std::size_t i = 0; i < framesCount; i++) {
+        transformCbvDesc[i].BufferLocation = transformBufferHandles[i].Resource().Get()->GetGPUVirtualAddress();
+        transformCbvDesc[i].SizeInBytes = transformBufferSize;
+    }
 
-    //auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_GENERIC_READ);
-    //auto triangleMesh = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(verticesDataSize), D3D12_RESOURCE_STATE_COPY_DEST);
-    
-    void* uploadBufferPtr = nullptr;
-    //uploadBuffer.Resource().Get()->Map(0, nullptr, &uploadBufferPtr);
-    //std::memcpy(uploadBufferPtr, verticesData, verticesDataSize);
-    //uploadBuffer.Resource().Get()->Unmap(0, nullptr);
+    auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
-    //triangleMesh.Resource().UpdateData(initializationEngine, uploadBuffer.Resource(), 0, verticesDataSize);
-    //triangleMesh.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
-    D3D12_VERTEX_BUFFER_VIEW triangleView{};
-    //triangleView.BufferLocation = triangleMesh.Resource().Get()->GetGPUVirtualAddress();
-    //triangleView.SizeInBytes = verticesDataSize;
-    triangleView.StrideInBytes = sizeof(Vertex);
 
     DXRL::GPURenderItem triangleRenderItem{};
-    //triangleRenderItem.vertexBuffer_ = triangleMesh;
-    triangleRenderItem.vertexBufferDescriptor_ = triangleView;
-    triangleRenderItem.vertexCount_ = 3;
+    triangleRenderItem.vertexBuffer_ = vertexBuffer;
+    triangleRenderItem.vertexBufferDescriptor_ = vbView;
+    triangleRenderItem.vertexCount_ = header.vertexCount_;
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    triangleRenderItem.dynamicArg_ = DXRL::GPURenderItem::GPUDynamicRootArgument{ 0, DXRL::GPUResourceViewTable{1, &constBuffer_} };
+    triangleRenderItem.indexBuffer_ = indexBuffer;
+    triangleRenderItem.indexCount_ = header.indexCount_;
+    triangleRenderItem.dynamicArg_ = DXRL::GPURenderItem::GPUDynamicRootArgument{ 1, DXRL::GPUResourceViewTable{1, &transformBuffer} };
 
     auto pipelineState = CreatePipelineState(rootSignature);
     DXRL::GPUPipelineState trianglePipelineState_{ pipelineState };
@@ -209,16 +246,19 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
 
 Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignature()
 {
-    CD3DX12_ROOT_PARAMETER rootParameters[1];
-    CD3DX12_DESCRIPTOR_RANGE ranges[1];
+    CD3DX12_ROOT_PARAMETER rootParameters[2];
+    CD3DX12_DESCRIPTOR_RANGE ranges[2];
 
     ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
     rootParameters[0].InitAsDescriptorTable(1, ranges);
 
+    ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+    rootParameters[1].InitAsDescriptorTable(1, ranges + 1);
+
     D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-    rootSignatureDesc.Init(1, rootParameters, 0, nullptr, rootSignatureFlags);
+    rootSignatureDesc.Init(2, rootParameters, 0, nullptr, rootSignatureFlags);
 
     Microsoft::WRL::ComPtr<ID3DBlob> signature;
     Microsoft::WRL::ComPtr<ID3DBlob> errors;
@@ -245,7 +285,6 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
     };
 
     // Setup pipeline state, which inludes setting shaders.
@@ -256,7 +295,9 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    psoDesc.DepthStencilState.DepthEnable = FALSE;
+    psoDesc.DepthStencilState.DepthEnable = TRUE;
+    psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+    psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
     psoDesc.DepthStencilState.StencilEnable = FALSE;
     psoDesc.SampleMask = UINT_MAX;
     psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -288,22 +329,22 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
 
 void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 {
-    constexpr float offset = 0.0005f;
-    constexpr float offsetBounds = 1.25f;
-
-    constantBufferData_.offset.x += offset;
-    if (constantBufferData_.offset.x > offsetBounds) {
-        constantBufferData_.offset.x -= 2 * offsetBounds;
-    }
-
-    static D3D12_RANGE readRange{ 0, 0 };
-
-
-    void* mappedData = nullptr;
-    constBuffer_.View(frameIndex).Resource().Get()->Map(0, nullptr, &mappedData);
-
-    std::memcpy(mappedData, &constantBufferData_, sizeof(constantBufferData_));
-
-    static D3D12_RANGE writeRange{ 0, sizeof(constantBufferData_) };
-    constBuffer_.View(frameIndex).Resource().Get()->Unmap(0, &writeRange);
+    //constexpr float offset = 0.0005f;
+    //constexpr float offsetBounds = 1.25f;
+    //
+    //sceneBufferData_.offset.x += offset;
+    //if (sceneBufferData_.offset.x > offsetBounds) {
+    //    sceneBufferData_.offset.x -= 2 * offsetBounds;
+    //}
+    //
+    //static D3D12_RANGE readRange{ 0, 0 };
+    //
+    //
+    //void* mappedData = nullptr;
+    //constBuffer_.View(frameIndex).Resource().Get()->Map(0, nullptr, &mappedData);
+    //
+    //std::memcpy(mappedData, &sceneBufferData_, sizeof(sceneBufferData_));
+    //
+    //static D3D12_RANGE writeRange{ 0, sizeof(sceneBufferData_) };
+    //constBuffer_.View(frameIndex).Resource().Get()->Unmap(0, &writeRange);
 }

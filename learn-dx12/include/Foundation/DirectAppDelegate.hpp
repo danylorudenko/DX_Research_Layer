@@ -37,6 +37,7 @@ private:
 
     // CUSTOM APPLICATION DATA
 
-    SceneConstantBuffer constantBufferData_;
-    DXRL::GPUResourceViewHandle constBuffer_;
+    SceneConstantBuffer sceneBufferData_;
+    DXRL::GPUResourceViewHandle sceneBuffer_;
+    DXRL::GPUResourceViewHandle transformBuffer_;
 };

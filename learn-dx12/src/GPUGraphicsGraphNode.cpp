@@ -203,7 +203,7 @@ void GPUGraphicsGraphNode::BindRenderItemIndexBuffer(GPURenderItem& item)
 
 void GPUGraphicsGraphNode::DrawCallRenderItem(GPURenderItem& item)
 {
-    executionEngine_->Commit().DrawInstanced(item.vertexCount_, 1, 0, 0);
+    executionEngine_->Commit().DrawIndexedInstanced(item.indexCount_, 1, 0, 0, 0);
 }
 
 }
