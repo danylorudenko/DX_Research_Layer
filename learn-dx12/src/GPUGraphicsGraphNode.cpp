@@ -116,6 +116,7 @@ void GPUGraphicsGraphNode::BindRenderDepthStencilTargets(std::size_t frameIndex)
     D3D12_CPU_DESCRIPTOR_HANDLE* depthStencilHandlePtr = nullptr;
     if (depthStencilTarget_.IsValid()) {
         depthStencilHandle = depthStencilTarget_.View(frameIndex).CPUHandle();
+        depthStencilHandlePtr = &depthStencilHandle;
     }
     executionEngine_->Commit().OMSetRenderTargets(static_cast<UINT>(renderTargetsCount), renderTargetHandles, false, depthStencilHandlePtr);
 

@@ -46,7 +46,7 @@ void DirectAppDelegate::start(Application& application)
 
 
     ////////////////////////////////////////////////////////////////////////////
-    std::ifstream ifstream("header.vert", std::ios_base::binary);
+    std::ifstream ifstream("test.vert", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
@@ -65,6 +65,8 @@ void DirectAppDelegate::start(Application& application)
 
     ifstream.read(vertexData, vertexBytes);
     ifstream.read(indexData, indexBytes);
+
+    ifstream.close();
 
     auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes > indexBytes ? vertexBytes : indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
     auto vertexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
@@ -93,13 +95,13 @@ void DirectAppDelegate::start(Application& application)
 
     D3D12_VERTEX_BUFFER_VIEW vbView{};
     vbView.BufferLocation = vertexBuffer.Resource().Get()->GetGPUVirtualAddress();
-    vbView.SizeInBytes = vertexBytes;
+    vbView.SizeInBytes = static_cast<UINT>(vertexBytes);
     vbView.StrideInBytes = sizeof(Pos);
 
     D3D12_INDEX_BUFFER_VIEW ibView{};
     ibView.BufferLocation = indexBuffer.Resource().Get()->GetGPUVirtualAddress();
     ibView.Format = DXGI_FORMAT_R32_UINT;
-    ibView.SizeInBytes = indexBytes;
+    ibView.SizeInBytes = static_cast<UINT>(indexBytes);
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -144,6 +146,7 @@ void DirectAppDelegate::start(Application& application)
     triangleRenderItem.vertexCount_ = header.vertexCount_;
     triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     triangleRenderItem.indexBuffer_ = indexBuffer;
+    triangleRenderItem.indexBufferDescriptor_ = ibView;
     triangleRenderItem.indexCount_ = header.indexCount_;
     triangleRenderItem.dynamicArg_ = DXRL::GPURenderItem::GPUDynamicRootArgument{ 1, DXRL::GPUResourceViewTable{1, &transformBuffer} };
 
@@ -289,7 +292,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
 
     // Setup pipeline state, which inludes setting shaders.
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-    psoDesc.InputLayout = { inputElementDescs, 2 };
+    psoDesc.InputLayout = { inputElementDescs, 1 };
     psoDesc.pRootSignature = rootSignature.Get();
     psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
@@ -299,6 +302,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
     psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
     psoDesc.DepthStencilState.StencilEnable = FALSE;
+    psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
     psoDesc.SampleMask = UINT_MAX;
     psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     psoDesc.NumRenderTargets = 1;
