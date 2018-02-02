@@ -6,6 +6,7 @@
 class Camera
 {
 public:
+    Camera();
     Camera(float fow, float aspectRatio, float nearPlane, float farPlane);
     Camera(Camera const&);
     Camera(Camera&&);

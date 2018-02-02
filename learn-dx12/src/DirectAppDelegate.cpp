@@ -24,21 +24,7 @@ void DirectAppDelegate::start(Application& application)
 {
     auto constexpr framesCount = DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
 
-    /////////////////////////////////////////////////////////////////////////////
-    // TESTING CONSTANT VERTEX DATA
-    /////////////////////////////////////////////////////////////////////////////
 
-    /*Vertex verticesData[] = {
-        { { 0.0f, 0.25f, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
-        { { 0.25f, -0.25f, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
-        { { -0.25f, -0.25f, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } },
-    };*/
-
-    //auto const verticesDataSize = sizeof(verticesData);
-
-    /////////////////////////////////////////////////////////////////////////////
-    
-    
     gpuFoundation_ = std::make_unique<DXRL::GPUFoundation>(application);
     gameTimer_.Reset();
 
@@ -91,6 +77,8 @@ void DirectAppDelegate::start(Application& application)
     vertexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
     indexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
+    delete[] vertexData;
+    delete[] indexData;
     initializationEngine.FlushReset();
 
     D3D12_VERTEX_BUFFER_VIEW vbView{};
@@ -141,6 +129,9 @@ void DirectAppDelegate::start(Application& application)
 
 
     DXRL::GPURenderItem triangleRenderItem{};
+    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 20.0f });
+    triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0, 0, 0 });
+    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(0.2f, 0.2f, 0.2f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;
@@ -210,6 +201,11 @@ void DirectAppDelegate::start(Application& application)
     gpuFoundation_->FrameGraph().ParseGraphToQueue();
 
     initializationEngine.FlushReset();
+
+    camera_.NearPlane(0.1f);
+    camera_.FarPlane(100.0f);
+    camera_.Fow(60.f);
+    camera_.AspectRatio(static_cast<float>(DXRL::GPUFoundation::WIDTH) / static_cast<float>(DXRL::GPUFoundation::HEIGHT));
 }
 
 void DirectAppDelegate::update(Application& application)
@@ -333,22 +329,15 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
 
 void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 {
-    //constexpr float offset = 0.0005f;
-    //constexpr float offsetBounds = 1.25f;
-    //
-    //sceneBufferData_.offset.x += offset;
-    //if (sceneBufferData_.offset.x > offsetBounds) {
-    //    sceneBufferData_.offset.x -= 2 * offsetBounds;
-    //}
-    //
-    //static D3D12_RANGE readRange{ 0, 0 };
-    //
-    //
-    //void* mappedData = nullptr;
-    //constBuffer_.View(frameIndex).Resource().Get()->Map(0, nullptr, &mappedData);
-    //
-    //std::memcpy(mappedData, &sceneBufferData_, sizeof(sceneBufferData_));
-    //
-    //static D3D12_RANGE writeRange{ 0, sizeof(sceneBufferData_) };
-    //constBuffer_.View(frameIndex).Resource().Get()->Unmap(0, &writeRange);
+    sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
+    sceneBufferData_.camersPosition_ = DirectX::XMFLOAT3A{ 0, 0, 0 };
+
+    char* mappedCameraData = nullptr;
+    auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
+
+    cameraBuffer.Get()->Map(0, nullptr, (void**)&mappedCameraData);
+    std::memcpy(mappedCameraData, &sceneBufferData_, sizeof(sceneBufferData_));
+
+    D3D12_RANGE writtenRange{ 0, sizeof(sceneBufferData_) };
+    cameraBuffer.Get()->Unmap(0, &writtenRange);
 }

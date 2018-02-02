@@ -47,6 +47,7 @@ void GPUGraphicsGraphNode::IterateRenderItems(std::size_t frameIndex)
         auto& item = renderItems_[i];
         BindRenderItemVertexBuffer(item);
         BindRenderItemIndexBuffer(item);
+        UpdateRenderItemTransform(item, frameIndex);
         BindRenderItemRootResources(item, frameIndex);
         DrawCallRenderItem(item);
     }
@@ -180,6 +181,18 @@ void GPUGraphicsGraphNode::ClearDepthStencilTargets(std::size_t frameIndex)
     if (depthStencilSettings_.depthStencilClearFlags_ != 0) {
         executionEngine_->Commit().ClearDepthStencilView(depthStencilTarget_.View(frameIndex).CPUHandle(), depthStencilSettings_.depthStencilClearFlags_, 0.0f, 0, 0, nullptr);
     }
+}
+
+void GPUGraphicsGraphNode::UpdateRenderItemTransform(GPURenderItem& item, std::size_t frameIndex)
+{
+    auto& transformBuffer = item.dynamicArg_.itemTable_.TableMember(0).View(frameIndex).Resource();
+    auto& transformData = item.transform_.WorldMatrix();
+
+    void* mappedData = nullptr;
+    transformBuffer.Get()->Map(0, nullptr, &mappedData);
+    std::memcpy(mappedData, &transformData, sizeof(transformData));
+    D3D12_RANGE writtenRange{ 0, sizeof(transformData) };
+    transformBuffer.Get()->Unmap(0, &writtenRange);
 }
 
 void GPUGraphicsGraphNode::BindRenderItemRootResources(GPURenderItem& item, std::size_t frameIndex)

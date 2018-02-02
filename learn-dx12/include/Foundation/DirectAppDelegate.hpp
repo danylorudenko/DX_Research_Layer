@@ -8,6 +8,7 @@
 #include <Rendering\Data\SceneConstantBuffer.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
+#include <Math\Camera.hpp>
 
 class DirectAppDelegate : public Application::Delegate
 {
@@ -37,7 +38,7 @@ private:
 
     // CUSTOM APPLICATION DATA
 
+    Camera camera_;
     SceneConstantBuffer sceneBufferData_;
     DXRL::GPUResourceViewHandle sceneBuffer_;
-    DXRL::GPUResourceViewHandle transformBuffer_;
 };

@@ -52,6 +52,7 @@ private:
     void ClearDepthStencilTargets(std::size_t frameIndex);
 
     void IterateRenderItems(std::size_t frameIndex);
+    void UpdateRenderItemTransform(GPURenderItem& item, std::size_t frameIndex);
     void BindRenderItemRootResources(GPURenderItem& item, std::size_t frameIndex);
     void BindRenderItemVertexBuffer(GPURenderItem& item);
     void BindRenderItemIndexBuffer(GPURenderItem& item);
