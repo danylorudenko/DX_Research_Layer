@@ -96,7 +96,7 @@ void DirectAppDelegate::start(Application& application)
 
 
     auto rootSignature = CreateRootSignature();
-    DXRL::GPURootSignature triangleRootSignature_{ rootSignature };
+    DXRL::GPURootSignature triangleRootSignature{ rootSignature };
 
     auto constexpr sceneConstBufferSize = (sizeof(sceneBufferData_) + 255) & ~255;
     DXRL::GPUResourceHandle constBufferHandles[framesCount];
@@ -111,7 +111,7 @@ void DirectAppDelegate::start(Application& application)
     }
     
     sceneBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, sceneCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
-    triangleRootSignature_.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &sceneBuffer_ });
+    triangleRootSignature.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &sceneBuffer_ });
 
     auto constexpr transformBufferSize = (sizeof(DirectX::XMFLOAT4X4A) + 255) & ~255;
     DXRL::GPUResourceHandle transformBufferHandles[framesCount];
@@ -127,9 +127,8 @@ void DirectAppDelegate::start(Application& application)
 
     auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
-
     DXRL::GPURenderItem triangleRenderItem{};
-    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 20.0f });
+    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, -20.0f });
     triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0, 0, 0 });
     triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(0.2f, 0.2f, 0.2f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
@@ -143,7 +142,7 @@ void DirectAppDelegate::start(Application& application)
 
     auto pipelineState = CreatePipelineState(rootSignature);
     DXRL::GPUPipelineState trianglePipelineState_{ pipelineState };
-    auto& triangleGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature_));
+    auto& triangleGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature));
     triangleGraphNode.ImportRenderItem(triangleRenderItem);
 
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
@@ -204,7 +203,7 @@ void DirectAppDelegate::start(Application& application)
 
     camera_.NearPlane(0.1f);
     camera_.FarPlane(100.0f);
-    camera_.Fow(60.f);
+    camera_.Fow(60.0f);
     camera_.AspectRatio(static_cast<float>(DXRL::GPUFoundation::WIDTH) / static_cast<float>(DXRL::GPUFoundation::HEIGHT));
 }
 
@@ -330,7 +329,7 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
 void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 {
     sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
-    sceneBufferData_.camersPosition_ = DirectX::XMFLOAT3A{ 0, 0, 0 };
+    sceneBufferData_.cameraPosition_ = DirectX::XMFLOAT3A{ 0, 0, 0 };
 
     char* mappedCameraData = nullptr;
     auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
