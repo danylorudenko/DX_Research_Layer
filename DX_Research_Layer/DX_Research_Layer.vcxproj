@@ -24,6 +24,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>learndx12</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <ProjectName>DX_Research_Layer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -249,7 +250,10 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="learn-dx12.rc" />
+    <ResourceCompile Include="DX_Research_Layer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DX_Research_Layer.aps" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

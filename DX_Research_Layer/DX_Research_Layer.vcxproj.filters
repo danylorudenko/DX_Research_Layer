@@ -229,8 +229,11 @@
     <FxCompile Include="Shaders\triangle_shader.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="learn-dx12.rc">
+    <ResourceCompile Include="DX_Research_Layer.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DX_Research_Layer.aps" />
   </ItemGroup>
 </Project>
