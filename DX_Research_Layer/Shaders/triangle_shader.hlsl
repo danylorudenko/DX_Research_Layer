@@ -1,6 +1,7 @@
 cbuffer SceneBuffer : register(b0)
 {
     float4x4 projectionMatrix;
+    float4x4 viewMatrix;
     float3 cameraPosition;
 };
 
@@ -19,7 +20,7 @@ PSInput VS(float3 position : POSITION)
 {
     PSInput result;
 
-    float4 positionW = mul(float4(position, 1.0f), worldMatrix);
+    float4 positionW = mul(float4(position, 1.0f), viewMatrix);
     result.PosW = positionW.xyz;
     result.PosH = mul(positionW, projectionMatrix);
 

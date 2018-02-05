@@ -128,9 +128,9 @@ void DirectAppDelegate::start(Application& application)
     auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
     DXRL::GPURenderItem triangleRenderItem{};
-    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, -20.0f });
+    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 20.0f });
     triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0, 0, 0 });
-    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(0.2f, 0.2f, 0.2f));
+    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(0.1f, 0.1f, 0.1f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;
@@ -202,7 +202,7 @@ void DirectAppDelegate::start(Application& application)
     initializationEngine.FlushReset();
 
     camera_.NearPlane(0.1f);
-    camera_.FarPlane(100.0f);
+    camera_.FarPlane(1000.0f);
     camera_.Fow(60.0f);
     camera_.AspectRatio(static_cast<float>(DXRL::GPUFoundation::WIDTH) / static_cast<float>(DXRL::GPUFoundation::HEIGHT));
 }
@@ -329,7 +329,9 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
 void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 {
     sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
-    sceneBufferData_.cameraPosition_ = DirectX::XMFLOAT3A{ 0, 0, 0 };
+    auto cameraPos = DirectX::XMFLOAT3A{ 0, 0, -20 };
+    sceneBufferData_.viewMatrix_ = camera_.ViewMatrix(cameraPos, DirectX::XMFLOAT3A{ 0, 0, 1 }, DirectX::XMFLOAT3A{ 0, 1, 0 });
+    sceneBufferData_.cameraPosition_ = cameraPos;
 
     char* mappedCameraData = nullptr;
     auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
