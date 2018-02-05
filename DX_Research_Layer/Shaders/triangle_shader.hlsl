@@ -16,13 +16,15 @@ struct PSInput
     float3 PosW : POSITION;
 };
 
-PSInput VS(float3 position : POSITION)
+PSInput VS(float4 position : POSITION)
 {
     PSInput result;
 
-    float4 positionW = mul(float4(position, 1.0f), viewMatrix);
-    result.PosW = positionW.xyz;
-    result.PosH = mul(positionW, projectionMatrix);
+    //float4 positionW = mul(float4(position, 1.0f), viewMatrix);
+    //result.PosW = positionW.xyz;
+    //result.PosH = mul(positionW, projectionMatrix);
+    result.PosW = position.xyz;
+    result.PosH = float4(position.xyz, 1.0f);
 
     return result;
 }
@@ -34,5 +36,6 @@ float4 PS(PSInput input) : SV_TARGET
     float3 viewDir = normalize(input.PosW - cameraPosition);
     float3 litColor = dot(lightDir, viewDir);
     
-    return float4(litColor, 1.0f);
+    //return float4(litColor, 1.0f);
+    return float4(1.0f, 1.0f, 1.0f, 1.0f);
 }

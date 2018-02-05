@@ -17,11 +17,19 @@ struct VertHeader
 
 struct Pos
 {
-    float x, y, z;
+    float x, y, z, w;
 };
 
 void DirectAppDelegate::start(Application& application)
 {
+    Pos testVertexData[] = {
+        { 0.0f, 0.25f, 0.0f, 1.0f },
+        { 0.25f, -0.25f, 0.0f, 1.0f },
+        { -0.25f, -0.25f, 0.0f, 1.0f },
+    };
+
+    std::uint32_t testIndexData[] = { 0, 1, 2 };
+    
     auto constexpr framesCount = DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
 
 
@@ -32,13 +40,17 @@ void DirectAppDelegate::start(Application& application)
 
 
     ////////////////////////////////////////////////////////////////////////////
-    std::ifstream ifstream("test.vert", std::ios_base::binary);
-    if (!ifstream.is_open()) {
-        assert(false);
-    }
-    ifstream.seekg(std::ios_base::beg);
+    //std::ifstream ifstream("test.vert", std::ios_base::binary);
+    //if (!ifstream.is_open()) {
+    //    assert(false);
+    //}
+    //ifstream.seekg(std::ios_base::beg);
     VertHeader header;
-    ifstream.read(reinterpret_cast<char*>(&header), sizeof(VertHeader));
+    header.vertexCount_ = 3;
+    header.vertexSize_ = sizeof(Pos);
+    header.indexCount_ = 3;
+    header.indexSize_ = sizeof(std::uint32_t);
+    //ifstream.read(reinterpret_cast<char*>(&header), sizeof(VertHeader));
 
     std::size_t const vertexSize = header.vertexSize_;
     std::size_t const indexSize = header.indexSize_;
@@ -48,37 +60,42 @@ void DirectAppDelegate::start(Application& application)
 
     char* vertexData = new char[vertexBytes];
     char* indexData = new char[indexBytes];
+    std::memcpy(vertexData, testVertexData, vertexBytes);
+    std::memcpy(indexData, testIndexData, indexBytes);
 
-    ifstream.read(vertexData, vertexBytes);
-    ifstream.read(indexData, indexBytes);
+    //ifstream.read(vertexData, vertexBytes);
+    //ifstream.read(indexData, indexBytes);
 
-    ifstream.close();
+    //ifstream.close();
 
-    auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes > indexBytes ? vertexBytes : indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
-    auto vertexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
-    auto indexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
+    //auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes > indexBytes ? vertexBytes : indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
+    //auto vertexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
+    //auto indexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
+    auto vertexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
+    auto indexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
+
 
     void* mappedData = nullptr;
-    uploadBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
+    vertexBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
     std::memcpy(mappedData, vertexData, vertexBytes);
     D3D12_RANGE writtenVertexRangle{ 0, vertexBytes };
-    uploadBuffer.Resource().Get()->Unmap(0, &writtenVertexRangle);
+    vertexBuffer.Resource().Get()->Unmap(0, &writtenVertexRangle);
     mappedData = nullptr;
-    initializationEngine.Commit().CopyBufferRegion(vertexBuffer.Resource().GetPtr(), 0, uploadBuffer.Resource().GetPtr(), 0, vertexBytes);
+    //initializationEngine.Commit().CopyBufferRegion(vertexBuffer.Resource().GetPtr(), 0, vertexBuffer.Resource().GetPtr(), 0, vertexBytes);
 
-    uploadBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
+    indexBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
     std::memcpy(mappedData, indexData, indexBytes);
     D3D12_RANGE writtenIndexRange{ 0, indexBytes };
-    uploadBuffer.Resource().Get()->Unmap(0, &writtenIndexRange);
+    indexBuffer.Resource().Get()->Unmap(0, &writtenIndexRange);
     mappedData = nullptr;
-    initializationEngine.Commit().CopyBufferRegion(indexBuffer.Resource().GetPtr(), 0, uploadBuffer.Resource().GetPtr(), 0, indexBytes);
+    //initializationEngine.Commit().CopyBufferRegion(indexBuffer.Resource().GetPtr(), 0, uploadBuffer.Resource().GetPtr(), 0, indexBytes);
 
 
-    vertexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-    indexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_INDEX_BUFFER);
+    //vertexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+    //indexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
-    delete[] vertexData;
-    delete[] indexData;
+    //delete[] vertexData;
+    //delete[] indexData;
     initializationEngine.FlushReset();
 
     D3D12_VERTEX_BUFFER_VIEW vbView{};
@@ -129,8 +146,8 @@ void DirectAppDelegate::start(Application& application)
 
     DXRL::GPURenderItem triangleRenderItem{};
     triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 20.0f });
-    triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0, 0, 0 });
-    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(0.1f, 0.1f, 0.1f));
+    triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
+    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(1.0f, 1.0f, 1.0f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;
@@ -282,7 +299,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     // Define the vertex input layout.
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
     {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
     };
 
     // Setup pipeline state, which inludes setting shaders.
@@ -329,7 +346,7 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
 void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 {
     sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
-    auto cameraPos = DirectX::XMFLOAT3A{ 0, 0, -20 };
+    auto cameraPos = DirectX::XMFLOAT3A{ 0, 0, -2 };
     sceneBufferData_.viewMatrix_ = camera_.ViewMatrix(cameraPos, DirectX::XMFLOAT3A{ 0, 0, 1 }, DirectX::XMFLOAT3A{ 0, 1, 0 });
     sceneBufferData_.cameraPosition_ = cameraPos;
 

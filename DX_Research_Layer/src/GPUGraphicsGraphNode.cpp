@@ -179,7 +179,7 @@ void GPUGraphicsGraphNode::ClearRenderTargets(std::size_t frameIndex)
 void GPUGraphicsGraphNode::ClearDepthStencilTargets(std::size_t frameIndex)
 {
     if (depthStencilSettings_.depthStencilClearFlags_ != 0) {
-        executionEngine_->Commit().ClearDepthStencilView(depthStencilTarget_.View(frameIndex).CPUHandle(), depthStencilSettings_.depthStencilClearFlags_, 0.0f, 0, 0, nullptr);
+        executionEngine_->Commit().ClearDepthStencilView(depthStencilTarget_.View(frameIndex).CPUHandle(), depthStencilSettings_.depthStencilClearFlags_, 1.0f, 0, 0, nullptr);
     }
 }
 
