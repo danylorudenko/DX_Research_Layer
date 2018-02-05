@@ -32,7 +32,7 @@ GPUResourceView::~GPUResourceView() = default;
 GPUShaderVisibleResourceView::GPUShaderVisibleResourceView() = default;
 
 GPUShaderVisibleResourceView::GPUShaderVisibleResourceView(std::size_t offsetInHeap, GPUResourceViewHeap const& parentHeap, GPUResourceHandle const& resourceID, D3D12_RESOURCE_STATES targetState) :
-    GPUResourceView{ offsetInHeap_, parentHeap }, resourceID_{ resourceID }, targetState_{ targetState }
+    GPUResourceView{ offsetInHeap, parentHeap }, resourceID_{ resourceID }, targetState_{ targetState }
 { }
 
 GPUShaderVisibleResourceView::GPUShaderVisibleResourceView(GPUShaderVisibleResourceView&& rhs) = default;
