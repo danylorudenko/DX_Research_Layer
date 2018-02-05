@@ -145,7 +145,7 @@ void DirectAppDelegate::start(Application& application)
     auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
     DXRL::GPURenderItem triangleRenderItem{};
-    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 20.0f });
+    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 2.0f });
     triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
     triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(1.0f, 1.0f, 1.0f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;

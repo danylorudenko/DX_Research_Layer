@@ -20,11 +20,11 @@ PSInput VS(float4 position : POSITION)
 {
     PSInput result;
 
-    //float4 positionW = mul(float4(position, 1.0f), viewMatrix);
-    //result.PosW = positionW.xyz;
-    //result.PosH = mul(positionW, projectionMatrix);
-    result.PosW = position.xyz;
-    result.PosH = float4(position.xyz, 1.0f);
+    float4 positionW = mul(float4(position), worldMatrix);
+    result.PosW = positionW.xyz;
+    result.PosH = mul(mul(positionW, projectionMatrix), viewMatrix);
+    //result.PosW = position.xyz;
+    //result.PosH = float4(position.xyz, 1.0f);
 
     return result;
 }
