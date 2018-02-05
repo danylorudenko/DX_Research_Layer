@@ -68,31 +68,31 @@ void DirectAppDelegate::start(Application& application)
 
     //ifstream.close();
 
-    //auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes > indexBytes ? vertexBytes : indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
-    //auto vertexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
-    //auto indexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
-    auto vertexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
-    auto indexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
+    auto uploadBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes > indexBytes ? vertexBytes : indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
+    auto vertexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
+    auto indexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
+    //auto vertexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
+    //auto indexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
 
 
     void* mappedData = nullptr;
-    vertexBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
+    uploadBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
     std::memcpy(mappedData, vertexData, vertexBytes);
     D3D12_RANGE writtenVertexRangle{ 0, vertexBytes };
-    vertexBuffer.Resource().Get()->Unmap(0, &writtenVertexRangle);
+    uploadBuffer.Resource().Get()->Unmap(0, &writtenVertexRangle);
     mappedData = nullptr;
-    //initializationEngine.Commit().CopyBufferRegion(vertexBuffer.Resource().GetPtr(), 0, vertexBuffer.Resource().GetPtr(), 0, vertexBytes);
+    initializationEngine.Commit().CopyBufferRegion(vertexBuffer.Resource().GetPtr(), 0, uploadBuffer.Resource().GetPtr(), 0, vertexBytes);
 
-    indexBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
+    uploadBuffer.Resource().Get()->Map(0, nullptr, &mappedData);
     std::memcpy(mappedData, indexData, indexBytes);
     D3D12_RANGE writtenIndexRange{ 0, indexBytes };
-    indexBuffer.Resource().Get()->Unmap(0, &writtenIndexRange);
+    uploadBuffer.Resource().Get()->Unmap(0, &writtenIndexRange);
     mappedData = nullptr;
-    //initializationEngine.Commit().CopyBufferRegion(indexBuffer.Resource().GetPtr(), 0, uploadBuffer.Resource().GetPtr(), 0, indexBytes);
+    initializationEngine.Commit().CopyBufferRegion(indexBuffer.Resource().GetPtr(), 0, uploadBuffer.Resource().GetPtr(), 0, indexBytes);
 
 
-    //vertexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-    //indexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_INDEX_BUFFER);
+    vertexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+    indexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
     //delete[] vertexData;
     //delete[] indexData;
