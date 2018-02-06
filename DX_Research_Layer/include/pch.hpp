@@ -40,3 +40,6 @@
 #endif // DEBUG
 
 #endif // ThrowIfFailed
+
+float constexpr DEGREE_TO_RAD = DirectX::XM_PI / 180.0f;
+float constexpr RAD_TO_DEGREE = 180.0f / DirectX::XM_PI;

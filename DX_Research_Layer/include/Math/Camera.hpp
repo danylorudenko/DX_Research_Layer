@@ -14,12 +14,12 @@ public:
     Camera& operator=(Camera const&);
     Camera& operator=(Camera&&);
 
-    float Fow() const { return fow_; }
+    float Fow() const { return fow_ * RAD_TO_DEGREE; }
     float AspectRatio() const { return aspectRatio_; }
     float NearPlane() const { return nearPlane_; }
     float FarPlane() const { return farPlane_; }
 
-    void Fow(float fow) { fow_ = fow; perspectiveMatrixDirty_ = true; }
+    void Fow(float fow) { fow_ = fow * DEGREE_TO_RAD; perspectiveMatrixDirty_ = true; }
     void NearPlane(float nearPlane) { nearPlane_ = nearPlane; perspectiveMatrixDirty_ = true; }
     void FarPlane(float farPlane) { farPlane_ = farPlane; perspectiveMatrixDirty_ = true; }
     void AspectRatio(float aspect) { aspectRatio_ = aspect; perspectiveMatrixDirty_ = true; }

@@ -60,7 +60,8 @@ void Transform::Rotation(DirectX::FXMVECTOR rotation)
 
 void Transform::RotationRollPitchYaw(DirectX::FXMVECTOR eulerAngles)
 {
-    DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYawFromVector(eulerAngles);
+    XMVECTOR eulerRad = DirectX::XMVectorMultiply(eulerAngles, DirectX::XMVectorReplicate(DEGREE_TO_RAD));
+    DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYawFromVector(eulerRad);
     DirectX::XMStoreFloat4A(&rotation_, quat);
     worldMatrixDirty_ = true;
 }
@@ -85,7 +86,8 @@ void Transform::Rotation(DirectX::XMFLOAT4A const& orientation)
 
 void Transform::RotationRollPitchYaw(DirectX::XMFLOAT3A const& eulerAngles)
 {
-    DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYawFromVector(DirectX::XMLoadFloat3A(&eulerAngles));
+    DirectX::XMVECTOR eulerRad = DirectX::XMVectorMultiply(DirectX::XMLoadFloat3A(&eulerAngles), DirectX::XMVectorReplicate(DEGREE_TO_RAD));
+    DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYawFromVector(eulerRad);
     DirectX::XMStoreFloat4A(&rotation_, quat);
     worldMatrixDirty_ = true;
 }
