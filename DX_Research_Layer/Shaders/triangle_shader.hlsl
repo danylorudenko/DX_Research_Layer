@@ -1,3 +1,5 @@
+#pragma pack_matrix(row_major)
+
 cbuffer SceneBuffer : register(b0)
 {
     float4x4 projectionMatrix;
@@ -22,9 +24,7 @@ PSInput VS(float4 position : POSITION)
 
     float4 positionW = mul(float4(position), worldMatrix);
     result.PosW = positionW.xyz;
-    result.PosH = mul(mul(positionW, projectionMatrix), viewMatrix);
-    //result.PosW = position.xyz;
-    //result.PosH = float4(position.xyz, 1.0f);
+    result.PosH = mul(mul(positionW, viewMatrix), projectionMatrix);
 
     return result;
 }

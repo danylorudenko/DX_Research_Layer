@@ -56,5 +56,5 @@ DirectX::XMFLOAT4X4A const& Camera::PerspectiveMatrix()
 
 DirectX::XMMATRIX Camera::PerspectiveMatrixSIMD() const
 {
-    return DirectX::XMMatrixPerspectiveFovLH((DirectX::XM_PI / 180) * fow_, aspectRatio_, nearPlane_, farPlane_);
+    return DirectX::XMMatrixPerspectiveFovLH(fow_, aspectRatio_, nearPlane_, farPlane_);
 }
