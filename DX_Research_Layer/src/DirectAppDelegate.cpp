@@ -1,6 +1,4 @@
 #include <pch.hpp>
-#include <thread>
-#include <chrono>
 
 #include <Foundation\DirectAppDelegate.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
@@ -146,9 +144,9 @@ void DirectAppDelegate::start(Application& application)
     auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
     DXRL::GPURenderItem triangleRenderItem{};
-    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 1.0f });
+    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, -0.5f, 1.0f });
     triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
-    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(1.5f, 1.5f, 1.5f));
+    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(3.5f, 3.5f, 3.5f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;
@@ -220,7 +218,7 @@ void DirectAppDelegate::start(Application& application)
     initializationEngine.FlushReset();
 
     camera_.NearPlane(0.1f);
-    camera_.FarPlane(1000.0f);
+    camera_.FarPlane(100.0f);
     camera_.Fow(60.0f);
     camera_.AspectRatio(static_cast<float>(DXRL::GPUFoundation::WIDTH) / static_cast<float>(DXRL::GPUFoundation::HEIGHT));
 }

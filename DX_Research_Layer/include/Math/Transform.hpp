@@ -2,13 +2,16 @@
 
 #include <pch.hpp>
 
+namespace Math
+{
+
 class Transform
 {
 public:
     Transform();
     Transform(Transform const& rhs);
     Transform(Transform&& rhs);
-    
+
     Transform& operator=(Transform const& rhs);
     Transform& operator=(Transform&& rhs);
 
@@ -49,3 +52,5 @@ private:
     DirectX::XMFLOAT4X4A worldMatrix_;
     bool worldMatrixDirty_ = true;
 };
+
+}

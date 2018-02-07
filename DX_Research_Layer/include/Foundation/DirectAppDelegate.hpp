@@ -38,7 +38,7 @@ private:
 
     // CUSTOM APPLICATION DATA
 
-    Camera camera_;
+    Math::Camera camera_;
     SceneConstantBuffer sceneBufferData_;
     DXRL::GPUResourceViewHandle sceneBuffer_;
 };
