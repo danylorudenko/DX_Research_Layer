@@ -18,11 +18,11 @@ struct PSInput
     float3 PosW : POSITION;
 };
 
-PSInput VS(float4 position : POSITION)
+PSInput VS(float3 position : POSITION)
 {
     PSInput result;
 
-    float4 positionW = mul(float4(position), worldMatrix);
+    float4 positionW = mul(float4(position, 1.0f), worldMatrix);
     result.PosW = positionW.xyz;
     result.PosH = mul(mul(positionW, viewMatrix), projectionMatrix);
 

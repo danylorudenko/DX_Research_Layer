@@ -17,7 +17,7 @@ struct VertHeader
 
 struct Pos
 {
-    float x, y, z, w;
+    float x, y, z;
 };
 
 void DirectAppDelegate::start(Application& application)
@@ -146,9 +146,9 @@ void DirectAppDelegate::start(Application& application)
     auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
     DXRL::GPURenderItem triangleRenderItem{};
-    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 100.0f });
+    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 1.0f });
     triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
-    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(0.2f, 0.5f, 0.5f));
+    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(1.5f, 1.5f, 1.5f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;
