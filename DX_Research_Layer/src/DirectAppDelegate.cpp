@@ -41,7 +41,7 @@ void DirectAppDelegate::start(Application& application)
 
 
     ////////////////////////////////////////////////////////////////////////////
-    std::ifstream ifstream("test2.vert", std::ios_base::binary);
+    std::ifstream ifstream("skull.model", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
@@ -141,9 +141,9 @@ void DirectAppDelegate::start(Application& application)
     auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
     DXRL::GPURenderItem triangleRenderItem{};
-    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, -0.3f, 1.0f });
-    triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 45.0f, 0.0f });
-    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(4.0f, 4.0f, 4.0f));
+    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 3.0f });
+    triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, 45.0f, 0.0f });
+    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(1.0f, 1.0f, 1.0f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;

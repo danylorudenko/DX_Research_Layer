@@ -1,5 +1,8 @@
 #pragma pack_matrix(row_major)
 
+static const float PI = 3.14159265359f;
+static const float Lambertian = 1.0f / PI;
+
 cbuffer SceneBuffer : register(b0)
 {
     float4x4 projectionMatrix;
@@ -33,10 +36,19 @@ PSInput VS(float3 position : POSITION, float3 normal : NORMAL)
 
 float4 PS(PSInput input) : SV_TARGET
 {
-    const float3 lightDir = float3(-1.0f, 0.0f, 0.0f);
+    float3 ambient = pow(float3(0.2f, 0.3f, 0.5f), 2.2f) * Lambertian * 0.5f * (1.0f + dot(float3(0.0f, 1.0f, 0.0f), normalize(input.NormW)));
+
+    const float3 lightDir = normalize(float3(-1.0f, 0.0f, 0.0f));
+
+    const float3 baseColor = float3(1.0f, 1.0f, 1.0f);
+
+    float3 linBaseColor = pow(baseColor, 2.2f);
+
+    float ndotl = saturate(dot(lightDir, normalize(input.NormW)));
+
+    float3 fragment = linBaseColor * Lambertian * ndotl + ambient;
     
-    float3 litColor = dot(lightDir, normalize(input.NormW));
-    
-    return float4(litColor, 1.0f);
-    //return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    fragment = pow(fragment, 0.45454545454f);
+
+    return float4(fragment, 1.0f);
 }
