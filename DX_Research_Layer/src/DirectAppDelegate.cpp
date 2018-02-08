@@ -1,6 +1,4 @@
 #include <pch.hpp>
-#include <thread>
-#include <chrono>
 
 #include <Foundation\DirectAppDelegate.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
@@ -217,7 +215,7 @@ void DirectAppDelegate::start(Application& application)
     initializationEngine.FlushReset();
 
     camera_.NearPlane(0.1f);
-    camera_.FarPlane(1000.0f);
+    camera_.FarPlane(100.0f);
     camera_.Fow(60.0f);
     camera_.AspectRatio(static_cast<float>(DXRL::GPUFoundation::WIDTH) / static_cast<float>(DXRL::GPUFoundation::HEIGHT));
 }

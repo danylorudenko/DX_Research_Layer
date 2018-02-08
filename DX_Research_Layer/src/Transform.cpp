@@ -1,5 +1,8 @@
 #include <Math\Transform.hpp>
 
+namespace Math
+{
+
 using namespace DirectX;
 
 Transform::Transform() :
@@ -150,4 +153,6 @@ DirectX::XMFLOAT4X4A const& Transform::WorldMatrix()
 DirectX::XMMATRIX Transform::WorldMatrixSIMD() const
 {
     return DirectX::XMMatrixAffineTransformation(ScaleSIMD(), DirectX::XMVectorReplicate(0.0f), RotationSIMD(), PositionSIMD());
+}
+
 }

@@ -10,7 +10,7 @@ namespace DXRL
 
 struct GPURenderItem
 {
-    Transform transform_;
+    Math::Transform transform_;
 
     D3D_PRIMITIVE_TOPOLOGY primitiveTopology_;
 

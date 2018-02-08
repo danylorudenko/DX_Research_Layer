@@ -3,6 +3,9 @@
 #include <pch.hpp>
 #include <Math\Transform.hpp>
 
+namespace Math
+{
+
 class Camera
 {
 public:
@@ -42,3 +45,5 @@ private:
     float nearPlane_;
     float farPlane_;
 };
+
+}

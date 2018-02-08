@@ -1,5 +1,8 @@
 #include <Math\Camera.hpp>
 
+namespace Math
+{
+
 Camera::Camera() = default;
 
 Camera::Camera(float fow, float aspectRatio, float nearPlane, float farPlane) :
@@ -57,4 +60,6 @@ DirectX::XMFLOAT4X4A const& Camera::PerspectiveMatrix()
 DirectX::XMMATRIX Camera::PerspectiveMatrixSIMD() const
 {
     return DirectX::XMMatrixPerspectiveFovLH(fow_, aspectRatio_, nearPlane_, farPlane_);
+}
+
 }
