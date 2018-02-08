@@ -26,9 +26,6 @@
 
 #include <d3dcompiler.h>
 
-#include <Rendering\Data\Vertex.hpp>
-#include <Rendering\Data\SceneConstantBuffer.hpp>
-
 #ifndef ThrowIfFailed
 
 #if defined (DEBUG) || (_DEBUG)

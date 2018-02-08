@@ -236,7 +236,6 @@
     <ClInclude Include="include\Foundation\DirectAppDelegate.hpp" />
     <ClInclude Include="include\Foundation\PerformanceTimer.hpp" />
     <ClInclude Include="include\Rendering\Data\SceneConstantBuffer.hpp" />
-    <ClInclude Include="include\Rendering\Data\Vertex.hpp" />
     <ClInclude Include="include\Foundation\Window.hpp" />
     <ClInclude Include="include\Rendering\GPUSwapChain.hpp" />
     <ClInclude Include="resource.h" />

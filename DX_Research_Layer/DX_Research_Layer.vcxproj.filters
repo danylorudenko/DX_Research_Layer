@@ -164,9 +164,6 @@
     <ClInclude Include="include\Rendering\Data\SceneConstantBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Rendering\Data\Vertex.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rendering\GPUFoundation.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -20,16 +20,19 @@ struct Pos
     float x, y, z;
 };
 
+struct Normal
+{
+    float x, y, z;
+};
+
+struct Vertex
+{
+    Pos position_;
+    Normal normal_;;
+};
+
 void DirectAppDelegate::start(Application& application)
 {
-    //Pos testVertexData[] = {
-    //    { 0.0f, 0.25f, 0.0f, 1.0f },
-    //    { 0.25f, -0.25f, 0.0f, 1.0f },
-    //    { -0.25f, -0.25f, 0.0f, 1.0f },
-    //};
-    //
-    //std::uint32_t testIndexData[] = { 0, 1, 2 };
-    
     auto constexpr framesCount = DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
 
 
@@ -40,16 +43,12 @@ void DirectAppDelegate::start(Application& application)
 
 
     ////////////////////////////////////////////////////////////////////////////
-    std::ifstream ifstream("test.vert", std::ios_base::binary);
+    std::ifstream ifstream("test2.vert", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
     ifstream.seekg(std::ios_base::beg);
     VertHeader header;
-    //header.vertexCount_ = 3;
-    //header.vertexSize_ = sizeof(Pos);
-    //header.indexCount_ = 3;
-    //header.indexSize_ = sizeof(std::uint32_t);
     ifstream.read(reinterpret_cast<char*>(&header), sizeof(VertHeader));
 
     std::size_t const vertexSize = header.vertexSize_;
@@ -60,8 +59,6 @@ void DirectAppDelegate::start(Application& application)
 
     BYTE* vertexData = new BYTE[vertexBytes];
     BYTE* indexData = new BYTE[indexBytes];
-    //std::memcpy(vertexData, testVertexData, vertexBytes);
-    //std::memcpy(indexData, testIndexData, indexBytes);
 
     ifstream.read(reinterpret_cast<char*>(vertexData), vertexBytes);
     ifstream.read(reinterpret_cast<char*>(indexData), indexBytes);
@@ -102,7 +99,7 @@ void DirectAppDelegate::start(Application& application)
     D3D12_VERTEX_BUFFER_VIEW vbView{};
     vbView.BufferLocation = vertexBuffer.Resource().Get()->GetGPUVirtualAddress();
     vbView.SizeInBytes = static_cast<UINT>(vertexBytes);
-    vbView.StrideInBytes = sizeof(Pos);
+    vbView.StrideInBytes = sizeof(Vertex);
 
     D3D12_INDEX_BUFFER_VIEW ibView{};
     ibView.BufferLocation = indexBuffer.Resource().Get()->GetGPUVirtualAddress();
@@ -146,9 +143,9 @@ void DirectAppDelegate::start(Application& application)
     auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
     DXRL::GPURenderItem triangleRenderItem{};
-    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 1.0f });
-    triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
-    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(1.5f, 1.5f, 1.5f));
+    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, -0.3f, 1.0f });
+    triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 45.0f, 0.0f });
+    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(4.0f, 4.0f, 4.0f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;
@@ -301,11 +298,12 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
     };
 
     // Setup pipeline state, which inludes setting shaders.
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-    psoDesc.InputLayout = { inputElementDescs, 1 };
+    psoDesc.InputLayout = { inputElementDescs, 2 };
     psoDesc.pRootSignature = rootSignature.Get();
     psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
