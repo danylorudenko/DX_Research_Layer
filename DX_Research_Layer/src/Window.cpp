@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Foundation\Window.hpp>
+#include <Foundation\Application.hpp>
 
 //
 // WindowClass's implementation
@@ -13,10 +14,11 @@ namespace
 		auto window = reinterpret_cast<Window*>(data);
 
         if (window != nullptr) {
-            window->handleEvents(handle, message, wparam, lparam);
+            return window->handleEvents(handle, message, wparam, lparam);
         }
-
-		return ::DefWindowProc(handle, message, wparam, lparam);
+        else {
+            return ::DefWindowProc(handle, message, wparam, lparam);
+        }
 	}
 }
 
@@ -146,14 +148,13 @@ RECT Window::frame() const
 	return rect;
 }
 
-void Window::handleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Window::handleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    if (winProcHandler_ != nullptr) {
-        winProcHandler_(hwnd, msg, wParam, lParam);
+    if (winProcDelegate_) {
+        return winProcDelegate_(hwnd, msg, wParam, lParam);
+    }
+    else {
+        return DefWindowProc(hwnd, msg, wParam, lParam);
     }
 }
 
-void Window::winProcHandler(WinProcHandler winProcHandler)
-{
-    winProcHandler_ = winProcHandler;
-}

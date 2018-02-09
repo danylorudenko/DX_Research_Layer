@@ -31,7 +31,7 @@ struct Vertex
 
 void DirectAppDelegate::start(Application& application)
 {
-    application.window().winProcHandler(handleWinProc);
+    application.window().winProcHandler(Window::WinProcDelegate{ this, handleWinProc });
     
     auto constexpr framesCount = DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
 
@@ -345,9 +345,8 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
 void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 {
     sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
-    auto cameraPos = DirectX::XMFLOAT3A{ 0, 0, 0 };
-    sceneBufferData_.viewMatrix_ = camera_.ViewMatrix(cameraPos, DirectX::XMFLOAT3A{ 0, 0, 1 }, DirectX::XMFLOAT3A{ 0, 1, 0 });
-    sceneBufferData_.cameraPosition_ = cameraPos;
+    sceneBufferData_.viewMatrix_ = camera_.ViewMatrix(cameraPos_, DirectX::XMFLOAT3A{ 0, 0, 1 }, DirectX::XMFLOAT3A{ 0, 1, 0 });
+    sceneBufferData_.cameraPosition_ = cameraPos_;
 
     char* mappedCameraData = nullptr;
     auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
@@ -359,13 +358,19 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
     cameraBuffer.Get()->Unmap(0, &writtenRange);
 }
 
-void DirectAppDelegate::handleWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT DirectAppDelegate::handleWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg) {
     case WM_DESTROY:
         PostQuitMessage(0);
-        break;
+        return 0;
+    case WM_MOUSEMOVE:
+        int xCursor = static_cast<int>(LOWORD(lParam));
+        int yCursor = static_cast<int>(HIWORD(lParam));
+
     default:
         break;
     }
+
+    return DefWindowProc(hwnd, msg, wParam, lParam);
 }
