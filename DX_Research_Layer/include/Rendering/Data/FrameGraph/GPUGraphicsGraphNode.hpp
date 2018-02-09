@@ -37,6 +37,9 @@ public:
     void ImportRenderItem(GPURenderItem const& item);
     void ImportRenderItem(GPURenderItem&& item);
 
+    // TEMPORARY HACK
+    Math::Transform& GetRenderItemTransform(std::size_t index);
+
     virtual void Process(std::size_t frameIndex) override;
 
 private:

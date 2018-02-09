@@ -23,6 +23,11 @@ GPUGraphicsGraphNode& GPUGraphicsGraphNode::operator=(GPUGraphicsGraphNode&& rhs
     return *this;
 }
 
+Math::Transform & GPUGraphicsGraphNode::GetRenderItemTransform(std::size_t index)
+{
+    return renderItems_[index].transform_;
+}
+
 void GPUGraphicsGraphNode::Process(std::size_t frameIndex)
 {
     TransitionPassResources(frameIndex);

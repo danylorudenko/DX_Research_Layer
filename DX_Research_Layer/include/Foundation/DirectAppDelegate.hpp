@@ -19,6 +19,9 @@ public:
     DirectWinProcDelegate& operator=(DirectWinProcDelegate&&) = default;
 
     virtual LRESULT operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+
+    int prevMouseX;
+    int prevMouseY;
 };
 
 class DirectAppDelegate : public Application::Delegate
@@ -51,6 +54,7 @@ public:
     DirectWinProcDelegate winProcDelegate_;
 
     DirectX::XMFLOAT3A cameraPos_ = DirectX::XMFLOAT3A{ 0, 0, 0 };
+    Math::Transform* mainObjTransform = nullptr;
     Math::Camera camera_;
     SceneConstantBuffer sceneBufferData_;
     DXRL::GPUResourceViewHandle sceneBuffer_;

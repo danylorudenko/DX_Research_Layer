@@ -161,6 +161,8 @@ void DirectAppDelegate::start(Application& application)
     auto& triangleGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature));
     triangleGraphNode.ImportRenderItem(triangleRenderItem);
 
+    mainObjTransform = &triangleGraphNode.GetRenderItemTransform(0);
+
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
     triangleGraphNode.ImportRenderTargets(1, &swapChainRTV);
     DXRL::Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
@@ -367,14 +369,23 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
-    case WM_LBUTTONDOWN: {
-        //int xCursor = static_cast<int>(LOWORD(lParam));
-        //int yCursor = static_cast<int>(HIWORD(lParam));
+    case WM_MOUSEMOVE: {
+        if (directAppDelegate->mainObjTransform != nullptr) {
+            int xCursor = static_cast<int>(LOWORD(lParam));
+            int yCursor = static_cast<int>(HIWORD(lParam));
 
-        DirectX::XMVECTOR pos = DirectX::XMLoadFloat3A(&directAppDelegate->cameraPos_);
-        DirectX::XMVECTOR offset = DirectX::XMVectorSet(0.1f, 0.0f, 0.0f, 0.0f);
-        DirectX::XMStoreFloat3A(&directAppDelegate->cameraPos_, DirectX::XMVectorAdd(pos, offset));
+            auto& transform = *directAppDelegate->mainObjTransform;
 
+            float constexpr PIXEL_TO_ANGLE = 0.01f;
+
+            DirectX::XMVECTOR rotation = transform.RotationSIMD();
+            rotation = DirectX::XMQuaternionMultiply(rotation, DirectX::XMQuaternionRotationRollPitchYaw((prevMouseY - yCursor) * PIXEL_TO_ANGLE, (prevMouseX - xCursor)  * PIXEL_TO_ANGLE, 0.0f));
+
+            transform.Rotation(rotation);
+
+            prevMouseX = xCursor;
+            prevMouseY = yCursor;
+        }
         return 0;
     }
     default:
