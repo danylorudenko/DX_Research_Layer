@@ -46,7 +46,7 @@ int Application::run()
 	return 0;
 }
 
-Window const& Application::window() const
+Window& Application::window()
 {
 	return window_;
 }

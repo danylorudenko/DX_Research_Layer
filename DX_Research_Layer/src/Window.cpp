@@ -12,7 +12,9 @@ namespace
 		auto data = ::GetWindowLongPtr(handle, GWLP_USERDATA);
 		auto window = reinterpret_cast<Window*>(data);
 
-		window->handleEvents(message);
+        if (window != nullptr) {
+            window->handleEvents(handle, message, wparam, lparam);
+        }
 
 		return ::DefWindowProc(handle, message, wparam, lparam);
 	}
@@ -144,14 +146,14 @@ RECT Window::frame() const
 	return rect;
 }
 
-void Window::handleEvents(UINT message)
+void Window::handleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch (message) {
-		case WM_CLOSE:
-			PostQuitMessage(0);
-			break;
+    if (winProcHandler_ != nullptr) {
+        winProcHandler_(hwnd, msg, wParam, lParam);
+    }
+}
 
-		default:
-			break;
-	}
+void Window::winProcHandler(WinProcHandler winProcHandler)
+{
+    winProcHandler_ = winProcHandler;
 }

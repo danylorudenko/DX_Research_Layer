@@ -29,7 +29,7 @@ public:
 
 	int run();
 
-	Window const& window() const;
+	Window& window();
 
 	Delegate* const delegate() const;
 	Application& delegate(Delegate& delegate);

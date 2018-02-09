@@ -26,6 +26,8 @@ public:
     void Draw(std::size_t frameIndex);
     void CustomAction(std::size_t frameIndex);
 
+    static void handleWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 private:
     // FOUNDATION DATA
     PerformanceTimer gameTimer_;

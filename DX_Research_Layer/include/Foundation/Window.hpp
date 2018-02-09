@@ -38,6 +38,7 @@ class Window
 {
 public:
 	using NativeHandle = HWND;
+    using WinProcHandler = void (*)(HWND, UINT, WPARAM, LPARAM);
 
 public:
 	Window(HINSTANCE instance, std::wstring title, std::uint32_t width, std::uint32_t height);
@@ -57,12 +58,14 @@ public:
 	std::uint32_t width() const;
 	std::uint32_t height() const;
 
-	void handleEvents(UINT message);
+	void handleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    void winProcHandler(WinProcHandler winProcHandler);
 
 private:
 	RECT frame() const;
 
 private:
 	WindowClass windowClass_;
+    WinProcHandler winProcHandler_;
 	HWND handle_;
 };

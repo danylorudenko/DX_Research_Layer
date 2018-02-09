@@ -31,6 +31,8 @@ struct Vertex
 
 void DirectAppDelegate::start(Application& application)
 {
+    application.window().winProcHandler(handleWinProc);
+    
     auto constexpr framesCount = DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
 
 
@@ -355,4 +357,15 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 
     D3D12_RANGE writtenRange{ 0, sizeof(sceneBufferData_) };
     cameraBuffer.Get()->Unmap(0, &writtenRange);
+}
+
+void DirectAppDelegate::handleWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    switch (msg) {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        break;
+    }
 }
