@@ -24,31 +24,28 @@ private:
 	bool successfully_;
 }; 
 
-class Application;
+class WinProcDelegate
+{
+public:
+    WinProcDelegate() = default;
+    WinProcDelegate(void* appDelegate) : appDelegate_{ appDelegate } {}
+    WinProcDelegate(WinProcDelegate&& rhs) = default;
+    WinProcDelegate(WinProcDelegate const&) = delete;
+    WinProcDelegate& operator=(WinProcDelegate&& rhs) = default;
+    WinProcDelegate& operator=(WinProcDelegate const&) = delete;
+
+    operator bool() const { return appDelegate_ != nullptr; }
+    virtual LRESULT operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+
+protected:
+    void* appDelegate_;
+};
 
 class Window
 {
 public:
 	using NativeHandle = HWND;
     using WinProcFunc = LRESULT (*)(HWND, UINT, WPARAM, LPARAM);
-
-    class WinProcDelegate
-    {
-    public:
-        WinProcDelegate();
-        WinProcDelegate(Application::Delegate* appDelegate, Window::WinProcFunc winProcHandler) : appDelegate_{ appDelegate_ }, winProcHandler_{ winProcHandler } {}
-        WinProcDelegate(WinProcDelegate&& rhs) = default;
-        WinProcDelegate(WinProcDelegate const&) = delete;
-        WinProcDelegate& operator=(WinProcDelegate&& rhs) = default;
-        WinProcDelegate& operator=(WinProcDelegate const&) = delete;
-
-        operator bool() const { return winProcHandler_ != null; }
-        LRESULT operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) { }
-
-    private:
-        Application::Delegate* appDelegate_;
-        WinProcFunc winProcHandler_;
-    };
 
 public:
 	Window(HINSTANCE instance, std::wstring title, std::uint32_t width, std::uint32_t height);
@@ -69,13 +66,14 @@ public:
 	std::uint32_t height() const;
 
 	LRESULT handleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    void winProcHandler(WinProcDelegate&& winProcDelegate);
+    void winProcHandler(WinProcDelegate* winProcDelegate) { winProcDelegate_ = winProcDelegate; }
 
 private:
 	RECT frame() const;
 
 private:
 	WindowClass windowClass_;
-    WinProcDelegate winProcDelegate_;
+    WinProcDelegate* winProcDelegate_;
 	HWND handle_;
 };
+

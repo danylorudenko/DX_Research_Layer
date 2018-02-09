@@ -31,7 +31,8 @@ struct Vertex
 
 void DirectAppDelegate::start(Application& application)
 {
-    application.window().winProcHandler(Window::WinProcDelegate{ this, handleWinProc });
+    winProcDelegate_ = DirectWinProcDelegate{ this };
+    application.window().winProcHandler(&winProcDelegate_);
     
     auto constexpr framesCount = DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
 
@@ -358,16 +359,24 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
     cameraBuffer.Get()->Unmap(0, &writtenRange);
 }
 
-LRESULT DirectAppDelegate::handleWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+    DirectAppDelegate* directAppDelegate = reinterpret_cast<DirectAppDelegate*>(appDelegate_);
+
     switch (msg) {
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
-    case WM_MOUSEMOVE:
-        int xCursor = static_cast<int>(LOWORD(lParam));
-        int yCursor = static_cast<int>(HIWORD(lParam));
+    case WM_LBUTTONDOWN: {
+        //int xCursor = static_cast<int>(LOWORD(lParam));
+        //int yCursor = static_cast<int>(HIWORD(lParam));
 
+        DirectX::XMVECTOR pos = DirectX::XMLoadFloat3A(&directAppDelegate->cameraPos_);
+        DirectX::XMVECTOR offset = DirectX::XMVectorSet(0.1f, 0.0f, 0.0f, 0.0f);
+        DirectX::XMStoreFloat3A(&directAppDelegate->cameraPos_, DirectX::XMVectorAdd(pos, offset));
+
+        return 0;
+    }
     default:
         break;
     }

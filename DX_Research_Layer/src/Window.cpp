@@ -150,8 +150,8 @@ RECT Window::frame() const
 
 LRESULT Window::handleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    if (winProcDelegate_) {
-        return winProcDelegate_(hwnd, msg, wParam, lParam);
+    if (winProcDelegate_ && *winProcDelegate_) {
+        return (*winProcDelegate_)(hwnd, msg, wParam, lParam);
     }
     else {
         return DefWindowProc(hwnd, msg, wParam, lParam);

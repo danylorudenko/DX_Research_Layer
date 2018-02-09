@@ -10,6 +10,17 @@
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Math\Camera.hpp>
 
+class DirectWinProcDelegate : public WinProcDelegate
+{
+public:
+    DirectWinProcDelegate() = default;
+    DirectWinProcDelegate(void* appDelegate) : WinProcDelegate{ appDelegate } {}
+    DirectWinProcDelegate(DirectWinProcDelegate&&) = default;
+    DirectWinProcDelegate& operator=(DirectWinProcDelegate&&) = default;
+
+    virtual LRESULT operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+};
+
 class DirectAppDelegate : public Application::Delegate
 {
 public:
@@ -26,9 +37,7 @@ public:
     void Draw(std::size_t frameIndex);
     void CustomAction(std::size_t frameIndex);
 
-    static LRESULT handleWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-private:
     // FOUNDATION DATA
     PerformanceTimer gameTimer_;
     std::wstring windowText_;
@@ -39,6 +48,7 @@ private:
 
 
     // CUSTOM APPLICATION DATA
+    DirectWinProcDelegate winProcDelegate_;
 
     DirectX::XMFLOAT3A cameraPos_ = DirectX::XMFLOAT3A{ 0, 0, 0 };
     Math::Camera camera_;
