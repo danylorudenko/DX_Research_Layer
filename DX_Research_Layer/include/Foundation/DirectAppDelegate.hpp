@@ -20,6 +20,8 @@ public:
 
     virtual LRESULT operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
+    bool rotationOn = false;
+
     int prevMouseX;
     int prevMouseY;
 };

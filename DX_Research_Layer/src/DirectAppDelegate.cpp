@@ -44,7 +44,8 @@ void DirectAppDelegate::start(Application& application)
 
 
     ////////////////////////////////////////////////////////////////////////////
-    std::ifstream ifstream("skull.model", std::ios_base::binary);
+    //std::ifstream ifstream("skull.model", std::ios_base::binary);
+    std::ifstream ifstream("test2.vert", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
@@ -146,7 +147,7 @@ void DirectAppDelegate::start(Application& application)
     DXRL::GPURenderItem triangleRenderItem{};
     triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 3.0f });
     triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, 45.0f, 0.0f });
-    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(1.0f, 1.0f, 1.0f));
+    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(10.0f, 10.0f, 10.0f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;
@@ -370,7 +371,15 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
         PostQuitMessage(0);
         return 0;
     case WM_MOUSEMOVE: {
-        if (directAppDelegate->mainObjTransform != nullptr) {
+        if (wParam == MK_LBUTTON) {
+            rotationOn = true;
+        }
+
+        if (wParam == MK_RBUTTON) {
+            rotationOn = false;
+        }
+        
+        if (directAppDelegate->mainObjTransform != nullptr && rotationOn) {
             int xCursor = static_cast<int>(LOWORD(lParam));
             int yCursor = static_cast<int>(HIWORD(lParam));
 
