@@ -147,7 +147,7 @@ void DirectAppDelegate::start(Application& application)
     DXRL::GPURenderItem triangleRenderItem{};
     triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 3.0f });
     triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, 45.0f, 0.0f });
-    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(1.3f, 1.3f, 1.3f));
+    triangleRenderItem.transform_.Scale(1.3f);
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;

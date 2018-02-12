@@ -101,6 +101,12 @@ void Transform::Scale(DirectX::XMFLOAT3A const& scale)
     worldMatrixDirty_ = true;
 }
 
+void Transform::Scale(float scale)
+{
+    scale_ = DirectX::XMFLOAT3A(scale, scale, scale);
+    worldMatrixDirty_ = true;
+}
+
 DirectX::XMFLOAT3A Transform::Forward() const
 {
     DirectX::XMFLOAT3A forward{};

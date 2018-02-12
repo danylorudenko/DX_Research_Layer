@@ -32,6 +32,7 @@ public:
     void Rotation(DirectX::XMFLOAT4A const& orientation);
     void RotationRollPitchYaw(DirectX::XMFLOAT3A const& eulerAngles);
     void Scale(DirectX::XMFLOAT3A const& scale);
+    void Scale(float scale);
 
     DirectX::XMFLOAT3A Forward() const;
     DirectX::XMFLOAT3A Right() const;
