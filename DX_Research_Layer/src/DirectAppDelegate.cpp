@@ -45,7 +45,7 @@ void DirectAppDelegate::start(Application& application)
 
     ////////////////////////////////////////////////////////////////////////////
     //std::ifstream ifstream("skull.model", std::ios_base::binary);
-    std::ifstream ifstream("test2.vert", std::ios_base::binary);
+    std::ifstream ifstream("skull.model", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
@@ -147,7 +147,7 @@ void DirectAppDelegate::start(Application& application)
     DXRL::GPURenderItem triangleRenderItem{};
     triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 3.0f });
     triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, 45.0f, 0.0f });
-    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(10.0f, 10.0f, 10.0f));
+    triangleRenderItem.transform_.Scale(DirectX::XMFLOAT3A(1.3f, 1.3f, 1.3f));
     triangleRenderItem.vertexBuffer_ = vertexBuffer;
     triangleRenderItem.vertexBufferDescriptor_ = vbView;
     triangleRenderItem.vertexCount_ = header.vertexCount_;
@@ -166,7 +166,7 @@ void DirectAppDelegate::start(Application& application)
 
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
     triangleGraphNode.ImportRenderTargets(1, &swapChainRTV);
-    DXRL::Color clearColor{ 0.5f, 0.2f, 0.3f, 1.0f };
+    DXRL::Color clearColor{ 0.1f, 0.11f, 0.12f, 1.0f };
     triangleGraphNode.ImportClearColors(&clearColor, 1);
 
     D3D12_RESOURCE_DESC depthStencilDesc;
