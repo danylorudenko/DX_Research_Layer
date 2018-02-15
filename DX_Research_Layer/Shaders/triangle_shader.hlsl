@@ -40,11 +40,11 @@ float4 PS(PSInput input) : SV_TARGET
 {
     //float3 ambient = pow(float3(0.2f, 0.3f, 0.5f), 2.2f) * Lambertian * 0.5f * (1.0f + dot(float3(0.0f, 1.0f, 0.0f), normalize(input.NormW)));
 
-    const float m = 2048.0f;
+    const float m = 64.0f;
 
     const float3 lightDir = normalize(float3(-1.0f, 0.0f, 0.0f));
-    const float3 baseDiffColor = float3(1.0f, 1.0f, 0.5f);
-    const float3 baseSpecColor = float3(0.5f, 0.5f, 0.1f);
+    const float3 baseDiffColor = float3(1.0f, 1.0f, 1.1f);
+    const float3 baseSpecColor = float3(1.0f, 1.0f, 1.0f);
 
     const float3 baseLinDiffColor = pow(baseDiffColor, TO_LINEAR);
     const float3 baseLinSpecColor = pow(baseSpecColor, TO_LINEAR);
