@@ -55,7 +55,6 @@ public:
     // CUSTOM APPLICATION DATA
     DirectWinProcDelegate winProcDelegate_;
 
-    DirectX::XMFLOAT3A cameraPos_ = DirectX::XMFLOAT3A{ 0, 0, 0 };
     Math::Transform* mainObjTransform = nullptr;
     Math::Camera camera_;
     SceneConstantBuffer sceneBufferData_;

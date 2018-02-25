@@ -44,8 +44,8 @@ void DirectAppDelegate::start(Application& application)
 
 
     ////////////////////////////////////////////////////////////////////////////
-    //std::ifstream ifstream("skull.model", std::ios_base::binary);
-    std::ifstream ifstream("sphere.model", std::ios_base::binary);
+    std::ifstream ifstream("skull.model", std::ios_base::binary);
+    //std::ifstream ifstream("sphere.model", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
@@ -144,30 +144,28 @@ void DirectAppDelegate::start(Application& application)
 
     auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
-    DXRL::GPURenderItem triangleRenderItem{};
-    triangleRenderItem.transform_.Position(DirectX::XMFLOAT3A{ -0.0f, -0.0f, 3.0f });
-    triangleRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, 45.0f, 0.0f });
-    triangleRenderItem.transform_.Scale(0.02f);
-    triangleRenderItem.vertexBuffer_ = vertexBuffer;
-    triangleRenderItem.vertexBufferDescriptor_ = vbView;
-    triangleRenderItem.vertexCount_ = header.vertexCount_;
-    triangleRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    triangleRenderItem.indexBuffer_ = indexBuffer;
-    triangleRenderItem.indexBufferDescriptor_ = ibView;
-    triangleRenderItem.indexCount_ = header.indexCount_;
-    triangleRenderItem.dynamicArg_ = DXRL::GPURenderItem::GPUDynamicRootArgument{ 1, DXRL::GPUResourceViewTable{1, &transformBuffer} };
+    DXRL::GPURenderItem renderItem{};
+    renderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
+    renderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, 90.0f, 0.0f });
+    renderItem.transform_.Scale(0.8f);
+    renderItem.vertexBuffer_ = vertexBuffer;
+    renderItem.vertexBufferDescriptor_ = vbView;
+    renderItem.vertexCount_ = header.vertexCount_;
+    renderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    renderItem.indexBuffer_ = indexBuffer;
+    renderItem.indexBufferDescriptor_ = ibView;
+    renderItem.indexCount_ = header.indexCount_;
+    renderItem.dynamicArg_ = DXRL::GPURenderItem::GPUDynamicRootArgument{ 1, DXRL::GPUResourceViewTable{1, &transformBuffer} };
 
     auto pipelineState = CreatePipelineState(rootSignature);
     DXRL::GPUPipelineState trianglePipelineState_{ pipelineState };
-    auto& triangleGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature));
-    triangleGraphNode.ImportRenderItem(triangleRenderItem);
-
-    mainObjTransform = &triangleGraphNode.GetRenderItemTransform(0);
+    auto& graphicsGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature));
+	graphicsGraphNode.ImportRenderItem(renderItem);
 
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
-    triangleGraphNode.ImportRenderTargets(1, &swapChainRTV);
+    graphicsGraphNode.ImportRenderTargets(1, &swapChainRTV);
     DXRL::Color clearColor{ 0.1f, 0.11f, 0.12f, 1.0f };
-    triangleGraphNode.ImportClearColors(&clearColor, 1);
+    graphicsGraphNode.ImportClearColors(&clearColor, 1);
 
     D3D12_RESOURCE_DESC depthStencilDesc;
     depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -197,8 +195,8 @@ void DirectAppDelegate::start(Application& application)
     dsSettings.ActivateDepth();
     dsSettings.depthStencilClearFlags_ = D3D12_CLEAR_FLAG_DEPTH;
 
-    triangleGraphNode.ImportDepthStencilTarget(depthStencilView);
-    triangleGraphNode.ImportDepthStencilSettings(dsSettings);
+    graphicsGraphNode.ImportDepthStencilTarget(depthStencilView);
+    graphicsGraphNode.ImportDepthStencilSettings(dsSettings);
     
 
     D3D12_VIEWPORT viewport{};
@@ -209,10 +207,10 @@ void DirectAppDelegate::start(Application& application)
     viewport.Width = static_cast<float>(DXRL::GPUFoundation::WIDTH);
     viewport.Height = static_cast<float>(DXRL::GPUFoundation::HEIGHT);
     CD3DX12_RECT scissorRect{ 0, 0, static_cast<LONG>(DXRL::GPUFoundation::WIDTH), static_cast<LONG>(DXRL::GPUFoundation::HEIGHT) };
-    triangleGraphNode.ImportViewportScissor(viewport, scissorRect);
+    graphicsGraphNode.ImportViewportScissor(viewport, scissorRect);
 
 
-    auto& presentNode_ = gpuFoundation_->FrameGraph().AddPresentNode(triangleGraphNode, gpuFoundation_->SwapChain(), gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>());
+    auto& presentNode_ = gpuFoundation_->FrameGraph().AddPresentNode(graphicsGraphNode, gpuFoundation_->SwapChain(), gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>());
     presentNode_.ImportRenderTarget(swapChainRTV);
     
 
@@ -312,6 +310,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState.DepthEnable = TRUE;
     psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
@@ -348,9 +347,9 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
 
 void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 {
-    sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
-    sceneBufferData_.viewMatrix_ = camera_.ViewMatrix(cameraPos_, DirectX::XMFLOAT3A{ 0, 0, 1 }, DirectX::XMFLOAT3A{ 0, 1, 0 });
-    sceneBufferData_.cameraPosition_ = cameraPos_;
+	sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
+    sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
+	sceneBufferData_.cameraPosition_ = camera_.Transform().Position();
 
     char* mappedCameraData = nullptr;
     auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
@@ -370,28 +369,33 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
+	case WM_LBUTTONDOWN:
+		//if (wParam == MK_LBUTTON) {
+			rotationOn = true;
+		//}
+		return 0;
+	case WM_LBUTTONUP:
+		//if (wParam == MK_LBUTTON) {
+			rotationOn = false;
+		//}
+		return 0;
     case WM_MOUSEMOVE: {
-        if (wParam == MK_LBUTTON) {
-            rotationOn = true;
-        }
-
-        if (wParam == MK_RBUTTON) {
-            rotationOn = false;
-        }
-        
-        if (directAppDelegate->mainObjTransform != nullptr && rotationOn) {
+        if (rotationOn) {
             int xCursor = static_cast<int>(LOWORD(lParam));
             int yCursor = static_cast<int>(HIWORD(lParam));
 
-            auto& transform = *directAppDelegate->mainObjTransform;
+            float constexpr PIXEL_TO_ANGLE = 0.005f;
+			float constexpr RADIUS = 2.0f;
 
-            float constexpr PIXEL_TO_ANGLE = 0.01f;
+			float xAng = xCursor * PIXEL_TO_ANGLE;
+			float yAng = yCursor * PIXEL_TO_ANGLE;
 
-            DirectX::XMVECTOR rotation = transform.RotationSIMD();
-            rotation = DirectX::XMQuaternionMultiply(rotation, DirectX::XMQuaternionRotationRollPitchYaw((prevMouseY - yCursor) * PIXEL_TO_ANGLE, (prevMouseX - xCursor)  * PIXEL_TO_ANGLE, 0.0f));
-
-            transform.Rotation(rotation);
-
+			float x = DirectX::XMScalarSin(yAng) * DirectX::XMScalarCos(xAng) * RADIUS;
+			float y = DirectX::XMScalarSin(yAng) * DirectX::XMScalarSin(xAng) * RADIUS;
+			float z = DirectX::XMScalarCos(yAng) * RADIUS;
+			
+			directAppDelegate->camera_.Transform().Position(DirectX::XMFLOAT3A(x, z, y));
+			directAppDelegate->camera_.Transform().LookAt(DirectX::XMVectorReplicate(0.0f), DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
             prevMouseX = xCursor;
             prevMouseY = yCursor;
         }

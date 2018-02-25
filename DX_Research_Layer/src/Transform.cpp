@@ -6,9 +6,10 @@ namespace Math
 using namespace DirectX;
 
 Transform::Transform() :
-    position_(0.0f, 0.0f, 0.0f),
-    rotation_(1.0f, 0.0f, 0.0f, 0.0f),
-    scale_(1.0f, 1.0f, 1.0f)
+	rotation_{ 0.0f, 0.0f, 0.0f, 1.0f },
+    position_{ 0.0f, 0.0f, 0.0f },
+	scale_{ 1.0f, 1.0f, 1.0f },
+	pivot_{ 0.0f, 0.0f, 0.0f }
 { }
 
 Transform::Transform(Transform const& rhs) = default;
@@ -34,6 +35,11 @@ DirectX::XMVECTOR Transform::ScaleSIMD() const
     return DirectX::XMLoadFloat3A(&scale_);
 }
 
+DirectX::XMVECTOR XM_CALLCONV Transform::PivotSIMD() const
+{
+	return DirectX::XMLoadFloat3A(&pivot_);
+}
+
 DirectX::XMFLOAT3A const& Transform::Position() const
 {
     return position_;
@@ -47,6 +53,11 @@ DirectX::XMFLOAT4A const& Transform::Rotation() const
 DirectX::XMFLOAT3A const& Transform::Scale() const
 {
     return scale_;
+}
+
+DirectX::XMFLOAT3A const& Transform::Pivot() const
+{
+	return pivot_;
 }
 
 void Transform::Position(DirectX::FXMVECTOR src)
@@ -73,6 +84,12 @@ void Transform::Scale(DirectX::FXMVECTOR src)
 {
     DirectX::XMStoreFloat3A(&scale_, src);
     worldMatrixDirty_ = true;
+}
+
+void XM_CALLCONV Transform::Pivot(DirectX::FXMVECTOR pivot)
+{
+	DirectX::XMStoreFloat3A(&pivot_, pivot);
+	worldMatrixDirty_ = true;
 }
 
 void Transform::Position(DirectX::XMFLOAT3A const& pos)
@@ -105,6 +122,30 @@ void Transform::Scale(float scale)
 {
     scale_ = DirectX::XMFLOAT3A(scale, scale, scale);
     worldMatrixDirty_ = true;
+}
+
+void Transform::Pivot(DirectX::XMFLOAT3A const& pivot)
+{
+	pivot_ = pivot;
+	worldMatrixDirty_ = true;
+}
+
+void Transform::LookAt(DirectX::FXMVECTOR lookPos, DirectX::FXMVECTOR upVec)
+{
+	DirectX::XMMATRIX matrix = DirectX::XMMatrixLookAtLH(PositionSIMD(), lookPos, upVec);
+	DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationMatrix(matrix);
+	DirectX::XMStoreFloat4A(&rotation_, quat);
+	worldMatrixDirty_ = true;
+}
+
+void Transform::LookAt(DirectX::XMFLOAT3A const& lookPos, DirectX::XMFLOAT3A const& upVec)
+{
+	DirectX::XMVECTOR lookPosSIMD = DirectX::XMLoadFloat3A(&lookPos);
+	DirectX::XMVECTOR upVecSIMD = DirectX::XMLoadFloat3A(&upVec);
+
+	LookAt(lookPosSIMD, upVecSIMD);
+
+	worldMatrixDirty_ = true;
 }
 
 DirectX::XMFLOAT3A Transform::Forward() const
@@ -158,7 +199,7 @@ DirectX::XMFLOAT4X4A const& Transform::WorldMatrix()
 
 DirectX::XMMATRIX Transform::WorldMatrixSIMD() const
 {
-    return DirectX::XMMatrixAffineTransformation(ScaleSIMD(), DirectX::XMVectorReplicate(0.0f), RotationSIMD(), PositionSIMD());
+	return DirectX::XMMatrixAffineTransformation(ScaleSIMD(), PivotSIMD(), RotationSIMD(), PositionSIMD());
 }
 
 }

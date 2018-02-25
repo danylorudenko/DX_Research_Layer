@@ -22,29 +22,23 @@ Camera& Camera::operator=(Camera const&) = default;
 
 Camera& Camera::operator=(Camera&&) = default;
 
-DirectX::XMFLOAT4X4A Camera::ViewMatrix(DirectX::XMFLOAT3A& pos, DirectX::XMFLOAT3A& direction, DirectX::XMFLOAT3A& up) const
+DirectX::XMFLOAT4X4A Camera::ViewMatrix() const
 {
     DirectX::XMFLOAT4X4A viewMatrix;
-    DirectX::XMStoreFloat4x4A(&viewMatrix, ViewMatrixSIMD(DirectX::XMLoadFloat3A(&pos), DirectX::XMLoadFloat3A(&direction), DirectX::XMLoadFloat3A(&up)));
+    DirectX::XMStoreFloat4x4A(&viewMatrix, ViewMatrixSIMD());
     return viewMatrix;
 }
 
-DirectX::XMFLOAT4X4A Camera::ViewMatrix(DirectX::FXMVECTOR pos, DirectX::FXMVECTOR direction, DirectX::FXMVECTOR up) const
+DirectX::XMMATRIX Camera::ViewMatrixSIMD() const
 {
-    DirectX::XMFLOAT4X4A viewMatrix;
-    DirectX::XMStoreFloat4x4A(&viewMatrix, ViewMatrixSIMD(pos, direction, up));
-
-    return viewMatrix;
-}
-
-DirectX::XMMATRIX Camera::ViewMatrixSIMD(DirectX::FXMVECTOR pos, DirectX::FXMVECTOR direction, DirectX::FXMVECTOR up) const
-{
-    return DirectX::XMMatrixLookToLH(pos, direction, up);
-}
-
-DirectX::XMMATRIX Camera::ViewMatrixSIMD(DirectX::XMFLOAT3A& pos, DirectX::XMFLOAT3A& direction, DirectX::XMFLOAT3A& up) const
-{
-    return ViewMatrixSIMD(DirectX::XMLoadFloat3A(&pos), DirectX::XMLoadFloat3A(&direction), DirectX::XMLoadFloat3A(&up));
+	//DirectX::XMFLOAT3A pos = transform_.Position();
+	//DirectX::XMFLOAT4A rot = transform_.Rotation();
+	//DirectX::XMFLOAT3A scl = transform_.Scale();
+	//
+	//DirectX::XMFLOAT3A forward = transform_.Forward();
+	//DirectX::XMFLOAT3A up = transform_.Up();
+	
+	return DirectX::XMMatrixLookToLH(transform_.PositionSIMD(), transform_.ForwardSIMD(), transform_.UpSIMD());
 }
 
 DirectX::XMFLOAT4X4A const& Camera::PerspectiveMatrix()
