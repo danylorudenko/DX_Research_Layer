@@ -380,9 +380,10 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
 		//}
 		return 0;
     case WM_MOUSEMOVE: {
+		int xCursor = static_cast<int>(LOWORD(lParam));
+		int yCursor = static_cast<int>(HIWORD(lParam));
+
         if (rotationOn) {
-            int xCursor = static_cast<int>(LOWORD(lParam));
-            int yCursor = static_cast<int>(HIWORD(lParam));
 
             float constexpr PIXEL_TO_ANGLE = 0.005f;
 			float constexpr RADIUS = 2.0f;
@@ -395,10 +396,12 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
 			float z = DirectX::XMScalarCos(yAng) * RADIUS;
 			
 			directAppDelegate->camera_.Transform().Position(DirectX::XMFLOAT3A(x, z, y));
-			directAppDelegate->camera_.Transform().LookAt(DirectX::XMVectorReplicate(0.0f), DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-            prevMouseX = xCursor;
-            prevMouseY = yCursor;
+			directAppDelegate->camera_.Transform().LookAt(DirectX::XMFLOAT3A{ 0, 0, 0 }, DirectX::XMFLOAT3A{ 0.0f, 1.0f, 0.0f });
+            
         }
+
+		prevMouseX = xCursor;
+		prevMouseY = yCursor;
         return 0;
     }
     default:

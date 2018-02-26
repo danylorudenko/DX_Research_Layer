@@ -134,7 +134,7 @@ void Transform::LookAt(DirectX::FXMVECTOR lookPos, DirectX::FXMVECTOR upVec)
 {
 	DirectX::XMMATRIX matrix = DirectX::XMMatrixLookAtLH(PositionSIMD(), lookPos, upVec);
 	DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationMatrix(matrix);
-	DirectX::XMStoreFloat4A(&rotation_, quat);
+	DirectX::XMStoreFloat4A(&rotation_, DirectX::XMQuaternionInverse(quat));
 	worldMatrixDirty_ = true;
 }
 
@@ -144,8 +144,6 @@ void Transform::LookAt(DirectX::XMFLOAT3A const& lookPos, DirectX::XMFLOAT3A con
 	DirectX::XMVECTOR upVecSIMD = DirectX::XMLoadFloat3A(&upVec);
 
 	LookAt(lookPosSIMD, upVecSIMD);
-
-	worldMatrixDirty_ = true;
 }
 
 DirectX::XMFLOAT3A Transform::Forward() const
