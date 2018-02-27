@@ -83,11 +83,6 @@ private:
     UINT64 currentFrame_ = 0U;
     GPUFrameGraph frameGraph_;
 
-
-    std::size_t static constexpr RTV_HEAP_CAPACITY = 30;
-    std::size_t static constexpr DSV_HEAP_CAPACITY = 30;
-    std::size_t static constexpr CBV_SRV_UAV_CAPACITY = 30;
-
     GPUResourceViewAllocator viewAllocator_;
     GPUResourceViewContextTable viewContextTable_;
 

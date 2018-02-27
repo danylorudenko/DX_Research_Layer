@@ -1,14 +1,9 @@
 #include <Rendering\Data\GPURenderItem.hpp>
+#include <Rendering\GPUFoundation.hpp>
 
 namespace DXRL
 {
 	
-GPURenderItem::GPURenderItem() = default;
-
-GPURenderItem::GPURenderItem(GPURenderItem&& rhs) = default;
-
-GPURenderItem& GPURenderItem::operator=(GPURenderItem&& rhs) = default;
-
 void GPURenderItem::CreateTransformBuffer(std::size_t frames, std::size_t bindSlot, GPUFoundation& foundation)
 {
 	D3D12_RESOURCE_DESC rd{};

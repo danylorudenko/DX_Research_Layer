@@ -46,7 +46,7 @@ private:
 
     static constexpr std::size_t RTV_HEAP_CAPACITY = 6;
     static constexpr std::size_t DSV_HEAP_CAPACITY = 6;
-    static constexpr std::size_t CBV_SRV_UAV_CAPACITY = 10;
+    static constexpr std::size_t CBV_SRV_UAV_CAPACITY = 30;
 
     GPUFoundation* foundation_ = nullptr;
 

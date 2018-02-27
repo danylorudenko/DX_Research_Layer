@@ -130,11 +130,16 @@ void DirectAppDelegate::start(Application& application)
     sceneBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, sceneCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
     triangleRootSignature.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &sceneBuffer_ });
 
-    
-    DXRL::GPURenderItem renderItem[3];
-	for (std::size_t i = 0; i < 3; i++) {
-		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>((i - 1) * 3) , 0.0f, 0.0f });
-		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, 90.0f, 0.0f });
+
+    auto pipelineState = CreatePipelineState(rootSignature);
+    DXRL::GPUPipelineState trianglePipelineState_{ pipelineState };
+    auto& graphicsGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature));
+
+	std::size_t constexpr renderItemsCount = 3;
+	DXRL::GPURenderItem renderItem[renderItemsCount];
+	for (std::size_t i = 0; i < renderItemsCount; i++) {
+		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>((i * 3) - 3) , 0.0f, 0.0f });
+		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, (45.0f * i) + 90.0f, 0.0f });
 		renderItem[i].transform_.Scale(0.8f);
 		renderItem[i].vertexBuffer_ = vertexBuffer;
 		renderItem[i].vertexBufferDescriptor_ = vbView;
@@ -144,15 +149,9 @@ void DirectAppDelegate::start(Application& application)
 		renderItem[i].indexBufferDescriptor_ = ibView;
 		renderItem[i].indexCount_ = header.indexCount_;
 		renderItem[i].CreateTransformBuffer(framesCount, 1, *gpuFoundation_);
-	}
-    
 
-    auto pipelineState = CreatePipelineState(rootSignature);
-    DXRL::GPUPipelineState trianglePipelineState_{ pipelineState };
-    auto& graphicsGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature));
-	graphicsGraphNode.ImportRenderItem(std::move(renderItem[0]));
-	graphicsGraphNode.ImportRenderItem(std::move(renderItem[1]));
-	graphicsGraphNode.ImportRenderItem(std::move(renderItem[2]));
+		graphicsGraphNode.ImportRenderItem(std::move(renderItem[i]));
+	}
 
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
     graphicsGraphNode.ImportRenderTargets(1, &swapChainRTV);
@@ -211,7 +210,7 @@ void DirectAppDelegate::start(Application& application)
     initializationEngine.FlushReset();
 
     camera_.NearPlane(0.1f);
-    camera_.FarPlane(100.0f);
+    camera_.FarPlane(1000.0f);
     camera_.Fow(60.0f);
     camera_.AspectRatio(static_cast<float>(DXRL::GPUFoundation::WIDTH) / static_cast<float>(DXRL::GPUFoundation::HEIGHT));
 }
@@ -377,7 +376,7 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
 
         if (rotationOn) {
 
-            float constexpr PIXEL_TO_ANGLE = 0.005f;
+            float constexpr PIXEL_TO_ANGLE = 0.01f;
 			float constexpr RADIUS = 2.0f;
 
 			float xAng = xCursor * PIXEL_TO_ANGLE;
