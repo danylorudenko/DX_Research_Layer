@@ -4,13 +4,27 @@
 
 #include <Math\Transform.hpp>
 #include <Rendering\Data\Resource\GPUResourceHandle.hpp>
+#include <Rendering\Data\Resource\ResourceView\GPUResourceViewTable.hpp>
+#include <Rendering\GPUFoundation.hpp>
 
 namespace DXRL
 {
 
-struct GPURenderItem
+class GPURenderItem
 {
-    Math::Transform transform_;
+public:
+	GPURenderItem();
+	GPURenderItem(GPURenderItem const&) = delete;
+	GPURenderItem(GPURenderItem&& rhs);
+
+	GPURenderItem& operator=(GPURenderItem const&) = delete;
+	GPURenderItem& operator=(GPURenderItem&& rhs);
+
+	void CreateTransformBuffer(std::size_t frames, std::size_t bindSlot, GPUFoundation& foundation);
+
+
+public:
+	Math::Transform transform_;
 
     D3D_PRIMITIVE_TOPOLOGY primitiveTopology_;
 

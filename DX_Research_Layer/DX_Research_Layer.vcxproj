@@ -184,6 +184,7 @@
     <ClCompile Include="src\GPUGraphNode.cpp" />
     <ClCompile Include="src\GPUPipelineState.cpp" />
     <ClCompile Include="src\GPUPresentGraphNode.cpp" />
+    <ClCompile Include="src\GPURenderItem.cpp" />
     <ClCompile Include="src\GPUResource.cpp" />
     <ClCompile Include="src\GPUResourceViewContextTable.cpp" />
     <ClCompile Include="src\GPUResourceHandle.cpp" />

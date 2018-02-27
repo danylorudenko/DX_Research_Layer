@@ -130,37 +130,29 @@ void DirectAppDelegate::start(Application& application)
     sceneBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, sceneCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
     triangleRootSignature.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &sceneBuffer_ });
 
-    auto constexpr transformBufferSize = (sizeof(DirectX::XMFLOAT4X4A) + 255) & ~255;
-    DXRL::GPUResourceHandle transformBufferHandles[framesCount];
-    for (std::size_t i = 0; i < framesCount; i++) {
-        transformBufferHandles[i] = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(transformBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
-    }
-
-    D3D12_CONSTANT_BUFFER_VIEW_DESC transformCbvDesc[framesCount];
-    for (std::size_t i = 0; i < framesCount; i++) {
-        transformCbvDesc[i].BufferLocation = transformBufferHandles[i].Resource().Get()->GetGPUVirtualAddress();
-        transformCbvDesc[i].SizeInBytes = transformBufferSize;
-    }
-
-    auto transformBuffer = gpuFoundation_->AllocCBV(framesCount, transformBufferHandles, transformCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
-
-    DXRL::GPURenderItem renderItem{};
-    renderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
-    renderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, 90.0f, 0.0f });
-    renderItem.transform_.Scale(0.8f);
-    renderItem.vertexBuffer_ = vertexBuffer;
-    renderItem.vertexBufferDescriptor_ = vbView;
-    renderItem.vertexCount_ = header.vertexCount_;
-    renderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    renderItem.indexBuffer_ = indexBuffer;
-    renderItem.indexBufferDescriptor_ = ibView;
-    renderItem.indexCount_ = header.indexCount_;
-    renderItem.dynamicArg_ = DXRL::GPURenderItem::GPUDynamicRootArgument{ 1, DXRL::GPUResourceViewTable{1, &transformBuffer} };
+    
+    DXRL::GPURenderItem renderItem[3];
+	for (std::size_t i = 0; i < 3; i++) {
+		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>((i - 1) * 3) , 0.0f, 0.0f });
+		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, 90.0f, 0.0f });
+		renderItem[i].transform_.Scale(0.8f);
+		renderItem[i].vertexBuffer_ = vertexBuffer;
+		renderItem[i].vertexBufferDescriptor_ = vbView;
+		renderItem[i].vertexCount_ = header.vertexCount_;
+		renderItem[i].primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		renderItem[i].indexBuffer_ = indexBuffer;
+		renderItem[i].indexBufferDescriptor_ = ibView;
+		renderItem[i].indexCount_ = header.indexCount_;
+		renderItem[i].CreateTransformBuffer(framesCount, 1, *gpuFoundation_);
+	}
+    
 
     auto pipelineState = CreatePipelineState(rootSignature);
     DXRL::GPUPipelineState trianglePipelineState_{ pipelineState };
     auto& graphicsGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature));
-	graphicsGraphNode.ImportRenderItem(renderItem);
+	graphicsGraphNode.ImportRenderItem(std::move(renderItem[0]));
+	graphicsGraphNode.ImportRenderItem(std::move(renderItem[1]));
+	graphicsGraphNode.ImportRenderItem(std::move(renderItem[2]));
 
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
     graphicsGraphNode.ImportRenderTargets(1, &swapChainRTV);
