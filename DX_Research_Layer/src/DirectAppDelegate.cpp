@@ -209,6 +209,7 @@ void DirectAppDelegate::start(Application& application)
 
     initializationEngine.FlushReset();
 
+	camera_.Transform().Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, -6.0f });
     camera_.NearPlane(0.1f);
     camera_.FarPlane(1000.0f);
     camera_.Fow(60.0f);
@@ -345,7 +346,10 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 
 	camera_.Transform().Rotation(DirectX::XMQuaternionRotationRollPitchYaw(cameraTargetPitch_, cameraTargetYaw_, 0.0f));
 	
-	float constexpr SPEED_PER_FRAME = 0.003f;
+	/////////////////////////////////
+
+	float constexpr SPEED_PER_FRAME = 0.005f;
+
 	auto pos = camera_.Transform().PositionSIMD();
 	auto forward = camera_.Transform().ForwardSIMD();
 	auto right = camera_.Transform().RightSIMD();
@@ -365,7 +369,8 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 
 	camera_.Transform().Position(pos);
 
-	
+	/////////////////////////////////
+
 	sceneBufferData_.cameraPosition_ = camera_.Transform().Position();
 	sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
     sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
@@ -393,13 +398,10 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
 	case WM_LBUTTONDOWN:
 		rotationOn = !rotationOn;
 		if(rotationOn) {
-			ShowCursor(false);
-
-			RECT winRect;
-			GetWindowRect(hwnd, &winRect);
+			//ShowCursor(false);
 		}
 		else {
-			ShowCursor(true);
+			//ShowCursor(true);
 		}
 		return 0;
     case WM_MOUSEMOVE: {
@@ -410,9 +412,9 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
 			mouseXDelta_ = static_cast<float>(xMouse - prevMouseX_);
 			mouseYDelta_ = static_cast<float>(yMouse - prevMouseY_);
 
-			RECT winRect;
-			GetWindowRect(hwnd, &winRect);
-			ClipCursor(&winRect);
+			//RECT winRect;
+			//GetWindowRect(hwnd, &winRect);
+			//ClipCursor(&winRect);
         }
 
 		prevMouseX_ = xMouse;
