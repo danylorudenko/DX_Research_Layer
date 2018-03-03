@@ -138,8 +138,8 @@ void DirectAppDelegate::start(Application& application)
 	std::size_t constexpr renderItemsCount = 3;
 	DXRL::GPURenderItem renderItem[renderItemsCount];
 	for (std::size_t i = 0; i < renderItemsCount; i++) {
-		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>((i * 3) - 3) , 0.0f, 0.0f });
-		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, (45.0f * i) + 90.0f, 0.0f });
+		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>(i * 3) - 3 , 0.0f, 0.0f });
+		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, (i * -45.0f) + 45.0f, 0.0f });
 		renderItem[i].transform_.Scale(0.8f);
 		renderItem[i].vertexBuffer_ = vertexBuffer;
 		renderItem[i].vertexBufferDescriptor_ = vbView;
@@ -338,10 +338,38 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
 
 void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 {
+	float constexpr PIXEL_TO_ANGLE = 0.3f;
+
+	cameraTargetPitch_ += winProcDelegate_.mouseYDelta_ * PIXEL_TO_ANGLE * DEGREE_TO_RAD;
+	cameraTargetYaw_ += winProcDelegate_.mouseXDelta_ * PIXEL_TO_ANGLE * DEGREE_TO_RAD;
+
+	camera_.Transform().Rotation(DirectX::XMQuaternionRotationRollPitchYaw(cameraTargetPitch_, cameraTargetYaw_, 0.0f));
+	
+	float constexpr SPEED_PER_FRAME = 0.003f;
+	auto pos = camera_.Transform().PositionSIMD();
+	auto forward = camera_.Transform().ForwardSIMD();
+	auto right = camera_.Transform().RightSIMD();
+
+	if (winProcDelegate_.WPressed()) {
+		pos = DirectX::XMVectorAdd(pos, DirectX::XMVectorMultiply(forward, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
+	}
+	if (winProcDelegate_.SPressed()) {
+		pos = DirectX::XMVectorSubtract(pos, DirectX::XMVectorMultiply(forward, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
+	}
+	if (winProcDelegate_.APressed()) {
+		pos = DirectX::XMVectorAdd(pos, DirectX::XMVectorMultiply(right, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
+	}
+	if (winProcDelegate_.DPressed()) {
+		pos = DirectX::XMVectorSubtract(pos, DirectX::XMVectorMultiply(right, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
+	}
+
+	camera_.Transform().Position(pos);
+
+	
+	sceneBufferData_.cameraPosition_ = camera_.Transform().Position();
 	sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
     sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
-	sceneBufferData_.cameraPosition_ = camera_.Transform().Position();
-
+	
     char* mappedCameraData = nullptr;
     auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
 
@@ -356,48 +384,90 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
 {
     DirectAppDelegate* directAppDelegate = reinterpret_cast<DirectAppDelegate*>(appDelegate_);
 
+	mouseXDelta_ = mouseYDelta_ = 0.0f;
+
     switch (msg) {
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
 	case WM_LBUTTONDOWN:
-		//if (wParam == MK_LBUTTON) {
-			rotationOn = true;
-		//}
-		return 0;
-	case WM_LBUTTONUP:
-		//if (wParam == MK_LBUTTON) {
-			rotationOn = false;
-		//}
+		rotationOn = !rotationOn;
+		if(rotationOn) {
+			ShowCursor(false);
+
+			RECT winRect;
+			GetWindowRect(hwnd, &winRect);
+		}
+		else {
+			ShowCursor(true);
+		}
 		return 0;
     case WM_MOUSEMOVE: {
-		int xCursor = static_cast<int>(LOWORD(lParam));
-		int yCursor = static_cast<int>(HIWORD(lParam));
+		int xMouse = static_cast<int>(LOWORD(lParam));
+		int yMouse = static_cast<int>(HIWORD(lParam));
 
         if (rotationOn) {
+			mouseXDelta_ = static_cast<float>(xMouse - prevMouseX_);
+			mouseYDelta_ = static_cast<float>(yMouse - prevMouseY_);
 
-            float constexpr PIXEL_TO_ANGLE = 0.01f;
-			float constexpr RADIUS = 2.0f;
-
-			float xAng = xCursor * PIXEL_TO_ANGLE;
-			float yAng = yCursor * PIXEL_TO_ANGLE;
-
-			float x = DirectX::XMScalarSin(yAng) * DirectX::XMScalarCos(xAng) * RADIUS;
-			float y = DirectX::XMScalarSin(yAng) * DirectX::XMScalarSin(xAng) * RADIUS;
-			float z = DirectX::XMScalarCos(yAng) * RADIUS;
-			
-			directAppDelegate->camera_.Transform().Position(DirectX::XMFLOAT3A(x, z, y));
-			directAppDelegate->camera_.Transform().LookAt(DirectX::XMFLOAT3A{ 0, 0, 0 }, DirectX::XMFLOAT3A{ 0.0f, 1.0f, 0.0f });
-            
+			RECT winRect;
+			GetWindowRect(hwnd, &winRect);
+			ClipCursor(&winRect);
         }
 
-		prevMouseX = xCursor;
-		prevMouseY = yCursor;
+		prevMouseX_ = xMouse;
+		prevMouseY_ = yMouse;
         return 0;
     }
+	case WM_KEYDOWN:
+		if (wParam == 0x57) { // W
+			keyMap_ |= (1 << 0);
+		}
+		if (wParam == 0x41) { // A
+			keyMap_ |= (1 << 1);
+		}
+		if (wParam == 0x53) { // S
+			keyMap_ |= (1 << 2);
+		}
+		if (wParam == 0x44) { // D
+			keyMap_ |= (1 << 3);
+		}
+		return 0;
+	case WM_KEYUP:
+		if (wParam == 0x57) { // W
+			keyMap_ &= ~(1 << 0);
+		}
+		if (wParam == 0x41) { // A
+			keyMap_ &= ~(1 << 1);
+		}
+		if (wParam == 0x53) { // S
+			keyMap_ &= ~(1 << 2);
+		}
+		if (wParam == 0x44) { // D
+			keyMap_ &= ~(1 << 3);
+		}
+		return 0;
     default:
-        break;
+		return DefWindowProc(hwnd, msg, wParam, lParam);
     }
+}
 
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+bool DirectWinProcDelegate::WPressed() const
+{
+	return keyMap_ & (1 << 0);
+}
+
+bool DirectWinProcDelegate::APressed() const
+{
+	return keyMap_ & (1 << 1);
+}
+
+bool DirectWinProcDelegate::SPressed() const
+{
+	return keyMap_ & (1 << 2);
+}
+
+bool DirectWinProcDelegate::DPressed() const
+{
+	return keyMap_ & (1 << 3);
 }

@@ -168,7 +168,7 @@ DirectX::XMFLOAT3A Transform::Right() const
 
 DirectX::XMVECTOR Transform::RightSIMD() const
 {
-    DirectX::XMVECTOR unitRight = DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+    DirectX::XMVECTOR unitRight = DirectX::XMVectorSet(-1.0f, 0.0f, 0.0f, 0.0f);
     return DirectX::XMVector4Transform(unitRight, DirectX::XMMatrixRotationQuaternion(RotationSIMD()));
 }
 

@@ -20,10 +20,20 @@ public:
 
     virtual LRESULT operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
+	bool WPressed() const;
+	bool APressed() const;
+	bool SPressed() const;
+	bool DPressed() const;
+
     bool rotationOn = false;
 
-    int prevMouseX;
-    int prevMouseY;
+	float mouseXDelta_;
+	float mouseYDelta_;
+
+	std::uint8_t keyMap_ = 0; // WASD
+
+    int prevMouseX_;
+    int prevMouseY_;
 };
 
 class DirectAppDelegate : public Application::Delegate
@@ -57,6 +67,8 @@ public:
 
     Math::Transform* mainObjTransform = nullptr;
     Math::Camera camera_;
+	float cameraTargetPitch_ = 0.0f;
+	float cameraTargetYaw_ = 0.0f;
     SceneConstantBuffer sceneBufferData_;
     DXRL::GPUResourceViewHandle sceneBuffer_;
 };

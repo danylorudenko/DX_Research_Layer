@@ -13,6 +13,7 @@
 #include <memory>
 
 #include <Windows.h>
+#include <windowsx.h>
 #include <wrl.h>
 
 #include <dxgi.h>
