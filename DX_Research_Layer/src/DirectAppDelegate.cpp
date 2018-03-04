@@ -138,7 +138,7 @@ void DirectAppDelegate::start(Application& application)
 	std::size_t constexpr renderItemsCount = 3;
 	DXRL::GPURenderItem renderItem[renderItemsCount];
 	for (std::size_t i = 0; i < renderItemsCount; i++) {
-		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>(i * 3) - 3 , 0.0f, 0.0f });
+		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>(i * 1.7f) - 1.7f , 0.0f, 0.0f });
 		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, (i * -45.0f) + 45.0f, 0.0f });
 		renderItem[i].transform_.Scale(0.8f);
 		renderItem[i].vertexBuffer_ = vertexBuffer;
@@ -348,7 +348,7 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 	
 	/////////////////////////////////
 
-	float constexpr SPEED_PER_FRAME = 0.005f;
+	float constexpr SPEED_PER_FRAME = 0.02f;
 
 	auto pos = camera_.Transform().PositionSIMD();
 	auto forward = camera_.Transform().ForwardSIMD();
