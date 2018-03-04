@@ -44,8 +44,19 @@ void DirectAppDelegate::start(Application& application)
 
 
     ////////////////////////////////////////////////////////////////////////////
+	float constexpr planeVertexData[] = {
+		 1.0f, 0.0f,  1.0f,   0.0f, 1.0f, 0.0f,
+		-1.0f, 0.0f,  1.0f,   0.0f, 1.0f, 0.0f,
+		 1.0f, 0.0f, -1.0f,   0.0f, 1.0f, 0.0f,
+		-1.0f, 0.0f, -1.0f,   0.0f, 1.0f, 0.0f,
+	};
+
+	std::int32_t constexpr planeIndexData[] = {
+		2, 1, 0,
+		3, 1, 2
+	};
+
     std::ifstream ifstream("skull.model", std::ios_base::binary);
-    //std::ifstream ifstream("sphere.model", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
@@ -59,36 +70,42 @@ void DirectAppDelegate::start(Application& application)
     std::size_t const vertexBytes = vertexSize * header.vertexCount_;
     std::size_t const indexBytes = indexSize * header.indexCount_;
 
-    BYTE* vertexData = new BYTE[vertexBytes];
-    BYTE* indexData = new BYTE[indexBytes];
+    BYTE* vertexData = new BYTE[vertexBytes + sizeof(planeVertexData)];
+    BYTE* indexData = new BYTE[indexBytes + sizeof(planeIndexData)];
 
     ifstream.read(reinterpret_cast<char*>(vertexData), vertexBytes);
     ifstream.read(reinterpret_cast<char*>(indexData), indexBytes);
 
     ifstream.close();
 
-    auto uploadVertexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
-    auto vertexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
-    auto uploadIndexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_GENERIC_READ);
-    auto indexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes), D3D12_RESOURCE_STATE_COPY_DEST);
+	std::memcpy(vertexData + vertexBytes, planeVertexData, sizeof(planeVertexData));
+	std::memcpy(indexData + indexBytes, planeIndexData, sizeof(planeIndexData));
+
+
+    auto uploadVertexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes + sizeof(planeVertexData)), D3D12_RESOURCE_STATE_GENERIC_READ);
+    auto vertexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes + sizeof(planeVertexData)), D3D12_RESOURCE_STATE_COPY_DEST);
+    auto uploadIndexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes + sizeof(planeIndexData)), D3D12_RESOURCE_STATE_GENERIC_READ);
+    auto indexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes + sizeof(planeIndexData)), D3D12_RESOURCE_STATE_COPY_DEST);
 
 
     BYTE* mappedVertexData = nullptr;
     uploadVertexBuffer.Resource().Get()->Map(0, nullptr, reinterpret_cast<void**>(&mappedVertexData));
     std::memcpy(mappedVertexData, vertexData, vertexBytes);
-    D3D12_RANGE writtenVertexRange{ 0, vertexBytes };
+	std::memcpy(mappedVertexData + vertexBytes, planeVertexData, sizeof(planeVertexData));
+    D3D12_RANGE writtenVertexRange{ 0, vertexBytes + sizeof(planeVertexData) };
     uploadVertexBuffer.Resource().Get()->Unmap(0, &writtenVertexRange);
     mappedVertexData = nullptr;
 
     BYTE* mappedIndexData = nullptr;
     uploadIndexBuffer.Resource().Get()->Map(0, nullptr, reinterpret_cast<void**>(&mappedIndexData));
     std::memcpy(mappedIndexData, indexData, indexBytes);
-    D3D12_RANGE writtenIndexRange{ 0, indexBytes };
+	std::memcpy(mappedIndexData + indexBytes, planeIndexData, sizeof(planeIndexData));
+    D3D12_RANGE writtenIndexRange{ 0, indexBytes + sizeof(planeIndexData) };
     uploadIndexBuffer.Resource().Get()->Unmap(0, &writtenIndexRange);
     mappedIndexData = nullptr;
 
-    initializationEngine.Commit().CopyBufferRegion(vertexBuffer.Resource().GetPtr(), 0, uploadVertexBuffer.Resource().GetPtr(), 0, vertexBytes);
-    initializationEngine.Commit().CopyBufferRegion(indexBuffer.Resource().GetPtr(), 0, uploadIndexBuffer.Resource().GetPtr(), 0, indexBytes);
+    initializationEngine.Commit().CopyBufferRegion(vertexBuffer.Resource().GetPtr(), 0, uploadVertexBuffer.Resource().GetPtr(), 0, vertexBytes + sizeof(planeVertexData));
+    initializationEngine.Commit().CopyBufferRegion(indexBuffer.Resource().GetPtr(), 0, uploadIndexBuffer.Resource().GetPtr(), 0, indexBytes + sizeof(planeIndexData));
 
 
     vertexBuffer.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
@@ -153,6 +170,33 @@ void DirectAppDelegate::start(Application& application)
 		graphicsGraphNode.ImportRenderItem(std::move(renderItem[i]));
 	}
 
+	D3D12_VERTEX_BUFFER_VIEW planeVbView{};
+	planeVbView.BufferLocation = vertexBuffer.Resource().Get()->GetGPUVirtualAddress() + vertexBytes;
+	planeVbView.SizeInBytes = static_cast<UINT>(sizeof(planeVertexData));
+	planeVbView.StrideInBytes = sizeof(Vertex);
+
+	D3D12_INDEX_BUFFER_VIEW planeIbView{};
+	planeIbView.BufferLocation = indexBuffer.Resource().Get()->GetGPUVirtualAddress() + indexBytes;
+	planeIbView.Format = DXGI_FORMAT_R32_UINT;
+	planeIbView.SizeInBytes = static_cast<UINT>(sizeof(planeIndexData));
+
+	DXRL::GPURenderItem planeRenderItem{};
+	planeRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, -2.0f, 0.0f });
+	planeRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
+	planeRenderItem.transform_.Scale(6.0f);
+	planeRenderItem.vertexBuffer_ = vertexBuffer;
+	planeRenderItem.vertexBufferDescriptor_ = planeVbView;
+	planeRenderItem.vertexCount_ = 4;
+	planeRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	planeRenderItem.indexBuffer_ = indexBuffer;
+	planeRenderItem.indexBufferDescriptor_ = planeIbView;
+	planeRenderItem.indexCount_ = 6;
+	planeRenderItem.CreateTransformBuffer(framesCount, 1, *gpuFoundation_);
+
+	graphicsGraphNode.ImportRenderItem(std::move(planeRenderItem));
+
+	/////////////////////////////////////////////////////////////
+
     auto swapChainRTV = gpuFoundation_->SwapChainRTV();
     graphicsGraphNode.ImportRenderTargets(1, &swapChainRTV);
     DXRL::Color clearColor{ 0.1f, 0.11f, 0.12f, 1.0f };
@@ -209,7 +253,7 @@ void DirectAppDelegate::start(Application& application)
 
     initializationEngine.FlushReset();
 
-	camera_.Transform().Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, -6.0f });
+	camera_.Transform().Position(DirectX::XMFLOAT3A{ 0.0f, 0.0f, -4.0f });
     camera_.NearPlane(0.1f);
     camera_.FarPlane(1000.0f);
     camera_.Fow(60.0f);
@@ -302,7 +346,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	//psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState.DepthEnable = TRUE;
     psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
