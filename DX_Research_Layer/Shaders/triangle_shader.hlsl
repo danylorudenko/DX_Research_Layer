@@ -30,7 +30,7 @@ PSInput VS(float3 position : POSITION, float3 normal : NORMAL)
 
     float4 positionW = mul(float4(position, 1.0f), worldMatrix);
     result.PosW = positionW.xyz;
-    result.NormW = mul(float4(normal, 1.0f), worldMatrix).xyz;
+    result.NormW = mul(float4(normal, 0.0f), worldMatrix).xyz;
     result.PosH = mul(mul(positionW, viewMatrix), projectionMatrix);
 
     return result;
@@ -40,29 +40,28 @@ float4 PS(PSInput input) : SV_TARGET
 {
     //float3 ambient = pow(float3(0.2f, 0.3f, 0.5f), 2.2f) * Lambertian * 0.5f * (1.0f + dot(float3(0.0f, 1.0f, 0.0f), normalize(input.NormW)));
 
-    const float m = 64.0f;
+	const float m = 256.0f;
 
-    const float3 lightDir = normalize(float3(-1.0f, 0.0f, 0.0f));
-    const float3 baseDiffColor = float3(1.0f, 1.0f, 1.1f);
-    const float3 baseSpecColor = float3(1.0f, 1.0f, 1.0f);
+    const float3 baseDiffColor = float3(0.5f, 0.5f, 1.0f);
+    const float3 baseSpecColor = float3(0.5f, 0.5f, 0.5f);
 
     const float3 baseLinDiffColor = pow(baseDiffColor, TO_LINEAR);
     const float3 baseLinSpecColor = pow(baseSpecColor, TO_LINEAR);
 
-    float3 nv = normalize(input.NormW);
-    float ndotl = saturate(dot(lightDir, nv));
+    const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
+	const float3 n = normalize(input.NormW);
+	const float ndotl = max(dot(n, l), 0.0f);
+	const float3 v = normalize(cameraPosition - input.PosW);
+	const float3 h = normalize((l + v) / 2);
 
-    float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
+	const float nF = (m + 8) / (8 * PI);
 
-    float3 vv = normalize(cameraPosition - input.PosW);
-    float3 hv = normalize(vv + input.NormW);
-    float Kspec = (m + 8) / (8 * PI);
-    float3 Mspec = baseLinSpecColor * ndotl;
-    float magic = pow(saturate(dot(nv, hv)), m);
+	const float3 specLin = pow(max(dot(n, h), 0.0f), m) * nF * baseLinSpecColor;
 
-    float3 specular = Kspec * magic * Mspec;
 
-    float3 final = pow(diffuse + specular, TO_GAMMA);
-    return float4(final, 1.0f);
+	const float3 diffLin = ndotl * baseLinDiffColor * LAMBERTIAN;
+	const float3 resultColor = /*pow(diffLin, TO_GAMMA) + */pow(specLin, TO_GAMMA);
+
+    return float4(resultColor, 1.0f);
 
 }
