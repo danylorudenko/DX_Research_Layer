@@ -193,7 +193,7 @@ void DirectAppDelegate::start(Application& application)
 	planeRenderItem.indexCount_ = 6;
 	planeRenderItem.CreateTransformBuffer(framesCount, 1, *gpuFoundation_);
 
-	graphicsGraphNode.ImportRenderItem(std::move(planeRenderItem));
+	//graphicsGraphNode.ImportRenderItem(std::move(planeRenderItem));
 
 	/////////////////////////////////////////////////////////////
 
