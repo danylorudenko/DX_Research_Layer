@@ -69,11 +69,11 @@ float4 PS(PSInput input) : SV_TARGET
 
 	float3 fresnelReflectance =  ShlickFresnel(R0, ndotv);
 
-	const float3 specLin = /*pow(ndoth, m) * nF * */fresnelReflectance * baseLinSpecColor;
+	const float3 specLin = pow(ndoth, m) * nF * fresnelReflectance * baseLinSpecColor;
 
 
 	const float3 resultLinColor = ndotl * baseLinDiffColor * LAMBERTIAN;
-	const float3 resultColor = /*pow(resultLinColor, TO_GAMMA) + */pow(specLin, TO_GAMMA);
+	const float3 resultColor = pow(resultLinColor, TO_GAMMA) + pow(specLin, TO_GAMMA);
 
     return float4(resultColor, 1.0f);
 
