@@ -291,6 +291,12 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
     windowText_ += L";    FPS: ";
     windowText_ += std::to_wstring(1 / drawTime);
 
+	windowText_ += L"roughness: ";
+	windowText_ += std::to_wstring(sceneBufferData_.roughness);
+
+	windowText_ += L"     metalness: ";
+	windowText_ += std::to_wstring(sceneBufferData_.metalness);
+
     HWND windowHandle = application.window().nativeHandle();
     SetWindowText(windowHandle, windowText_.c_str());
 }
@@ -414,7 +420,7 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 
 
 	auto static clip = [](float val, float l, float h) -> float { return (std::max)(l, (std::min)(val, h)); };
-	float constexpr STEP = 0.002f;
+	float constexpr STEP = 0.001f;
 	if (winProcDelegate_.UPressed()) {
 		sceneBufferData_.roughness = clip(sceneBufferData_.roughness + STEP, 0.0f, 1.0f);
 	}

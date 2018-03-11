@@ -87,19 +87,14 @@ float3 CombineDiffuseSpecular(float3 BRDF, float3 diffuse, float ndotl, float me
 
 float4 PS(PSInput input) : SV_TARGET
 {
-    //float3 ambient = pow(float3(0.2f, 0.3f, 0.5f), 2.2f) * Lambertian * 0.5f * (1.0f + dot(float3(0.0f, 1.0f, 0.0f), normalize(input.NormW)));
-
     const float3 baseDiffColor = float3(0.0f, 215.0f, 255.0f ) * CLAMP_256;
     const float3 baseSpecColor = float3(0.5f, 0.5f, 0.5f);
 
     const float3 baseLinDiffColor = pow(baseDiffColor, TO_LINEAR);
     const float3 baseLinSpecColor = pow(baseSpecColor, TO_LINEAR);
 
-
-	//const float  roughness = 0.05f;
-	//const float  metalness = 0.9f;
-		  float3 R0 = float3(0.04f, 0.04f, 0.04f);
-				 R0 = lerp(R0, baseLinSpecColor, metalness);
+	float3 R0 = float3(0.04f, 0.04f, 0.04f);
+	R0 = lerp(R0, baseLinSpecColor, metalness);
 
 
     const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
