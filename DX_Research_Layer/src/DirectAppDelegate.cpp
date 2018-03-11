@@ -410,8 +410,24 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 	if (winProcDelegate_.DPressed()) {
 		pos = DirectX::XMVectorSubtract(pos, DirectX::XMVectorMultiply(right, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
 	}
-
 	camera_.Transform().Position(pos);
+
+
+	auto static clip = [](float val, float l, float h) -> float { return (std::max)(l, (std::min)(val, h)); };
+	float constexpr STEP = 0.002f;
+	if (winProcDelegate_.UPressed()) {
+		sceneBufferData_.roughness = clip(sceneBufferData_.roughness + STEP, 0.0f, 1.0f);
+	}
+	if (winProcDelegate_.JPressed()) {
+		sceneBufferData_.roughness = clip(sceneBufferData_.roughness - STEP, 0.0f, 1.0f);
+	}
+	if (winProcDelegate_.IPressed()) {
+		sceneBufferData_.metalness = clip(sceneBufferData_.metalness + STEP, 0.0f, 1.0f);
+	}
+	if (winProcDelegate_.KPressed()) {
+		sceneBufferData_.metalness = clip(sceneBufferData_.metalness - STEP, 0.0f, 1.0f);
+	}
+
 
 	/////////////////////////////////
 
@@ -478,6 +494,18 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
 		if (wParam == 0x44) { // D
 			keyMap_ |= (1 << 3);
 		}
+		if (wParam == 0x55) { // U
+			keyMap_ |= (1 << 4);
+		}
+		if (wParam == 0x4A) { // J
+			keyMap_ |= (1 << 5);
+		}
+		if (wParam == 0x49) { // I
+			keyMap_ |= (1 << 6);
+		}
+		if (wParam == 0x4B) { // K
+			keyMap_ |= (1 << 7);
+		}
 		return 0;
 	case WM_KEYUP:
 		if (wParam == 0x57) { // W
@@ -491,6 +519,18 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
 		}
 		if (wParam == 0x44) { // D
 			keyMap_ &= ~(1 << 3);
+		}
+		if (wParam == 0x55) { // U
+			keyMap_ &= ~(1 << 4);
+		}
+		if (wParam == 0x4A) { // J
+			keyMap_ &= ~(1 << 5);
+		}
+		if (wParam == 0x49) { // I
+			keyMap_ &= ~(1 << 6);
+		}
+		if (wParam == 0x4B) { // K
+			keyMap_ &= ~(1 << 7);
 		}
 		return 0;
     default:
@@ -516,4 +556,24 @@ bool DirectWinProcDelegate::SPressed() const
 bool DirectWinProcDelegate::DPressed() const
 {
 	return keyMap_ & (1 << 3);
+}
+
+bool DirectWinProcDelegate::UPressed() const
+{
+	return keyMap_ & (1 << 4);
+}
+
+bool DirectWinProcDelegate::JPressed() const
+{
+	return keyMap_ & (1 << 5);
+}
+
+bool DirectWinProcDelegate::IPressed() const
+{
+	return keyMap_ & (1 << 6);
+}
+
+bool DirectWinProcDelegate::KPressed() const
+{
+	return keyMap_ & (1 << 7);
 }

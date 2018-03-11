@@ -10,7 +10,10 @@ cbuffer SceneBuffer : register(b0)
 {
     float4x4 projectionMatrix;
     float4x4 viewMatrix;
+	float roughness;
     float3 cameraPosition;
+	float metalness;
+
 };
 
 cbuffer TransformBuffer : register(b1)
@@ -48,7 +51,8 @@ float TrowbridgeReitzGGXNDF(float ndoth, float roughness)
 
 float ShlickGGX(float ndotv, float roughness)
 {
-	float k = pow(roughness + 1, 2) / 8.0f;
+	float r = roughness + 1.0f;
+	float k = roughness * roughness / 8.0f;
 
 	float denominator = (ndotv * (1 - k)) + k;
 
@@ -77,7 +81,7 @@ float3 CombineDiffuseSpecular(float3 BRDF, float3 diffuse, float ndotl, float me
 	float3 kD = float3(1.0f, 1.0f, 1.0f) - kS;
 	kD *= 1.0f - metalness;
 
-	float3 result = (diffuse * kD) + (BRDF * ndotl);
+	float3 result = diffuse * kD + BRDF;
 	return result;
 }
 
@@ -92,8 +96,8 @@ float4 PS(PSInput input) : SV_TARGET
     const float3 baseLinSpecColor = pow(baseSpecColor, TO_LINEAR);
 
 
-	const float  roughness = 0.01f;
-	const float  metalness = 0.9f;
+	//const float  roughness = 0.05f;
+	//const float  metalness = 0.9f;
 		  float3 R0 = float3(0.04f, 0.04f, 0.04f);
 				 R0 = lerp(R0, baseLinSpecColor, metalness);
 
@@ -115,7 +119,7 @@ float4 PS(PSInput input) : SV_TARGET
 	const float3 resultLinDiffColor = ndotl * baseLinDiffColor * LAMBERTIAN;
 	//const float3 resultLinDiffColor = float3(0.0f, 0.0f, 0.0f);
 
-	const float3 resultLin = CombineDiffuseSpecular(resultLinDiffColor, specLin, ndotl, metalness);
+	const float3 resultLin = CombineDiffuseSpecular(resultLinDiffColor, specLin, ndotl, metalness) * ndotl;
 	const float3 resultColor = pow(resultLin, TO_GAMMA);
 
     return float4(resultColor, 1.0f);

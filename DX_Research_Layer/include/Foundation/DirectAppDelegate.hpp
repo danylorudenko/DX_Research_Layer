@@ -25,12 +25,17 @@ public:
 	bool SPressed() const;
 	bool DPressed() const;
 
+	bool UPressed() const;
+	bool JPressed() const;
+	bool IPressed() const;
+	bool KPressed() const;
+
     bool rotationOn = false;
 
 	float mouseXDelta_;
 	float mouseYDelta_;
 
-	std::uint8_t keyMap_ = 0; // WASD
+	std::uint32_t keyMap_ = 0; // WASD UJIK
 
     int prevMouseX_;
     int prevMouseY_;

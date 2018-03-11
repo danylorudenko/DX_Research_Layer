@@ -11,6 +11,7 @@
 #include <set>
 #include <stack>
 #include <memory>
+#include <algorithm>
 
 #include <Windows.h>
 #include <windowsx.h>
