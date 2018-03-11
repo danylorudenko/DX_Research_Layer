@@ -291,10 +291,10 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
     windowText_ += L";    FPS: ";
     windowText_ += std::to_wstring(1 / drawTime);
 
-	windowText_ += L"roughness: ";
+	windowText_ += L"     Roughness: ";
 	windowText_ += std::to_wstring(sceneBufferData_.roughness);
 
-	windowText_ += L"     metalness: ";
+	windowText_ += L"     Metalness: ";
 	windowText_ += std::to_wstring(sceneBufferData_.metalness);
 
     HWND windowHandle = application.window().nativeHandle();

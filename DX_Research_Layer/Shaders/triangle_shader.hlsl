@@ -42,21 +42,31 @@ PSInput VS(float3 position : POSITION, float3 normal : NORMAL)
 
 float TrowbridgeReitzGGXNDF(float ndoth, float roughness)
 {
-	float nominator = roughness * roughness;
-	float denominator = ndoth * ndoth * (nominator - 1.0f) + 1.0f;
+	float r2 = roughness * roughness;
+	float nominator = r2;
+	float denominator = ndoth * ndoth * (r2 - 1.0f) + 1.0f;
 	denominator = PI * denominator * denominator;
 
 	return nominator / max(denominator, 0.001f);
 }
 
-float ShlickGGX(float ndotv, float roughness)
+float ShlickGGX(float dot, float roughness)
 {
 	float r = roughness + 1.0f;
-	float k = roughness * roughness / 8.0f;
+	float k = r * r / 8.0f;
 
-	float denominator = (ndotv * (1 - k)) + k;
+	float nominator = dot;
+	float denominator = (dot * (1 - k)) + k;
 
-	return ndotv / max(denominator, 0.001f);
+	return nominator / max(denominator, 0.001f);
+}
+
+float SmithGGX(float ndotl, float ndotv, float roughness)
+{
+	float lGGX = ShlickGGX(ndotl, roughness);
+	float vGGX = ShlickGGX(ndotv, roughness);
+
+	return lGGX * vGGX;
 }
 
 float3 ShlickFresnel(float3 Rf0, float angleCos)
@@ -94,7 +104,7 @@ float4 PS(PSInput input) : SV_TARGET
     const float3 baseLinSpecColor = pow(baseSpecColor, TO_LINEAR);
 
 	float3 R0 = float3(0.04f, 0.04f, 0.04f);
-	R0 = lerp(R0, baseLinSpecColor, metalness);
+	R0 = lerp(R0, baseLinDiffColor, metalness);
 
 
     const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
@@ -107,14 +117,13 @@ float4 PS(PSInput input) : SV_TARGET
 
 	const float3 fresnel	= ShlickFresnel(R0, ndotv);
 	const float  ndf		= TrowbridgeReitzGGXNDF(ndoth, roughness);
-	const float  g			= ShlickGGX(ndotv, roughness);
+	const float  g			= SmithGGX(ndotl, ndotv, roughness);
 	const float3 specLin	= CookTorranceBRDF(ndf, g, fresnel, ndotv, ndotl);
 
 
 	const float3 resultLinDiffColor = ndotl * baseLinDiffColor * LAMBERTIAN;
-	//const float3 resultLinDiffColor = float3(0.0f, 0.0f, 0.0f);
 
-	const float3 resultLin = CombineDiffuseSpecular(resultLinDiffColor, specLin, ndotl, metalness) * ndotl;
+	const float3 resultLin = CombineDiffuseSpecular(resultLinDiffColor, specLin, ndotl, metalness);
 	const float3 resultColor = pow(resultLin, TO_GAMMA);
 
     return float4(resultColor, 1.0f);
