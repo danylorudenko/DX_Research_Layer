@@ -292,7 +292,7 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
     windowText_ += std::to_wstring(1 / drawTime);
 
 	windowText_ += L"     Roughness: ";
-	windowText_ += std::to_wstring(sceneBufferData_.roughness);
+	windowText_ += std::to_wstring(sceneBufferData_.cameraPosition_roghness_.w);
 
 	windowText_ += L"     Metalness: ";
 	windowText_ += std::to_wstring(sceneBufferData_.metalness);
@@ -422,10 +422,10 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 	auto static clip = [](float val, float l, float h) -> float { return (std::max)(l, (std::min)(val, h)); };
 	float constexpr STEP = 0.001f;
 	if (winProcDelegate_.UPressed()) {
-		sceneBufferData_.roughness = clip(sceneBufferData_.roughness + STEP, 0.0f, 1.0f);
+		sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w + STEP, 0.0f, 1.0f);
 	}
 	if (winProcDelegate_.JPressed()) {
-		sceneBufferData_.roughness = clip(sceneBufferData_.roughness - STEP, 0.0f, 1.0f);
+		sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w - STEP, 0.0f, 1.0f);
 	}
 	if (winProcDelegate_.IPressed()) {
 		sceneBufferData_.metalness = clip(sceneBufferData_.metalness + STEP, 0.0f, 1.0f);
@@ -437,7 +437,10 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 
 	/////////////////////////////////
 
-	sceneBufferData_.cameraPosition_ = camera_.Transform().Position();
+	const auto& cameraPos = camera_.Transform().Position();
+	sceneBufferData_.cameraPosition_roghness_.x = cameraPos.x;
+	sceneBufferData_.cameraPosition_roghness_.y = cameraPos.y;
+	sceneBufferData_.cameraPosition_roghness_.z = cameraPos.z;
 	sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
     sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
 	
