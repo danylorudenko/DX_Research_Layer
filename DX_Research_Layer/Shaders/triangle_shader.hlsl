@@ -45,6 +45,23 @@ float3 ShlickFresnel(float3 Rf0, float cosTheta)
 	return (pow(r, 5.0f) * (1 - Rf0)) + Rf0;
 }
 
+float GeometryGGX(float ndotv, float roughness)
+{
+	float k = pow(roughness + 1, 2) / 8;
+
+	float nom = ndotv;
+	float denom = ndotv * (1.0f - k) + k;
+	return nom / max(denom, 0.001f);
+}
+
+float SmithGGX(float ndotv, float ndotl, float roughness)
+{
+	float vGGX = GeometryGGX(ndotv, roughness);
+	float lGGX = GeometryGGX(ndotl, roughness);
+
+	return lGGX * vGGX;
+}
+
 float4 PS(PSInput input) : SV_TARGET
 {
     const float3 baseDiffColor = float3(0.0f, 215.0f, 255.0f ) * CLAMP_256;
@@ -62,10 +79,11 @@ float4 PS(PSInput input) : SV_TARGET
 	const float3 h = normalize(l + v);
 	const float  ndotl = max(dot(n, l), 0.0f);
 	const float  ndoth = max(dot(n, h), 0.0f);
-	const float  ndotv = dot(n, v);
+	const float  ndotv = max(dot(n, v), 0.0f);
 
 	float3 fresnel = ShlickFresnel(R0, ndotv);
-	float3 specular = fresnel * baseLinSpecColor;
+	float3 geometry = SmithGGX(ndotv, ndotl, cameraPosition_roughness.w);
+	float3 specular = geometry;
 
 	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
 
