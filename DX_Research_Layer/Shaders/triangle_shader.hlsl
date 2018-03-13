@@ -62,6 +62,43 @@ float SmithGGX(float ndotv, float ndotl, float roughness)
 	return lGGX * vGGX;
 }
 
+float TrowbridgeReitzNDF(float ndoth, float roughness)
+{
+	float r2 = roughness * roughness;
+	float ndoth2 = ndoth * ndoth;
+
+	float nom = r2;
+	float denom = ndoth2 * (r2 - 1.0f) + 1;
+	denom = denom * denom * PI;
+
+	return nom / max(denom, 0.001f);
+}
+
+float3 MetallicFresnelReflectance(float3 diffuse, float metalness)
+{
+	const float3 dRf0 = float3(0.04f, 0.04f, 0.04f);
+	const float3 result = lerp(dRf0, diffuse, metalness);
+
+	return result;
+}
+
+float3 CookTorranceSpecular(float3 fresnel, float geometry, float ndf, float ndotv, float ndotl)
+{
+	float3 nom = ndf * geometry * fresnel;
+	float denom = 4 * ndotv * ndotl;
+
+	return nom / max(denom, 0.001f);
+}
+
+float3 CookTorranceMix(float3 specular, float3 diffuse)
+{
+	float3 kS = specular;
+	float3 kD = float3(1.0f, 1.0f, 1.0f) - kS;
+
+	float3 result = specular + diffuse * kD;
+	return result;
+}
+
 float4 PS(PSInput input) : SV_TARGET
 {
     const float3 baseDiffColor = float3(0.0f, 215.0f, 255.0f ) * CLAMP_256;
@@ -71,7 +108,7 @@ float4 PS(PSInput input) : SV_TARGET
     const float3 baseLinSpecColor = pow(baseSpecColor, TO_LINEAR);
 
 	float3 R0 = float3(0.02f, 0.02f, 0.02f);
-	//R0 = lerp(R0, baseLinDiffColor, metalness);
+	R0 = MetallicFresnelReflectance(baseLinDiffColor, metalness);
 
     const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
 	const float3 n = normalize(input.NormW);
@@ -82,14 +119,14 @@ float4 PS(PSInput input) : SV_TARGET
 	const float  ndotv = max(dot(n, v), 0.0f);
 
 	float3 fresnel = ShlickFresnel(R0, ndotv);
-	float3 geometry = SmithGGX(ndotv, ndotl, cameraPosition_roughness.w);
-	float3 specular = geometry;
+	float  geometry = SmithGGX(ndotv, ndotl, cameraPosition_roughness.w);
+	float  ndf = TrowbridgeReitzNDF(ndoth, cameraPosition_roughness.w);
 
+	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl);
 	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
 
-	float3 resultLin = specular;
-	float3 resultColor = pow(resultLin, TO_GAMMA);
+	float3 resultColor = CookTorranceMix(spec, diffuse) * ndotl;
 
-    return float4(resultColor, 1.0f);
+    return float4(pow(resultColor, TO_GAMMA), 1.0f);
 
 }
