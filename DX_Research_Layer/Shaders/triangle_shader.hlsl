@@ -51,7 +51,7 @@ float GeometryGGX(float ndotv, float roughness)
 
 	float nom = ndotv;
 	float denom = ndotv * (1.0f - k) + k;
-	return nom / max(denom, 0.001f);
+	return nom / denom;
 }
 
 float SmithGGX(float ndotv, float ndotl, float roughness)
@@ -68,10 +68,10 @@ float TrowbridgeReitzNDF(float ndoth, float roughness)
 	float ndoth2 = ndoth * ndoth;
 
 	float nom = r2;
-	float denom = ndoth2 * (r2 - 1.0f) + 1;
+	float denom = ndoth2 * (r2 - 1.0f) + 1.0f;
 	denom = denom * denom * PI;
 
-	return nom / max(denom, 0.001f);
+	return nom / denom;
 }
 
 float3 MetallicFresnelReflectance(float3 diffuse, float metalness)
@@ -87,13 +87,14 @@ float3 CookTorranceSpecular(float3 fresnel, float geometry, float ndf, float ndo
 	float3 nom = ndf * geometry * fresnel;
 	float denom = 4 * ndotv * ndotl;
 
-	return nom / max(denom, 0.001f);
+	return nom / denom;
 }
 
-float3 CookTorranceMix(float3 specular, float3 diffuse)
+float3 CookTorranceMix(float3 specular, float3 diffuse, float metalness)
 {
 	float3 kS = specular;
 	float3 kD = float3(1.0f, 1.0f, 1.0f) - kS;
+	kD *= 1.0f - metalness;
 
 	float3 result = specular + diffuse * kD;
 	return result;
@@ -107,7 +108,7 @@ float4 PS(PSInput input) : SV_TARGET
     const float3 baseLinDiffColor = pow(baseDiffColor, TO_LINEAR);
     const float3 baseLinSpecColor = pow(baseSpecColor, TO_LINEAR);
 
-	float3 R0 = float3(0.02f, 0.02f, 0.02f);
+	float3 R0 = float3(0.04f, 0.04f, 0.04f);
 	R0 = MetallicFresnelReflectance(baseLinDiffColor, metalness);
 
     const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
@@ -125,7 +126,7 @@ float4 PS(PSInput input) : SV_TARGET
 	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl);
 	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
 
-	float3 resultColor = CookTorranceMix(spec, diffuse) * ndotl;
+	float3 resultColor = CookTorranceMix(spec, diffuse, metalness) * ndotl;
 
     return float4(pow(resultColor, TO_GAMMA), 1.0f);
 
