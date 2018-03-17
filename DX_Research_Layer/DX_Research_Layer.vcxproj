@@ -203,6 +203,7 @@
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\3rdParty\stb_image.h" />
     <ClInclude Include="include\d3dx12.h" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp" />
     <ClInclude Include="include\Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp" />

@@ -224,6 +224,9 @@
     <ClInclude Include="include\Rendering\Data\GPUDepthStencilSettings.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\3rdParty\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\triangle_shader.hlsl" />
