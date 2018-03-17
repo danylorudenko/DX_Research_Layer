@@ -210,7 +210,12 @@ void DirectAppDelegate::start(Application& application)
     }
     
     sceneBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, sceneCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
-    triangleRootSignature.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &sceneBuffer_ });
+
+	DXRL::GPUResourceViewHandle rootViews[2];
+	rootViews[0] = sceneBuffer_;
+	rootViews[1] = albedoView;
+
+    triangleRootSignature.PushRootArgument(0, DXRL::GPUResourceViewTable{ 2, rootViews });
 
 
     auto pipelineState = CreatePipelineState(rootSignature);
@@ -380,29 +385,25 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignatu
 
     D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	D3D12_STATIC_SAMPLER_DESC samplerDesc;
-	samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_LESS;
-	samplerDesc.Filter = D3D12_FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT;
-	samplerDesc.MaxAnisotropy = 1;
-	samplerDesc.MaxLOD = 0;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.ShaderRegister = 0;
-	samplerDesc.RegisterSpace = 0;
-	samplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-
+	CD3DX12_STATIC_SAMPLER_DESC samplerDesc;
+	samplerDesc.Init(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
 
 
     CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-    rootSignatureDesc.Init(2, rootParameters, 0, &samplerDesc, rootSignatureFlags);
+    rootSignatureDesc.Init(2, rootParameters, 1, &samplerDesc, rootSignatureFlags);
 
     Microsoft::WRL::ComPtr<ID3DBlob> signature;
     Microsoft::WRL::ComPtr<ID3DBlob> errors;
 
     {
         auto const result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors);
+
+		//if (errors->GetBufferSize() > 0) {
+		//	char* error = new char[errors->GetBufferSize()];
+		//	std::memcpy(error, errors->GetBufferPointer(), errors->GetBufferSize());
+		//
+		//}
+		
         ThrowIfFailed(result);
     }
     
@@ -424,12 +425,12 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD0", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
     };
 
     // Setup pipeline state, which inludes setting shaders.
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-    psoDesc.InputLayout = { inputElementDescs, 2 };
+    psoDesc.InputLayout = { inputElementDescs, 3 };
     psoDesc.pRootSignature = rootSignature.Get();
     psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());

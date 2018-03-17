@@ -15,6 +15,9 @@ cbuffer SceneBuffer : register(b0)
 
 };
 
+Texture2D albedo : register(t0);
+SamplerState samplr : register(s0);
+
 cbuffer TransformBuffer : register(b1)
 {
     float4x4 worldMatrix;
@@ -28,7 +31,7 @@ struct PSInput
 	float2 uv : UV;
 };
 
-PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float2 uv : TEXCOORD0)
+PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float2 uv : TEXCOORD)
 {
     PSInput result;
 
@@ -128,8 +131,10 @@ float4 PS(PSInput input) : SV_TARGET
 	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl);
 	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
 
-	float3 resultColor = CookTorranceMix(spec, diffuse, metalness) * ndotl;
+	//float3 resultColor = CookTorranceMix(spec, diffuse, metalness) * ndotl;
+    //return float4(pow(resultColor, TO_GAMMA), 1.0f);
 
-    return float4(pow(resultColor, TO_GAMMA), 1.0f);
+	float3 resultColor = albedo.Sample(samplr, input.uv).xyz;
+	return float4(resultColor, 1.0f);
 
 }
