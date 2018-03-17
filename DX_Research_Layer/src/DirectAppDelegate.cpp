@@ -1,5 +1,8 @@
 #include <pch.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <3rdParty\stb_image.h>
+
 #include <Foundation\DirectAppDelegate.hpp>
 #include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
@@ -23,10 +26,16 @@ struct Normal
     float x, y, z;
 };
 
+struct UV
+{
+	float u, v;
+};
+
 struct Vertex
 {
     Pos position_;
-    Normal normal_;;
+    Normal normal_;
+	UV uv_;
 };
 
 void DirectAppDelegate::start(Application& application)
@@ -56,7 +65,7 @@ void DirectAppDelegate::start(Application& application)
 		3, 1, 2
 	};
 
-    std::ifstream ifstream("skull.model", std::ios_base::binary);
+    std::ifstream ifstream("sphere.model", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
@@ -125,6 +134,62 @@ void DirectAppDelegate::start(Application& application)
     ibView.Format = DXGI_FORMAT_R32_UINT;
     ibView.SizeInBytes = static_cast<UINT>(indexBytes);
 
+	//////////////////////
+
+	int albedoHeight = 0;
+	int albedoWidth = 0;
+	int albedoComponents = 0;
+	unsigned char* albedoData = stbi_load("J:\\Models\\free_hq_pbr_game_model_-_old_billiard_ball\\textures\\Stand_baseColor.jpeg", &albedoHeight, &albedoWidth, &albedoComponents, STBI_rgb_alpha);
+	int textureSize = albedoWidth * albedoHeight * albedoComponents;
+
+	D3D12_RESOURCE_DESC albedoMapDesc;
+	albedoMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	albedoMapDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	albedoMapDesc.Alignment = 0;
+	albedoMapDesc.Width = albedoWidth;
+	albedoMapDesc.Height = albedoHeight;
+	albedoMapDesc.DepthOrArraySize = 1;
+	albedoMapDesc.MipLevels = 1;
+	albedoMapDesc.SampleDesc.Count = 1;
+	albedoMapDesc.SampleDesc.Quality = 0;
+	albedoMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	albedoMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	DXRL::GPUResourceHandle albedoMapUploadHeap = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(textureSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+	DXRL::GPUResourceHandle albedoMap = gpuFoundation_->AllocDefaultResource(albedoMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+
+	D3D12_SUBRESOURCE_DATA subData;
+	subData.pData = albedoData;
+	subData.RowPitch = albedoWidth;
+	subData.SlicePitch = albedoWidth * albedoHeight;
+
+	UpdateSubresources(
+		initializationEngine.CommandList(), 
+		albedoMap.Resource().GetPtr(),
+		albedoMapUploadHeap.Resource().GetPtr(),
+		0,
+		0,
+		1,
+		&subData);
+
+	albedoMap.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	initializationEngine.FlushReset();
+
+	stbi_image_free(albedoData); albedoData = nullptr;
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC albedoViewDesc;
+	albedoViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	albedoViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	albedoViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	albedoViewDesc.Texture2D.MipLevels = 1;
+	albedoViewDesc.Texture2D.MostDetailedMip = 0;
+	albedoViewDesc.Texture2D.PlaneSlice = 0;
+	albedoViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+	DXRL::GPUResourceViewHandle albedoView = gpuFoundation_->AllocSRV(1, &albedoMap, &albedoViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	DXRL::GPUResourceHandle normalMap;
+	DXRL::GPUResourceHandle metallicRoughnessMap;
+
 
     /////////////////////////////////////////////////////////////////////////////
 
@@ -156,8 +221,8 @@ void DirectAppDelegate::start(Application& application)
 	DXRL::GPURenderItem renderItem[renderItemsCount];
 	for (std::size_t i = 0; i < renderItemsCount; i++) {
 		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>(i * 1.7f) - 1.7f , 0.0f, 0.0f });
-		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, (i * -45.0f) + 45.0f, 0.0f });
-		renderItem[i].transform_.Scale(0.8f);
+		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ /*90.0f, (i * -45.0f) + 45.0f*/0.0f, 0.0f, 0.0f });
+		renderItem[i].transform_.Scale(0.025f);
 		renderItem[i].vertexBuffer_ = vertexBuffer;
 		renderItem[i].vertexBufferDescriptor_ = vbView;
 		renderItem[i].vertexCount_ = header.vertexCount_;
@@ -304,18 +369,34 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
 Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignature()
 {
     CD3DX12_ROOT_PARAMETER rootParameters[2];
-    CD3DX12_DESCRIPTOR_RANGE ranges[2];
+    CD3DX12_DESCRIPTOR_RANGE ranges[3];
 
     ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-    rootParameters[0].InitAsDescriptorTable(1, ranges);
+	ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+    rootParameters[0].InitAsDescriptorTable(2, ranges);
 
-    ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-    rootParameters[1].InitAsDescriptorTable(1, ranges + 1);
+    ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+    rootParameters[1].InitAsDescriptorTable(1, ranges + 2);
 
     D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
+	D3D12_STATIC_SAMPLER_DESC samplerDesc;
+	samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_LESS;
+	samplerDesc.Filter = D3D12_FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.MaxLOD = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.ShaderRegister = 0;
+	samplerDesc.RegisterSpace = 0;
+	samplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+
+
     CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-    rootSignatureDesc.Init(2, rootParameters, 0, nullptr, rootSignatureFlags);
+    rootSignatureDesc.Init(2, rootParameters, 0, &samplerDesc, rootSignatureFlags);
 
     Microsoft::WRL::ComPtr<ID3DBlob> signature;
     Microsoft::WRL::ComPtr<ID3DBlob> errors;
@@ -342,7 +423,8 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD0", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
     };
 
     // Setup pipeline state, which inludes setting shaders.

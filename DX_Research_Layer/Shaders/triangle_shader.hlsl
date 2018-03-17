@@ -25,15 +25,17 @@ struct PSInput
     float4 PosH : SV_POSITION;
     float3 PosW : POSITION;
     float3 NormW : NORMAL;
+	float2 uv : UV;
 };
 
-PSInput VS(float3 position : POSITION, float3 normal : NORMAL)
+PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float2 uv : TEXCOORD0)
 {
     PSInput result;
 
     float4 positionW = mul(float4(position, 1.0f), worldMatrix);
     result.PosW = positionW.xyz;
     result.NormW = mul(float4(normal, 0.0f), worldMatrix).xyz;
+	result.uv = uv;
     result.PosH = mul(mul(positionW, viewMatrix), projectionMatrix);
 
     return result;
