@@ -15,7 +15,10 @@ cbuffer SceneBuffer : register(b0)
 
 };
 
-Texture2D albedo : register(t0);
+Texture2D albedoMap				: register(t0);
+Texture2D normalMap				: register(t1);
+Texture2D metalnessRoughnessMap : register(t2);
+
 SamplerState samplr : register(s0);
 
 cbuffer TransformBuffer : register(b1)
@@ -134,7 +137,8 @@ float4 PS(PSInput input) : SV_TARGET
 	//float3 resultColor = CookTorranceMix(spec, diffuse, metalness) * ndotl;
     //return float4(pow(resultColor, TO_GAMMA), 1.0f);
 
-	float3 resultColor = albedo.Sample(samplr, input.uv).xyz;
+	//float3 resultColor = albedoMap.Sample(samplr, input.uv).xyz;
+	float3 resultColor = float3(metalnessRoughnessMap.Sample(samplr, input.uv).xy, 0.0f);
 	return float4(resultColor, 1.0f);
 
 }

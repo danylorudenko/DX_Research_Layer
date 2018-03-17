@@ -65,7 +65,7 @@ void DirectAppDelegate::start(Application& application)
 		3, 1, 2
 	};
 
-    std::ifstream ifstream("sphere.model", std::ios_base::binary);
+    std::ifstream ifstream("ball.model", std::ios_base::binary);
     if (!ifstream.is_open()) {
         assert(false);
     }
@@ -140,11 +140,11 @@ void DirectAppDelegate::start(Application& application)
 	int albedoWidth = 0;
 	int albedoComponents = 0;
 	unsigned char* albedoData = stbi_load("J:\\Models\\free_hq_pbr_game_model_-_old_billiard_ball\\textures\\Stand_baseColor.jpeg", &albedoHeight, &albedoWidth, &albedoComponents, STBI_rgb_alpha);
-	int textureSize = albedoWidth * albedoHeight * albedoComponents;
+	int albedoBytesCount = albedoWidth * albedoHeight * albedoComponents;
 
 	D3D12_RESOURCE_DESC albedoMapDesc;
 	albedoMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	albedoMapDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	albedoMapDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	albedoMapDesc.Alignment = 0;
 	albedoMapDesc.Width = albedoWidth;
 	albedoMapDesc.Height = albedoHeight;
@@ -155,40 +155,150 @@ void DirectAppDelegate::start(Application& application)
 	albedoMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	albedoMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	DXRL::GPUResourceHandle albedoMapUploadHeap = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(textureSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+	UINT64 albedoCopyableSize = 0;
+	gpuFoundation_->Device()->GetCopyableFootprints(&albedoMapDesc, 0, 1, 0, nullptr, nullptr, nullptr, &albedoCopyableSize);
+
+	DXRL::GPUResourceHandle albedoMapUploadHeap = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(albedoCopyableSize), D3D12_RESOURCE_STATE_GENERIC_READ);
 	DXRL::GPUResourceHandle albedoMap = gpuFoundation_->AllocDefaultResource(albedoMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
-	D3D12_SUBRESOURCE_DATA subData;
-	subData.pData = albedoData;
-	subData.RowPitch = albedoWidth;
-	subData.SlicePitch = albedoWidth * albedoHeight;
+	D3D12_SUBRESOURCE_DATA albedoSubData;
+	albedoSubData.pData = albedoData;
+	albedoSubData.RowPitch = albedoWidth * 4;
+	albedoSubData.SlicePitch = albedoSubData.RowPitch * albedoHeight;
 
-	UpdateSubresources(
+	UINT64 result = UpdateSubresources(
 		initializationEngine.CommandList(), 
 		albedoMap.Resource().GetPtr(),
 		albedoMapUploadHeap.Resource().GetPtr(),
 		0,
 		0,
 		1,
-		&subData);
+		&albedoSubData);
 
 	albedoMap.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	initializationEngine.Commit().DiscardResource(albedoMapUploadHeap.Resource().GetPtr(), nullptr);
 	initializationEngine.FlushReset();
 
 	stbi_image_free(albedoData); albedoData = nullptr;
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC albedoViewDesc;
 	albedoViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	albedoViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	albedoViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	albedoViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	albedoViewDesc.Texture2D.MipLevels = 1;
 	albedoViewDesc.Texture2D.MostDetailedMip = 0;
 	albedoViewDesc.Texture2D.PlaneSlice = 0;
 	albedoViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
 	DXRL::GPUResourceViewHandle albedoView = gpuFoundation_->AllocSRV(1, &albedoMap, &albedoViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	DXRL::GPUResourceHandle normalMap;
-	DXRL::GPUResourceHandle metallicRoughnessMap;
+	//////////////////////
+
+	int normalHeight = 0;
+	int normalWidth = 0;
+	int normalComponents = 0;
+	unsigned char* normalData = stbi_load("J:\\Models\\free_hq_pbr_game_model_-_old_billiard_ball\\textures\\Stand_normal.jpeg", &normalHeight, &normalWidth, &normalComponents, STBI_rgb_alpha);
+	int normalBytesCount = normalHeight * normalHeight * normalComponents;
+
+	D3D12_RESOURCE_DESC normalMapDesc;
+	normalMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	normalMapDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	normalMapDesc.Alignment = 0;
+	normalMapDesc.Height = normalHeight;
+	normalMapDesc.Width = normalWidth;
+	normalMapDesc.DepthOrArraySize = 1;
+	normalMapDesc.MipLevels = 1;
+	normalMapDesc.SampleDesc.Count = 1;
+	normalMapDesc.SampleDesc.Quality = 0;
+	normalMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	normalMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+	
+
+	DXRL::GPUResourceHandle normalMap = gpuFoundation_->AllocDefaultResource(normalMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+	
+	D3D12_SUBRESOURCE_DATA normalSubData;
+	normalSubData.pData = normalData;
+	normalSubData.RowPitch = normalWidth * 4;
+	normalSubData.SlicePitch = normalSubData.RowPitch * normalHeight;
+	
+	UpdateSubresources(
+		initializationEngine.CommandList(),
+		normalMap.Resource().GetPtr(),
+		albedoMapUploadHeap.Resource().GetPtr(),
+		0,
+		0,
+		1,
+		&normalSubData);
+
+	stbi_image_free(normalData);
+	
+	normalMap.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	initializationEngine.FlushReset();
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC normalViewDesc;
+	normalViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	normalViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	normalViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	normalViewDesc.Texture2D.MipLevels = 1;
+	normalViewDesc.Texture2D.MostDetailedMip = 0;
+	normalViewDesc.Texture2D.PlaneSlice = 0;
+	normalViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	DXRL::GPUResourceViewHandle normalView = gpuFoundation_->AllocSRV(1, &normalMap, &normalViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	//////////////////////
+
+	int metallicRoughnessHeight = 0;
+	int metallicRoughnessWidth = 0;
+	int metallicRoughnessComponents = 0;
+	unsigned char* metallicRoughnessData = stbi_load("J:\\Models\\free_hq_pbr_game_model_-_old_billiard_ball\\textures\\Stand_metallicRoughness.png", &metallicRoughnessHeight, &metallicRoughnessWidth, &metallicRoughnessComponents, 0);
+	int metallicRoughnessBytesCount = metallicRoughnessHeight * metallicRoughnessHeight * metallicRoughnessComponents;
+
+	D3D12_RESOURCE_DESC metallicRoughnessMapDesc;
+	metallicRoughnessMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	metallicRoughnessMapDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	metallicRoughnessMapDesc.Alignment = 0;
+	metallicRoughnessMapDesc.Height = metallicRoughnessHeight;
+	metallicRoughnessMapDesc.Width = metallicRoughnessWidth;
+	metallicRoughnessMapDesc.DepthOrArraySize = 1;
+	metallicRoughnessMapDesc.MipLevels = 1;
+	metallicRoughnessMapDesc.SampleDesc.Count = 1;
+	metallicRoughnessMapDesc.SampleDesc.Quality = 0;
+	metallicRoughnessMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	metallicRoughnessMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+
+	DXRL::GPUResourceHandle metallicRoughnessMap = gpuFoundation_->AllocDefaultResource(metallicRoughnessMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+
+	D3D12_SUBRESOURCE_DATA metallicRoughnessSubData;
+	metallicRoughnessSubData.pData = metallicRoughnessData;
+	metallicRoughnessSubData.RowPitch = metallicRoughnessWidth * 4;
+	metallicRoughnessSubData.SlicePitch = metallicRoughnessSubData.RowPitch * metallicRoughnessHeight;
+
+	UpdateSubresources(
+		initializationEngine.CommandList(),
+		metallicRoughnessMap.Resource().GetPtr(),
+		albedoMapUploadHeap.Resource().GetPtr(),
+		0,
+		0,
+		1,
+		&metallicRoughnessSubData);
+
+	stbi_image_free(metallicRoughnessData);
+
+	metallicRoughnessMap.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	initializationEngine.FlushReset();
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC metallicRoughnessViewDesc;
+	metallicRoughnessViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	metallicRoughnessViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	metallicRoughnessViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	metallicRoughnessViewDesc.Texture2D.MipLevels = 1;
+	metallicRoughnessViewDesc.Texture2D.MostDetailedMip = 0;
+	metallicRoughnessViewDesc.Texture2D.PlaneSlice = 0;
+	metallicRoughnessViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	DXRL::GPUResourceViewHandle metallicRoughnessView = gpuFoundation_->AllocSRV(1, &metallicRoughnessMap, &metallicRoughnessViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -211,11 +321,14 @@ void DirectAppDelegate::start(Application& application)
     
     sceneBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, sceneCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
-	DXRL::GPUResourceViewHandle rootViews[2];
-	rootViews[0] = sceneBuffer_;
-	rootViews[1] = albedoView;
 
-    triangleRootSignature.PushRootArgument(0, DXRL::GPUResourceViewTable{ 2, rootViews });
+	triangleRootSignature.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &sceneBuffer_ });
+
+	DXRL::GPUResourceViewHandle textures[3];
+	textures[0] = albedoView;
+	textures[1] = normalView;
+	textures[2] = metallicRoughnessView;
+	triangleRootSignature.PushRootArgument(1, DXRL::GPUResourceViewTable{ 3, textures });
 
 
     auto pipelineState = CreatePipelineState(rootSignature);
@@ -227,7 +340,7 @@ void DirectAppDelegate::start(Application& application)
 	for (std::size_t i = 0; i < renderItemsCount; i++) {
 		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>(i * 1.7f) - 1.7f , 0.0f, 0.0f });
 		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ /*90.0f, (i * -45.0f) + 45.0f*/0.0f, 0.0f, 0.0f });
-		renderItem[i].transform_.Scale(0.025f);
+		renderItem[i].transform_.Scale(0.8f);
 		renderItem[i].vertexBuffer_ = vertexBuffer;
 		renderItem[i].vertexBufferDescriptor_ = vbView;
 		renderItem[i].vertexCount_ = header.vertexCount_;
@@ -235,7 +348,7 @@ void DirectAppDelegate::start(Application& application)
 		renderItem[i].indexBuffer_ = indexBuffer;
 		renderItem[i].indexBufferDescriptor_ = ibView;
 		renderItem[i].indexCount_ = header.indexCount_;
-		renderItem[i].CreateTransformBuffer(framesCount, 1, *gpuFoundation_);
+		renderItem[i].CreateTransformBuffer(framesCount, 2, *gpuFoundation_);
 
 		graphicsGraphNode.ImportRenderItem(std::move(renderItem[i]));
 	}
@@ -373,15 +486,17 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
 
 Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignature()
 {
-    CD3DX12_ROOT_PARAMETER rootParameters[2];
+    CD3DX12_ROOT_PARAMETER rootParameters[3];
     CD3DX12_DESCRIPTOR_RANGE ranges[3];
 
     ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-	ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-    rootParameters[0].InitAsDescriptorTable(2, ranges);
+    rootParameters[0].InitAsDescriptorTable(1, ranges);
+
+	ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0);
+	rootParameters[1].InitAsDescriptorTable(1, ranges + 1);
 
     ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-    rootParameters[1].InitAsDescriptorTable(1, ranges + 2);
+    rootParameters[2].InitAsDescriptorTable(1, ranges + 2);
 
     D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
@@ -390,7 +505,7 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignatu
 
 
     CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-    rootSignatureDesc.Init(2, rootParameters, 1, &samplerDesc, rootSignatureFlags);
+    rootSignatureDesc.Init(3, rootParameters, 1, &samplerDesc, rootSignatureFlags);
 
     Microsoft::WRL::ComPtr<ID3DBlob> signature;
     Microsoft::WRL::ComPtr<ID3DBlob> errors;
@@ -425,7 +540,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
     };
 
     // Setup pipeline state, which inludes setting shaders.
