@@ -10,14 +10,15 @@ cbuffer SceneBuffer : register(b0)
 {
     float4x4 projectionMatrix;
     float4x4 viewMatrix;
-    float4 cameraPosition_roughness;
-	float metalness;
+    float3 cameraPosition;
+	float3 lightDir;
 
 };
 
 Texture2D albedoMap				: register(t0);
 Texture2D normalMap				: register(t1);
-Texture2D metalnessRoughnessMap : register(t2);
+Texture2D metalnessMap			: register(t2);
+Texture2D roughnessMap			: register(t3);
 
 SamplerState samplr : register(s0);
 
@@ -110,35 +111,34 @@ float3 CookTorranceMix(float3 specular, float3 diffuse, float metalness)
 
 float4 PS(PSInput input) : SV_TARGET
 {
-    const float3 baseDiffColor = float3(0.0f, 215.0f, 255.0f ) * CLAMP_256;
-    const float3 baseSpecColor = float3(0.5f, 0.5f, 0.5f);
-
+    const float lightBrightness = 2.0f;
+	
+	const float3 baseDiffColor = albedoMap.Sample(samplr, input.uv).xyz;
     const float3 baseLinDiffColor = pow(baseDiffColor, TO_LINEAR);
-    const float3 baseLinSpecColor = pow(baseSpecColor, TO_LINEAR);
+
+	float  textureMetalness = metalnessMap.Sample(samplr, input.uv).r;
+	float  textureRoughness = roughnessMap.Sample(samplr, input.uv).r;
+	float3 textureNormal	= normalMap.Sample(samplr, input.uv).xyz;
 
 	float3 R0 = float3(0.04f, 0.04f, 0.04f);
-	R0 = MetallicFresnelReflectance(baseLinDiffColor, metalness);
+	R0 = MetallicFresnelReflectance(baseLinDiffColor, textureMetalness);
 
     const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
 	const float3 n = normalize(input.NormW);
-	const float3 v = normalize(cameraPosition_roughness.xyz - input.PosW);
+	const float3 v = normalize(cameraPosition.xyz - input.PosW);
 	const float3 h = normalize(l + v);
 	const float  ndotl = max(dot(n, l), 0.0f);
 	const float  ndoth = max(dot(n, h), 0.0f);
 	const float  ndotv = max(dot(n, v), 0.0f);
 
 	float3 fresnel = ShlickFresnel(R0, ndotv);
-	float  geometry = SmithGGX(ndotv, ndotl, cameraPosition_roughness.w);
-	float  ndf = TrowbridgeReitzNDF(ndoth, cameraPosition_roughness.w);
+	float  geometry = SmithGGX(ndotv, ndotl, textureRoughness);
+	float  ndf = TrowbridgeReitzNDF(ndoth, textureRoughness);
 
-	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl);
-	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
+	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl) * ndotl * lightBrightness;
+	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl * lightBrightness;
 
-	//float3 resultColor = CookTorranceMix(spec, diffuse, metalness) * ndotl;
-    //return float4(pow(resultColor, TO_GAMMA), 1.0f);
-
-	//float3 resultColor = albedoMap.Sample(samplr, input.uv).xyz;
-	float3 resultColor = float3(metalnessRoughnessMap.Sample(samplr, input.uv).xy, 0.0f);
-	return float4(resultColor, 1.0f);
+	float3 resultColor = CookTorranceMix(spec, diffuse, textureMetalness);
+    return float4(pow(resultColor, TO_GAMMA), 1.0f);
 
 }

@@ -139,7 +139,7 @@ void DirectAppDelegate::start(Application& application)
 	int albedoHeight = 0;
 	int albedoWidth = 0;
 	int albedoComponents = 0;
-	unsigned char* albedoData = stbi_load("J:\\Models\\free_hq_pbr_game_model_-_old_billiard_ball\\textures\\Stand_baseColor.jpeg", &albedoHeight, &albedoWidth, &albedoComponents, STBI_rgb_alpha);
+	unsigned char* albedoData = stbi_load("rustediron-streaks_basecolor.png", &albedoHeight, &albedoWidth, &albedoComponents, STBI_rgb_alpha);
 	int albedoBytesCount = albedoWidth * albedoHeight * albedoComponents;
 
 	D3D12_RESOURCE_DESC albedoMapDesc;
@@ -197,7 +197,7 @@ void DirectAppDelegate::start(Application& application)
 	int normalHeight = 0;
 	int normalWidth = 0;
 	int normalComponents = 0;
-	unsigned char* normalData = stbi_load("J:\\Models\\free_hq_pbr_game_model_-_old_billiard_ball\\textures\\Stand_normal.jpeg", &normalHeight, &normalWidth, &normalComponents, STBI_rgb_alpha);
+	unsigned char* normalData = stbi_load("rustediron-streaks_normal.png", &normalHeight, &normalWidth, &normalComponents, STBI_rgb_alpha);
 	int normalBytesCount = normalHeight * normalHeight * normalComponents;
 
 	D3D12_RESOURCE_DESC normalMapDesc;
@@ -248,57 +248,111 @@ void DirectAppDelegate::start(Application& application)
 
 	//////////////////////
 
-	int metallicRoughnessHeight = 0;
-	int metallicRoughnessWidth = 0;
-	int metallicRoughnessComponents = 0;
-	unsigned char* metallicRoughnessData = stbi_load("J:\\Models\\free_hq_pbr_game_model_-_old_billiard_ball\\textures\\Stand_metallicRoughness.png", &metallicRoughnessHeight, &metallicRoughnessWidth, &metallicRoughnessComponents, 0);
-	int metallicRoughnessBytesCount = metallicRoughnessHeight * metallicRoughnessHeight * metallicRoughnessComponents;
+	int metallnessHeight = 0;
+	int metallnessWidth = 0;
+	int metallnessComponents = 0;
+	unsigned char* metallnessData = stbi_load("rustediron-streaks_metallic.png", &metallnessHeight, &metallnessWidth, &metallnessComponents, 1);
+	int metallnessBytesCount = metallnessHeight * metallnessHeight * metallnessComponents;
 
-	D3D12_RESOURCE_DESC metallicRoughnessMapDesc;
-	metallicRoughnessMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	metallicRoughnessMapDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	metallicRoughnessMapDesc.Alignment = 0;
-	metallicRoughnessMapDesc.Height = metallicRoughnessHeight;
-	metallicRoughnessMapDesc.Width = metallicRoughnessWidth;
-	metallicRoughnessMapDesc.DepthOrArraySize = 1;
-	metallicRoughnessMapDesc.MipLevels = 1;
-	metallicRoughnessMapDesc.SampleDesc.Count = 1;
-	metallicRoughnessMapDesc.SampleDesc.Quality = 0;
-	metallicRoughnessMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	metallicRoughnessMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+	D3D12_RESOURCE_DESC metallnessMapDesc;
+	metallnessMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	metallnessMapDesc.Format = DXGI_FORMAT_R8_UNORM;
+	metallnessMapDesc.Alignment = 0;
+	metallnessMapDesc.Height = metallnessHeight;
+	metallnessMapDesc.Width = metallnessWidth;
+	metallnessMapDesc.DepthOrArraySize = 1;
+	metallnessMapDesc.MipLevels = 1;
+	metallnessMapDesc.SampleDesc.Count = 1;
+	metallnessMapDesc.SampleDesc.Quality = 0;
+	metallnessMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	metallnessMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 
-	DXRL::GPUResourceHandle metallicRoughnessMap = gpuFoundation_->AllocDefaultResource(metallicRoughnessMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+	DXRL::GPUResourceHandle metallnessMap = gpuFoundation_->AllocDefaultResource(metallnessMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
-	D3D12_SUBRESOURCE_DATA metallicRoughnessSubData;
-	metallicRoughnessSubData.pData = metallicRoughnessData;
-	metallicRoughnessSubData.RowPitch = metallicRoughnessWidth * 4;
-	metallicRoughnessSubData.SlicePitch = metallicRoughnessSubData.RowPitch * metallicRoughnessHeight;
+	D3D12_SUBRESOURCE_DATA metallnessSubData;
+	metallnessSubData.pData = metallnessData;
+	metallnessSubData.RowPitch = metallnessWidth;
+	metallnessSubData.SlicePitch = metallnessSubData.RowPitch * metallnessHeight;
 
 	UpdateSubresources(
 		initializationEngine.CommandList(),
-		metallicRoughnessMap.Resource().GetPtr(),
+		metallnessMap.Resource().GetPtr(),
 		albedoMapUploadHeap.Resource().GetPtr(),
 		0,
 		0,
 		1,
-		&metallicRoughnessSubData);
+		&metallnessSubData);
 
-	stbi_image_free(metallicRoughnessData);
+	stbi_image_free(metallnessData);
 
-	metallicRoughnessMap.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	metallnessMap.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	initializationEngine.FlushReset();
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC metallicRoughnessViewDesc;
-	metallicRoughnessViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	metallicRoughnessViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	metallicRoughnessViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	metallicRoughnessViewDesc.Texture2D.MipLevels = 1;
-	metallicRoughnessViewDesc.Texture2D.MostDetailedMip = 0;
-	metallicRoughnessViewDesc.Texture2D.PlaneSlice = 0;
-	metallicRoughnessViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+	D3D12_SHADER_RESOURCE_VIEW_DESC metallnessViewDesc;
+	metallnessViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	metallnessViewDesc.Format = DXGI_FORMAT_R8_UNORM;
+	metallnessViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	metallnessViewDesc.Texture2D.MipLevels = 1;
+	metallnessViewDesc.Texture2D.MostDetailedMip = 0;
+	metallnessViewDesc.Texture2D.PlaneSlice = 0;
+	metallnessViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-	DXRL::GPUResourceViewHandle metallicRoughnessView = gpuFoundation_->AllocSRV(1, &metallicRoughnessMap, &metallicRoughnessViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	DXRL::GPUResourceViewHandle metallnessView = gpuFoundation_->AllocSRV(1, &metallnessMap, &metallnessViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	//////////////////////
+
+	int roughnessHeight = 0;
+	int roughnessWidth = 0;
+	int roughnessComponents = 0;
+	unsigned char* roughnessData = stbi_load("rustediron-streaks_roughness.png", &roughnessHeight, &roughnessWidth, &roughnessComponents, 1);
+	int roughnessBytesCount = roughnessHeight * roughnessHeight * roughnessComponents;
+
+	D3D12_RESOURCE_DESC roughnessMapDesc;
+	roughnessMapDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	roughnessMapDesc.Format = DXGI_FORMAT_R8_UNORM;
+	roughnessMapDesc.Alignment = 0;
+	roughnessMapDesc.Height = roughnessHeight;
+	roughnessMapDesc.Width = roughnessWidth;
+	roughnessMapDesc.DepthOrArraySize = 1;
+	roughnessMapDesc.MipLevels = 1;
+	roughnessMapDesc.SampleDesc.Count = 1;
+	roughnessMapDesc.SampleDesc.Quality = 0;
+	roughnessMapDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	roughnessMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+
+	DXRL::GPUResourceHandle roughnessMap = gpuFoundation_->AllocDefaultResource(roughnessMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+
+	D3D12_SUBRESOURCE_DATA roughnessSubData;
+	roughnessSubData.pData = roughnessData;
+	roughnessSubData.RowPitch = roughnessWidth;
+	roughnessSubData.SlicePitch = roughnessSubData.RowPitch * roughnessHeight;
+
+	UpdateSubresources(
+		initializationEngine.CommandList(),
+		roughnessMap.Resource().GetPtr(),
+		albedoMapUploadHeap.Resource().GetPtr(),
+		0,
+		0,
+		1,
+		&roughnessSubData);
+
+	stbi_image_free(roughnessData);
+
+	roughnessMap.Resource().Transition(initializationEngine, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	initializationEngine.FlushReset();
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC roughnessViewDesc;
+	roughnessViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	roughnessViewDesc.Format = DXGI_FORMAT_R8_UNORM;
+	roughnessViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	roughnessViewDesc.Texture2D.MipLevels = 1;
+	roughnessViewDesc.Texture2D.MostDetailedMip = 0;
+	roughnessViewDesc.Texture2D.PlaneSlice = 0;
+	roughnessViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	DXRL::GPUResourceViewHandle roughnessView = gpuFoundation_->AllocSRV(1, &roughnessMap, &roughnessViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -324,11 +378,12 @@ void DirectAppDelegate::start(Application& application)
 
 	triangleRootSignature.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &sceneBuffer_ });
 
-	DXRL::GPUResourceViewHandle textures[3];
+	DXRL::GPUResourceViewHandle textures[4];
 	textures[0] = albedoView;
 	textures[1] = normalView;
-	textures[2] = metallicRoughnessView;
-	triangleRootSignature.PushRootArgument(1, DXRL::GPUResourceViewTable{ 3, textures });
+	textures[2] = metallnessView;
+	textures[3] = roughnessView;
+	triangleRootSignature.PushRootArgument(1, DXRL::GPUResourceViewTable{ 4, textures });
 
 
     auto pipelineState = CreatePipelineState(rootSignature);
@@ -474,11 +529,11 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
     windowText_ += L";    FPS: ";
     windowText_ += std::to_wstring(1 / drawTime);
 
-	windowText_ += L"     Roughness: ";
-	windowText_ += std::to_wstring(sceneBufferData_.cameraPosition_roghness_.w);
-
-	windowText_ += L"     Metalness: ";
-	windowText_ += std::to_wstring(sceneBufferData_.metalness);
+	//windowText_ += L"     Roughness: ";
+	//windowText_ += std::to_wstring(sceneBufferData_.cameraPosition_roghness_.w);
+	//
+	//windowText_ += L"     Metalness: ";
+	//windowText_ += std::to_wstring(sceneBufferData_.metalness);
 
     HWND windowHandle = application.window().nativeHandle();
     SetWindowText(windowHandle, windowText_.c_str());
@@ -492,7 +547,7 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignatu
     ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
     rootParameters[0].InitAsDescriptorTable(1, ranges);
 
-	ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0);
+	ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0);
 	rootParameters[1].InitAsDescriptorTable(1, ranges + 1);
 
     ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
@@ -617,33 +672,33 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 	camera_.Transform().Position(pos);
 
 
-	auto static clip = [](float val, float l, float h) -> float { return (std::max)(l, (std::min)(val, h)); };
-	float constexpr STEP = 0.001f;
-	if (winProcDelegate_.UPressed()) {
-		sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w + STEP, 0.0f, 1.0f);
-	}
-	if (winProcDelegate_.JPressed()) {
-		sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w - STEP, 0.0f, 1.0f);
-	}
-	if (winProcDelegate_.IPressed()) {
-		sceneBufferData_.metalness = clip(sceneBufferData_.metalness + STEP, 0.0f, 1.0f);
-	}
-	if (winProcDelegate_.KPressed()) {
-		sceneBufferData_.metalness = clip(sceneBufferData_.metalness - STEP, 0.0f, 1.0f);
-	}
+	//auto static clip = [](float val, float l, float h) -> float { return (std::max)(l, (std::min)(val, h)); };
+	//float constexpr STEP = 0.001f;
+	//if (winProcDelegate_.UPressed()) {
+	//	sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w + STEP, 0.0f, 1.0f);
+	//}
+	//if (winProcDelegate_.JPressed()) {
+	//	sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w - STEP, 0.0f, 1.0f);
+	//}
+	//if (winProcDelegate_.IPressed()) {
+	//	sceneBufferData_.metalness = clip(sceneBufferData_.metalness + STEP, 0.0f, 1.0f);
+	//}
+	//if (winProcDelegate_.KPressed()) {
+	//	sceneBufferData_.metalness = clip(sceneBufferData_.metalness - STEP, 0.0f, 1.0f);
+	//}
 
 
 	/////////////////////////////////
 
 	const auto& cameraPos = camera_.Transform().Position();
-	sceneBufferData_.cameraPosition_roghness_.x = cameraPos.x;
-	sceneBufferData_.cameraPosition_roghness_.y = cameraPos.y;
-	sceneBufferData_.cameraPosition_roghness_.z = cameraPos.z;
+	sceneBufferData_.cameraPosition = cameraPos;
 	sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
     sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
 	
     char* mappedCameraData = nullptr;
     auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
+
+	int kek = sizeof(sceneBufferData_);
 
     cameraBuffer.Get()->Map(0, nullptr, (void**)&mappedCameraData);
     std::memcpy(mappedCameraData, &sceneBufferData_, sizeof(sceneBufferData_));
