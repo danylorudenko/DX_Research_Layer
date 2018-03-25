@@ -31,6 +31,7 @@ struct PSInput
 {
     float4 PosH : SV_POSITION;
     float3 PosW : POSITION;
+	float3 NormW : NORMAL;
     float3x3 tbn : VERTEXSPACE;
 	float2 uv : TEXCOORD;
 };
@@ -48,6 +49,7 @@ PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float3 tangent : 
 	float3 tW = normalize(mul(float4(tangent, 0.0f), worldMatrix)).xyz;
 	float3 bW = normalize(mul(float4(bitangent, 0.0f), worldMatrix)).xyz;
 	result.tbn = (float3x3(tW, bW, nW));
+	result.NormW = nW;
 
     return result;
 }
@@ -122,7 +124,7 @@ float4 PS(PSInput input) : SV_TARGET
 	float  textureRoughness = roughnessMap.Sample(samplr, input.uv).r;
 	float3 textureNormal	= normalMap.Sample(samplr, input.uv).xyz;
 
-	const float3 n = normalize(mul(textureNormal, input.tbn));
+	const float3 n = normalize(input.NormW);
     const float3 l = normalize(float3(0.0f, 1.0f, 0.0f));
 	const float3 v = normalize(cameraPosition.xyz - input.PosW);
 	const float3 h = normalize(l + v);
@@ -136,7 +138,7 @@ float4 PS(PSInput input) : SV_TARGET
 	float  geometry = SmithGGX(ndotv, ndotl, textureRoughness);
 	float  ndf = TrowbridgeReitzNDF(ndoth, textureRoughness);
 
-	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl);
+	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl) * ndotl;
 	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
 
 	float3 resultColor = CookTorranceMix(spec, diffuse, textureMetalness);
