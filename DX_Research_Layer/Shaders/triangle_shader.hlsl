@@ -31,10 +31,8 @@ struct PSInput
 {
     float4 PosH : SV_POSITION;
     float3 PosW : POSITION;
-    float3 NormalW : NORMAL;
-	float3 TangentW : TANGENT;
-	float3 BitangentW : BITANGENT;
-	float2 uv : UV;
+    float3x3 tbn : VERTEXSPACE;
+	float2 uv : TEXCOORD;
 };
 
 PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float3 tangent : TANGENT, float3 bitangent : BITANGENT, float2 uv : TEXCOORD)
@@ -43,11 +41,13 @@ PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float3 tangent : 
 
     float4 positionW = mul(float4(position, 1.0f), worldMatrix);
     result.PosW = positionW.xyz;
-    result.NormalW = mul(float4(normal, 0.0f), worldMatrix).xyz;
-	result.TangentW = mul(float4(tangent, 0.0f), worldMatrix).xyz;
-	result.BitangentW = mul(float4(bitangent, 0.0f), worldMatrix).xyz;
-	result.uv = uv;
     result.PosH = mul(mul(positionW, viewMatrix), projectionMatrix);
+	result.uv = uv;
+
+    float3 nW = normalize(mul(float4(normal, 0.0f), worldMatrix)).xyz;
+	float3 tW = normalize(mul(float4(tangent, 0.0f), worldMatrix)).xyz;
+	float3 bW = normalize(mul(float4(bitangent, 0.0f), worldMatrix)).xyz;
+	result.tbn = (float3x3(tW, bW, nW));
 
     return result;
 }
@@ -109,14 +109,12 @@ float3 CookTorranceMix(float3 specular, float3 diffuse, float metalness)
 	float3 kD = float3(1.0f, 1.0f, 1.0f) - kS;
 	kD *= 1.0f - metalness;
 
-	float3 result = specular + diffuse * kD;
+	float3 result = max(specular, 0.0f) + diffuse * kD;
 	return result;
 }
 
 float4 PS(PSInput input) : SV_TARGET
 {
-    const float lightBrightness = 2.0f;
-	
 	const float3 baseDiffColor = albedoMap.Sample(samplr, input.uv).xyz;
     const float3 baseLinDiffColor = pow(baseDiffColor, TO_LINEAR);
 
@@ -124,27 +122,21 @@ float4 PS(PSInput input) : SV_TARGET
 	float  textureRoughness = roughnessMap.Sample(samplr, input.uv).r;
 	float3 textureNormal	= normalMap.Sample(samplr, input.uv).xyz;
 
-	float3 R0 = float3(0.04f, 0.04f, 0.04f);
-	R0 = MetallicFresnelReflectance(baseLinDiffColor, textureMetalness);
-
-	const float3 nGeom = normalize(input.NormalW);
-	const float3 t = normalize(input.TangentW);
-	const float3 b = normalize(input.BitangentW);
-	const float3x3 TBN = float3x3( t, b, nGeom );
-
-	const float3 n = normalize(mul(textureNormal, TBN));
-    const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
+	const float3 n = normalize(mul(textureNormal, input.tbn));
+    const float3 l = normalize(float3(0.0f, 1.0f, 0.0f));
 	const float3 v = normalize(cameraPosition.xyz - input.PosW);
 	const float3 h = normalize(l + v);
 	const float  ndotl = max(dot(n, l), 0.0f);
 	const float  ndoth = max(dot(n, h), 0.0f);
 	const float  ndotv = max(dot(n, v), 0.0f);
 
+	float3 R0 = MetallicFresnelReflectance(baseLinDiffColor, textureMetalness);
+
 	float3 fresnel = ShlickFresnel(R0, ndotv);
 	float  geometry = SmithGGX(ndotv, ndotl, textureRoughness);
 	float  ndf = TrowbridgeReitzNDF(ndoth, textureRoughness);
 
-	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl) * ndotl;
+	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl);
 	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
 
 	float3 resultColor = CookTorranceMix(spec, diffuse, textureMetalness);

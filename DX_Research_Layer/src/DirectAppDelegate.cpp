@@ -18,12 +18,22 @@ struct VertHeader
 
 struct Pos
 {
-    float x, y, z;
+	float x, y, z;
 };
 
 struct Normal
 {
-    float x, y, z;
+	float x, y, z;
+};
+
+struct Tangent
+{
+	float x, y, z;
+};
+
+struct Bitangent
+{
+	float x, y, z;
 };
 
 struct UV
@@ -33,8 +43,10 @@ struct UV
 
 struct Vertex
 {
-    Pos position_;
-    Normal normal_;
+	Pos position_;
+	Normal normal_;
+	Tangent tangent_;
+	Bitangent bitangent_;
 	UV uv_;
 };
 
@@ -607,7 +619,6 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	//psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState.DepthEnable = TRUE;
     psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
