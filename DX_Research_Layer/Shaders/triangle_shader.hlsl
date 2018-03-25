@@ -31,17 +31,21 @@ struct PSInput
 {
     float4 PosH : SV_POSITION;
     float3 PosW : POSITION;
-    float3 NormW : NORMAL;
+    float3 NormalW : NORMAL;
+	float3 TangentW : TANGENT;
+	float3 BitangentW : BITANGENT;
 	float2 uv : UV;
 };
 
-PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float2 uv : TEXCOORD)
+PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float3 tangent : TANGENT, float3 bitangent : BITANGENT, float2 uv : TEXCOORD)
 {
     PSInput result;
 
     float4 positionW = mul(float4(position, 1.0f), worldMatrix);
     result.PosW = positionW.xyz;
-    result.NormW = mul(float4(normal, 0.0f), worldMatrix).xyz;
+    result.NormalW = mul(float4(normal, 0.0f), worldMatrix).xyz;
+	result.TangentW = mul(float4(tangent, 0.0f), worldMatrix).xyz;
+	result.BitangentW = mul(float4(bitangent, 0.0f), worldMatrix).xyz;
 	result.uv = uv;
     result.PosH = mul(mul(positionW, viewMatrix), projectionMatrix);
 
@@ -123,8 +127,13 @@ float4 PS(PSInput input) : SV_TARGET
 	float3 R0 = float3(0.04f, 0.04f, 0.04f);
 	R0 = MetallicFresnelReflectance(baseLinDiffColor, textureMetalness);
 
+	const float3 nGeom = normalize(input.NormalW);
+	const float3 t = normalize(input.TangentW);
+	const float3 b = normalize(input.BitangentW);
+	const float3x3 TBN = float3x3( t, b, nGeom );
+
+	const float3 n = normalize(mul(textureNormal, TBN));
     const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
-	const float3 n = normalize(input.NormW);
 	const float3 v = normalize(cameraPosition.xyz - input.PosW);
 	const float3 h = normalize(l + v);
 	const float  ndotl = max(dot(n, l), 0.0f);
@@ -135,8 +144,8 @@ float4 PS(PSInput input) : SV_TARGET
 	float  geometry = SmithGGX(ndotv, ndotl, textureRoughness);
 	float  ndf = TrowbridgeReitzNDF(ndoth, textureRoughness);
 
-	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl) * ndotl * lightBrightness;
-	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl * lightBrightness;
+	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv, ndotl) * ndotl;
+	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
 
 	float3 resultColor = CookTorranceMix(spec, diffuse, textureMetalness);
     return float4(pow(resultColor, TO_GAMMA), 1.0f);
