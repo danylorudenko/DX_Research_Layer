@@ -11,5 +11,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ PSTR pCmdL
 
     app.run();
     
+	delete myDelegate;
+
     return 0;
 }

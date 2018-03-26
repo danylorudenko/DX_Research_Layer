@@ -31,7 +31,6 @@ struct PSInput
 {
     float4 PosH : SV_POSITION;
     float3 PosW : POSITION;
-	float3 NormW : NORMAL;
     float3x3 tbn : VERTEXSPACE;
 	float2 uv : TEXCOORD;
 };
@@ -45,11 +44,10 @@ PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float3 tangent : 
     result.PosH = mul(mul(positionW, viewMatrix), projectionMatrix);
 	result.uv = uv;
 
-    float3 nW = normalize(mul(float4(normal, 0.0f), worldMatrix)).xyz;
-	float3 tW = normalize(mul(float4(tangent, 0.0f), worldMatrix)).xyz;
-	float3 bW = normalize(mul(float4(bitangent, 0.0f), worldMatrix)).xyz;
-	result.tbn = (float3x3(tW, bW, nW));
-	result.NormW = nW;
+	float3 tW = mul(normalize(float4(tangent, 0.0f)), worldMatrix).xyz;
+	float3 bW = mul(normalize(float4(bitangent, 0.0f)), worldMatrix).xyz;
+    float3 nW = mul(normalize(float4(normal, 0.0f)), worldMatrix).xyz;
+	result.tbn = float3x3(tW, bW, nW);
 
     return result;
 }
@@ -124,8 +122,9 @@ float4 PS(PSInput input) : SV_TARGET
 	float  textureRoughness = roughnessMap.Sample(samplr, input.uv).r;
 	float3 textureNormal	= normalMap.Sample(samplr, input.uv).xyz;
 
-	const float3 n = normalize(input.NormW);
-    const float3 l = normalize(float3(0.0f, 1.0f, 0.0f));
+	const float3 nA = float3(textureNormal * 2) - 1;
+	const float3 n = normalize(mul(float3(nA), input.tbn));
+    const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
 	const float3 v = normalize(cameraPosition.xyz - input.PosW);
 	const float3 h = normalize(l + v);
 	const float  ndotl = max(dot(n, l), 0.0f);
@@ -142,6 +141,9 @@ float4 PS(PSInput input) : SV_TARGET
 	float3 diffuse = baseLinDiffColor * LAMBERTIAN * ndotl;
 
 	float3 resultColor = CookTorranceMix(spec, diffuse, textureMetalness);
-    return float4(pow(resultColor, TO_GAMMA), 1.0f);
+    //return float4(input.NormW, 1.0f);
+	//return float4(input.tbn[0], 1.0f);
+	//return float4(n, 0.0f);
+	return float4(pow(resultColor, TO_GAMMA), 1.0f);
 
 }
