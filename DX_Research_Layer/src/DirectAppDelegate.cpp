@@ -668,7 +668,7 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 	
 	/////////////////////////////////
 
-	float constexpr SPEED_PER_FRAME = 0.02f;
+	float constexpr SPEED_PER_FRAME = 0.005f;
 
 	auto pos = camera_.Transform().PositionSIMD();
 	auto forward = camera_.Transform().ForwardSIMD();
@@ -709,14 +709,12 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 
 	auto const totalTime = Timer().TotalTime();
 
-	//auto const& cameraPos = camera_.Transform().Position();
-	//auto const cameraPos4 = DirectX::XMFLOAT4A(cameraPos.x, cameraPos.y, cameraPos.z, 0.0f);
-	//sceneBufferData_.cameraPosition = cameraPos4;
 	sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
     sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
 
-	auto const kek = DirectX::XMScalarCos(static_cast<double>(totalTime) / 10.0f);
-	sceneBufferData_.lightDir = DirectX::XMFLOAT4A(kek, kek, kek, kek);
+	auto const x = (DirectX::XMScalarCos(totalTime * 2.0f) + 1.0f) / 2.0f;
+	auto const z = (DirectX::XMScalarSin(totalTime * 2.0f) + 1.0f) / 2.0f;
+	sceneBufferData_.lightDir = DirectX::XMFLOAT4A(x, 1.0f, z, 0.5f);
 	
 	
     void* mappedCameraData = nullptr;

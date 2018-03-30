@@ -147,5 +147,7 @@ float4 PS(PSInput input) : SV_TARGET
 	//return float4(input.tbn[0], 1.0f);
 	//return float4(n, 0.0f);
 	return float4(pow(resultColor, TO_GAMMA), 1.0f);
+	//float kek = ndotl;
+	//return float4(l, 1.0f);
 
 }
