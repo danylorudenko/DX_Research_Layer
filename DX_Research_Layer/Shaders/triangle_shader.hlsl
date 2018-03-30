@@ -116,7 +116,7 @@ float3 CookTorranceMix(float3 specular, float3 diffuse, float metalness)
 float4 PS(PSInput input) : SV_TARGET
 {
 	const float3 ambient = float3(0.01f, 0.01f, 0.015f);
-	const float3 baseDiffColor = albedoMap.Sample(samplr, input.uv).xyz + float3(0.5f, 0.0f, 0.0f);
+	const float3 baseDiffColor = albedoMap.Sample(samplr, input.uv).xyz + float3(0.768f, 0.687f, 0.494f);
     const float3 baseLinDiffColor = pow(baseDiffColor, TO_LINEAR);
 
 	float  textureMetalness = metalnessMap.Sample(samplr, input.uv).r;
@@ -125,7 +125,6 @@ float4 PS(PSInput input) : SV_TARGET
 
 	const float3 nA = float3(textureNormal * 2) - 1;
 	const float3 n = normalize(mul(float3(nA), input.tbn));
-    //const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
 	const float3 l = normalize(lightDir.xyz);
 	const float3 v = normalize(cameraPosition.xyz - input.PosW);
 	const float3 h = normalize(l + v);
@@ -139,7 +138,7 @@ float4 PS(PSInput input) : SV_TARGET
 	float  geometry = SmithGGX(ndotv, ndotl, textureRoughness);
 	float  ndf = TrowbridgeReitzNDF(ndoth, textureRoughness);
 
-	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv + 0.01f, ndotl) * (ndotl + 0.01f);
+	float3 spec = CookTorranceSpecular(fresnel, geometry, ndf, ndotv + 0.02f, ndotl) * (ndotl * 0.95f);
 	float3 diffuse = baseLinDiffColor * LAMBERTIAN * (ndotl + 0.01f);
 
 	float3 resultColor = CookTorranceMix(spec, diffuse, textureMetalness) + ambient;
@@ -147,7 +146,7 @@ float4 PS(PSInput input) : SV_TARGET
 	//return float4(input.tbn[0], 1.0f);
 	//return float4(n, 0.0f);
 	return float4(pow(resultColor, TO_GAMMA), 1.0f);
-	//float kek = ndotl;
-	//return float4(l, 1.0f);
+	//float kek = ndoth;
+	//return float4(kek, kek, kek, 1.0f);
 
 }
