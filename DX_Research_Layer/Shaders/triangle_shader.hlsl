@@ -10,8 +10,8 @@ cbuffer SceneBuffer : register(b0)
 {
     float4x4 projectionMatrix;
     float4x4 viewMatrix;
-    float3 cameraPosition;
-	float3 lightDir;
+    float4 cameraPosition;
+	float4 lightDir;
 
 };
 
@@ -125,7 +125,8 @@ float4 PS(PSInput input) : SV_TARGET
 
 	const float3 nA = float3(textureNormal * 2) - 1;
 	const float3 n = normalize(mul(float3(nA), input.tbn));
-    const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
+    //const float3 l = normalize(float3(1.0f, 1.0f, 0.0f));
+	const float3 l = normalize(lightDir.xyz);
 	const float3 v = normalize(cameraPosition.xyz - input.PosW);
 	const float3 h = normalize(l + v);
 	const float  ndotl = max(dot(n, l), 0.0f);
@@ -134,7 +135,7 @@ float4 PS(PSInput input) : SV_TARGET
 
 	float3 R0 = MetallicFresnelReflectance(baseLinDiffColor, textureMetalness);
 
-	float3 fresnel = ShlickFresnel(R0, ndotv);
+	float3 fresnel = ShlickFresnel(R0, ndotv) * 0.5f;
 	float  geometry = SmithGGX(ndotv, ndotl, textureRoughness);
 	float  ndf = TrowbridgeReitzNDF(ndoth, textureRoughness);
 

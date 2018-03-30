@@ -707,17 +707,22 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 
 	/////////////////////////////////
 
-	const auto& cameraPos = camera_.Transform().Position();
-	sceneBufferData_.cameraPosition = cameraPos;
+	auto const totalTime = Timer().TotalTime();
+
+	//auto const& cameraPos = camera_.Transform().Position();
+	//auto const cameraPos4 = DirectX::XMFLOAT4A(cameraPos.x, cameraPos.y, cameraPos.z, 0.0f);
+	//sceneBufferData_.cameraPosition = cameraPos4;
 	sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
     sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
+
+	auto const kek = DirectX::XMScalarCos(static_cast<double>(totalTime) / 10.0f);
+	sceneBufferData_.lightDir = DirectX::XMFLOAT4A(kek, kek, kek, kek);
 	
-    char* mappedCameraData = nullptr;
+	
+    void* mappedCameraData = nullptr;
     auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
 
-	int kek = sizeof(sceneBufferData_);
-
-    cameraBuffer.Get()->Map(0, nullptr, (void**)&mappedCameraData);
+    cameraBuffer.Get()->Map(0, nullptr, &mappedCameraData);
     std::memcpy(mappedCameraData, &sceneBufferData_, sizeof(sceneBufferData_));
 
     D3D12_RANGE writtenRange{ 0, sizeof(sceneBufferData_) };

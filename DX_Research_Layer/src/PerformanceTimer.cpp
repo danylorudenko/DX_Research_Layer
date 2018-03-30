@@ -11,6 +11,8 @@ PerformanceTimer::PerformanceTimer() :
     __int64 countsPerSecond;
     QueryPerformanceFrequency((LARGE_INTEGER*)&countsPerSecond);
     secondsPerCount_ = 1.0 / static_cast<double>(countsPerSecond);
+
+	Reset();
 }
 float PerformanceTimer::TotalTime() const
 {
@@ -22,6 +24,7 @@ void PerformanceTimer::Reset()
     __int64 currentTime;
     QueryPerformanceCounter((LARGE_INTEGER*)&currentTime);
 
+	baseTime_ = currentTime;
     currTime_ = currentTime;
     prevTime_ = currentTime;
 }
