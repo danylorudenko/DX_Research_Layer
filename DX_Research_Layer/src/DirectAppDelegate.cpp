@@ -151,8 +151,8 @@ void DirectAppDelegate::start(Application& application)
 	int albedoHeight = 0;
 	int albedoWidth = 0;
 	int albedoComponents = 0;
-	//unsigned char* albedoData = stbi_load("rustediron-streaks_basecolor.png", &albedoHeight, &albedoWidth, &albedoComponents, STBI_rgb_alpha);
-	unsigned char* albedoData = stbi_load("slipperystonework-albedo.png", &albedoHeight, &albedoWidth, &albedoComponents, STBI_rgb_alpha);
+	unsigned char* albedoData = stbi_load("rustediron-streaks_basecolor.png", &albedoHeight, &albedoWidth, &albedoComponents, STBI_rgb_alpha);
+	//unsigned char* albedoData = stbi_load("slipperystonework-albedo.png", &albedoHeight, &albedoWidth, &albedoComponents, STBI_rgb_alpha);
 	int albedoBytesCount = albedoWidth * albedoHeight * albedoComponents;
 
 	D3D12_RESOURCE_DESC albedoMapDesc;
@@ -210,8 +210,8 @@ void DirectAppDelegate::start(Application& application)
 	int normalHeight = 0;
 	int normalWidth = 0;
 	int normalComponents = 0;
-	//unsigned char* normalData = stbi_load("rustediron-streaks_normal.png", &normalHeight, &normalWidth, &normalComponents, STBI_rgb_alpha);
-	unsigned char* normalData = stbi_load("slipperystonework-normal.png", &normalHeight, &normalWidth, &normalComponents, STBI_rgb_alpha);
+	unsigned char* normalData = stbi_load("rustediron-streaks_normal.png", &normalHeight, &normalWidth, &normalComponents, STBI_rgb_alpha);
+	//unsigned char* normalData = stbi_load("slipperystonework-normal.png", &normalHeight, &normalWidth, &normalComponents, STBI_rgb_alpha);
 	int normalBytesCount = normalHeight * normalHeight * normalComponents;
 
 	D3D12_RESOURCE_DESC normalMapDesc;
@@ -265,8 +265,8 @@ void DirectAppDelegate::start(Application& application)
 	int metallnessHeight = 0;
 	int metallnessWidth = 0;
 	int metallnessComponents = 0;
-	//unsigned char* metallnessData = stbi_load("rustediron-streaks_metallic.png", &metallnessHeight, &metallnessWidth, &metallnessComponents, 1);
-	unsigned char* metallnessData = stbi_load("slipperystonework-metalness.png", &metallnessHeight, &metallnessWidth, &metallnessComponents, 1);
+	unsigned char* metallnessData = stbi_load("rustediron-streaks_metallic.png", &metallnessHeight, &metallnessWidth, &metallnessComponents, 1);
+	//unsigned char* metallnessData = stbi_load("slipperystonework-metalness.png", &metallnessHeight, &metallnessWidth, &metallnessComponents, 1);
 	int metallnessBytesCount = metallnessHeight * metallnessHeight * metallnessComponents;
 
 	D3D12_RESOURCE_DESC metallnessMapDesc;
@@ -320,8 +320,8 @@ void DirectAppDelegate::start(Application& application)
 	int roughnessHeight = 0;
 	int roughnessWidth = 0;
 	int roughnessComponents = 0;
-	//unsigned char* roughnessData = stbi_load("rustediron-streaks_roughness.png", &roughnessHeight, &roughnessWidth, &roughnessComponents, 1);
-	unsigned char* roughnessData = stbi_load("slipperystonework-rough.png", &roughnessHeight, &roughnessWidth, &roughnessComponents, 1);
+	unsigned char* roughnessData = stbi_load("rustediron-streaks_roughness.png", &roughnessHeight, &roughnessWidth, &roughnessComponents, 1);
+	//unsigned char* roughnessData = stbi_load("slipperystonework-rough.png", &roughnessHeight, &roughnessWidth, &roughnessComponents, 1);
 	int roughnessBytesCount = roughnessHeight * roughnessHeight * roughnessComponents;
 
 	D3D12_RESOURCE_DESC roughnessMapDesc;

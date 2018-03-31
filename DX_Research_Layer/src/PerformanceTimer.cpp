@@ -22,6 +22,7 @@ void PerformanceTimer::Reset()
     __int64 currentTime;
     QueryPerformanceCounter((LARGE_INTEGER*)&currentTime);
 
+	baseTime_ = currentTime;
     currTime_ = currentTime;
     prevTime_ = currentTime;
 }
