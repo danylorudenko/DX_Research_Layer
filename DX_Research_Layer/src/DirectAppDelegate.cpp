@@ -702,9 +702,14 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 	/////////////////////////////////
 
 	const auto& cameraPos = camera_.Transform().Position();
-	sceneBufferData_.cameraPosition_ = cameraPos;
-	sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
+	sceneBufferData_.projectionMatrix_ = camera_.PerspectiveMatrix();
     sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
+	sceneBufferData_.cameraPosition_ = DirectX::XMFLOAT3A{ cameraPos.x, cameraPos.y, cameraPos.z };
+
+	const auto t = Timer().TotalTime();
+	const auto lx = DirectX::XMScalarCos(t);
+	const auto lz = DirectX::XMScalarSin(t);
+	sceneBufferData_.lightDirection_ = DirectX::XMFLOAT3A{ lx, 0.0f, lz };
 	
     char* mappedCameraData = nullptr;
     auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
