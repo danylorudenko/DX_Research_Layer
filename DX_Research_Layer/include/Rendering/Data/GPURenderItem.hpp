@@ -9,13 +9,13 @@
 namespace DXRL
 {
 
-class GPUFoundation;
+class GPUDelegate;
 
 class GPURenderItem
 {
 public:
 
-	void CreateTransformBuffer(std::size_t frames, std::size_t bindSlot, GPUFoundation& foundation);
+	void CreateTransformBuffer(std::size_t frames, std::size_t bindSlot, GPUDelegate& foundation);
 
 
 public:

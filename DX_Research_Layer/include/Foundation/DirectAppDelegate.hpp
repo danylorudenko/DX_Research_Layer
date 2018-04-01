@@ -41,9 +41,11 @@ public:
     int prevMouseY_;
 };
 
-class DirectAppDelegate : public Application::Delegate
+class Direct3DAppDelegate : public Application::Delegate
 {
 public:
+    Direct3DAppDelegate();
+
     virtual void start(Application& application) override;
     virtual void update(Application& application) override;
     virtual void shutdown(Application& application) override;
@@ -51,29 +53,18 @@ public:
     PerformanceTimer& Timer();
     void DisplayFrameTime(Application& application, float drawTime);
 
-    Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRootSignature();
-    Microsoft::WRL::ComPtr<ID3D12PipelineState> CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature);
+    void MainUpdate(std::size_t frameIndex);
 
-    void Draw(std::size_t frameIndex);
-    void CustomAction(std::size_t frameIndex);
-
-
-    // FOUNDATION DATA
-    PerformanceTimer gameTimer_;
-    std::wstring windowText_;
-    std::unique_ptr<DXRL::GPUFoundation> gpuFoundation_;
-    Microsoft::WRL::ComPtr<IDXGraphicsAnalysis> graphicsAnalysis_;
-
-    UINT64 frameIndex_ = 0;
-
-
-    // CUSTOM APPLICATION DATA
+    
+public:
+    
+    Window const* mainWindow;
     DirectWinProcDelegate winProcDelegate_;
 
-    Math::Transform* mainObjTransform = nullptr;
-    Math::Camera camera_;
-	float cameraTargetPitch_ = 0.0f;
-	float cameraTargetYaw_ = 0.0f;
-    SceneConstantBuffer sceneBufferData_;
-    DXRL::GPUResourceViewHandle sceneBuffer_;
+    std::unique_ptr<DXRL::GPUDelegate> gpuDelegate_;
+
+    PerformanceTimer gameTimer_;
+    UINT64 mainUpdateIterator_;
+
+    std::wstring windowText_;
 };

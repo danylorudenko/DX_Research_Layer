@@ -8,13 +8,13 @@
 namespace DXRL
 {
 
-class GPUFoundation;
+class GPUDelegate;
 
 class GPUStaticResourceAllocator
 {
 public:
     GPUStaticResourceAllocator();
-    GPUStaticResourceAllocator(GPUFoundation& foundation);
+    GPUStaticResourceAllocator(GPUDelegate& foundation);
 
     GPUStaticResourceAllocator(GPUStaticResourceAllocator const&) = delete;
     GPUStaticResourceAllocator(GPUStaticResourceAllocator&& rhs);
@@ -29,7 +29,7 @@ public:
 
 
 private:
-    GPUFoundation* foundation_;
+    GPUDelegate* foundation_;
 
     std::vector<std::unique_ptr<GPUResource>> committedResources_;
 };

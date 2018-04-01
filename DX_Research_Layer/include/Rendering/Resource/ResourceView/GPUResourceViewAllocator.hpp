@@ -10,13 +10,13 @@
 namespace DXRL
 {
 
-class GPUFoundation;
+class GPUDelegate;
 
 class GPUResourceViewAllocator
 {
 public:
     GPUResourceViewAllocator();
-    GPUResourceViewAllocator(GPUFoundation& foundation);
+    GPUResourceViewAllocator(GPUDelegate& foundation);
     GPUResourceViewAllocator(GPUResourceViewAllocator const&) = delete;
     GPUResourceViewAllocator(GPUResourceViewAllocator&& rhs);
 
@@ -48,7 +48,7 @@ private:
     static constexpr std::size_t DSV_HEAP_CAPACITY = 6;
     static constexpr std::size_t CBV_SRV_UAV_CAPACITY = 30;
 
-    GPUFoundation* foundation_ = nullptr;
+    GPUDelegate* foundation_ = nullptr;
 
     GPUResourceViewHeap rtvHeap_;
     GPUResourceViewHeap dsvHeap_;

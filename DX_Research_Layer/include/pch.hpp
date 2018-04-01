@@ -53,8 +53,6 @@
     className(className&&) = default;                                           \
     className& operator=(className&&) = default;                                \
                                                                                 \
-    virtual ~className() = default;                                             \
-
 
 #endif // DXRL_DEFINE_UNCOPYABLE_MOVABLE_DEFAULT
 
@@ -87,8 +85,6 @@
     className(className&&);                                                     \
     className& operator=(className&&);                                          \
                                                                                 \
-    virtual ~className() = default;                                             \
-
 
 #endif // DXRL_DEFINE_COPYABLE_DEFAULT_MOVABLE_DEFAULT
 
@@ -104,9 +100,6 @@
                                                                                 \
     className(className&&);                                                     \
     className& operator=(className&&);                                          \
-                                                                                \
-    virtual ~className() = default;                                             \
-
 
 #endif // DXRL_DEFINE_COPYABLE_DEFAULT_MOVABLE
 

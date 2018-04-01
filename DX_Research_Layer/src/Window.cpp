@@ -6,27 +6,12 @@
 //
 // WindowClass's implementation
 //
-namespace 
-{
-	LRESULT CALLBACK windowEventHandler(HWND handle, UINT message, WPARAM wparam, LPARAM lparam)
-	{
-		auto data = ::GetWindowLongPtr(handle, GWLP_USERDATA);
-		auto window = reinterpret_cast<Window*>(data);
-
-        if (window != nullptr) {
-            return window->handleEvents(handle, message, wparam, lparam);
-        }
-        else {
-            return ::DefWindowProc(handle, message, wparam, lparam);
-        }
-	}
-}
 
 WindowClass::WindowClass(HINSTANCE instance, std::wstring name) : name_{ std::move(name) }, successfully_{ false }
 {
 	WNDCLASS wc = {
 		CS_VREDRAW | CS_HREDRAW,
-		windowEventHandler,
+		Window::HandleEvents,
 		0, 0,
 		instance,
 		LoadIcon(nullptr, IDI_APPLICATION),
@@ -129,13 +114,13 @@ Window::NativeHandle Window::nativeHandle() const
 	return reinterpret_cast<NativeHandle>(handle_);
 }
 
-std::uint32_t Window::width() const
+std::uint32_t Window::Width() const
 {
 	auto const rect = frame();
 	return rect.right - rect.left;
 }
 
-std::uint32_t Window::height() const
+std::uint32_t Window::Height() const
 {
 	auto const rect = frame();
 	return rect.bottom - rect.top;
@@ -148,7 +133,20 @@ RECT Window::frame() const
 	return rect;
 }
 
-LRESULT Window::handleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Window::HandleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    auto data = ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    auto window = reinterpret_cast<Window*>(data);
+
+    if (window != nullptr) {
+        return window->HandleEventsInternal(hwnd, msg, wParam, lParam);
+    }
+    else {
+        return ::DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+}
+
+LRESULT Window::HandleEventsInternal(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (winProcDelegate_ && *winProcDelegate_) {
         return (*winProcDelegate_)(hwnd, msg, wParam, lParam);
@@ -157,4 +155,3 @@ LRESULT Window::handleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
 }
-

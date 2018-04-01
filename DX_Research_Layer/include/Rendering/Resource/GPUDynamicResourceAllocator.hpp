@@ -25,7 +25,7 @@ class GPUDynamicResourceAllocator
 {
 public:
     GPUDynamicResourceAllocator();
-    GPUDynamicResourceAllocator(GPUFoundation& foundation, D3D12_HEAP_TYPE type, std::size_t size, std::size_t chunkSize = 256);
+    GPUDynamicResourceAllocator(GPUDelegate& foundation, D3D12_HEAP_TYPE type, std::size_t size, std::size_t chunkSize = 256);
     GPUDynamicResourceAllocator(GPUDynamicResourceAllocator const&) = delete;
     GPUDynamicResourceAllocator(GPUDynamicResourceAllocator&& rhs);
 

@@ -4,9 +4,9 @@
 namespace DXRL
 {
 
-GPUFoundation::GPUFoundation() = default;
+GPUDelegate::GPUDelegate() = default;
 
-GPUFoundation::GPUFoundation(Application& application)
+GPUDelegate::GPUDelegate(Application& application)
 {
     // Create device and dxgiFactory.
     InitializeD3D12();
@@ -28,11 +28,11 @@ GPUFoundation::GPUFoundation(Application& application)
     swapChainRTV_ = AllocSwapChainRTV(swapChain_, rtvDesc);
 }
 
-GPUFoundation::GPUFoundation(GPUFoundation&& rhs) = default;
+GPUDelegate::GPUDelegate(GPUDelegate&& rhs) = default;
 
-GPUFoundation& GPUFoundation::operator=(GPUFoundation&& rhs) = default;
+GPUDelegate& GPUDelegate::operator=(GPUDelegate&& rhs) = default;
 
-void GPUFoundation::InitializeD3D12()
+void GPUDelegate::InitializeD3D12()
 {
 #if defined(DEBUG) || defined(_DEBUG)
     {
@@ -57,27 +57,27 @@ void GPUFoundation::InitializeD3D12()
     device_ = GPUCapabilities::GenerateStandardDeviceQuery(*this);
 }
 
-void GPUFoundation::CreateGPUEngines()
+void GPUDelegate::CreateGPUEngines()
 {
     engines_[0] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_DIRECT, SWAP_CHAIN_BUFFER_COUNT };
     engines_[1] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_COPY, SWAP_CHAIN_BUFFER_COUNT };
     engines_[2] = GPUEngine{ device_.Get(), GPU_ENGINE_TYPE_COMPUTE, SWAP_CHAIN_BUFFER_COUNT };
 }
 
-void GPUFoundation::ResetAll()
+void GPUDelegate::ResetAll()
 {
     Engine<GPU_ENGINE_TYPE_DIRECT>().Reset();
     Engine<GPU_ENGINE_TYPE_COPY>().Reset();
     Engine<GPU_ENGINE_TYPE_COMPUTE>().Reset();
 }
 
-void GPUFoundation::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
+void GPUDelegate::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
 {
     auto const result = device_->CreateRootSignature(0, serializedRootSignature->GetBufferPointer(), serializedRootSignature->GetBufferSize(), IID_PPV_ARGS(&dest));
     DXRL_THROW_IF_FAILED(result);
 }
 
-void GPUFoundation::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type)
+void GPUDelegate::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type)
 {
 #if defined (_DEBUG) | (DEBUG)
     UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
@@ -90,33 +90,33 @@ void GPUFoundation::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DB
     }
 }
 
-void GPUFoundation::CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc)
+void GPUDelegate::CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc)
 {
     auto const result = device_->CreateGraphicsPipelineState(desc, IID_PPV_ARGS(&dest));
     DXRL_THROW_IF_FAILED(result);
 }
 
-GPUResourceHandle GPUFoundation::AllocDefaultResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState)
+GPUResourceHandle GPUDelegate::AllocDefaultResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState)
 {
     return staticResourceAllocator_.AllocDefault(desc, initialState);
 }
 
-GPUResourceHandle GPUFoundation::AllocUploadResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState)
+GPUResourceHandle GPUDelegate::AllocUploadResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState)
 {
     return staticResourceAllocator_.AllocUpload(desc, initialState);
 }
 
-void GPUFoundation::SetDefaultDescriptorHeaps()
+void GPUDelegate::SetDefaultDescriptorHeaps()
 {
     viewAllocator_.SetDefaultHeaps(Engine<GPU_ENGINE_TYPE_DIRECT>());
 }
 
-GPUResourceViewHandle GPUFoundation::SwapChainRTV()
+GPUResourceViewHandle GPUDelegate::SwapChainRTV()
 {
     return swapChainRTV_;
 }
 
-GPUResourceViewHandle GPUFoundation::AllocSwapChainRTV(GPUSwapChain& swapChain, D3D12_RENDER_TARGET_VIEW_DESC const& desc)
+GPUResourceViewHandle GPUDelegate::AllocSwapChainRTV(GPUSwapChain& swapChain, D3D12_RENDER_TARGET_VIEW_DESC const& desc)
 {
     auto const framesCount = swapChain.BufferCount();
     std::vector<GPUResourceViewDirectHandle> directHandles;
@@ -127,7 +127,7 @@ GPUResourceViewHandle GPUFoundation::AllocSwapChainRTV(GPUSwapChain& swapChain, 
     return viewContextTable_.InsertView(framesCount, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocRTV(std::size_t frames, GPUResourceHandle const* resources, D3D12_RENDER_TARGET_VIEW_DESC const* desc)
+GPUResourceViewHandle GPUDelegate::AllocRTV(std::size_t frames, GPUResourceHandle const* resources, D3D12_RENDER_TARGET_VIEW_DESC const* desc)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles;
@@ -138,7 +138,7 @@ GPUResourceViewHandle GPUFoundation::AllocRTV(std::size_t frames, GPUResourceHan
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState)
+GPUResourceViewHandle GPUDelegate::AllocDSV(std::size_t frames, GPUResourceHandle const* resources, D3D12_DEPTH_STENCIL_VIEW_DESC const& desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles;
@@ -149,7 +149,7 @@ GPUResourceViewHandle GPUFoundation::AllocDSV(std::size_t frames, GPUResourceHan
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocCBV(std::size_t frames, GPUResourceHandle const* resources, D3D12_CONSTANT_BUFFER_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
+GPUResourceViewHandle GPUDelegate::AllocCBV(std::size_t frames, GPUResourceHandle const* resources, D3D12_CONSTANT_BUFFER_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles;
@@ -160,7 +160,7 @@ GPUResourceViewHandle GPUFoundation::AllocCBV(std::size_t frames, GPUResourceHan
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocSRV(std::size_t frames, GPUResourceHandle const* resources, D3D12_SHADER_RESOURCE_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
+GPUResourceViewHandle GPUDelegate::AllocSRV(std::size_t frames, GPUResourceHandle const* resources, D3D12_SHADER_RESOURCE_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles;
@@ -171,7 +171,7 @@ GPUResourceViewHandle GPUFoundation::AllocSRV(std::size_t frames, GPUResourceHan
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewHandle GPUFoundation::AllocUAV(std::size_t frames, GPUResourceHandle const* resources, D3D12_UNORDERED_ACCESS_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
+GPUResourceViewHandle GPUDelegate::AllocUAV(std::size_t frames, GPUResourceHandle const* resources, D3D12_UNORDERED_ACCESS_VIEW_DESC const* desc, D3D12_RESOURCE_STATES targetState)
 {
     assert(frames == 1 || frames == swapChain_.BufferCount() && "Can't create views with invalid frameCount");
     std::vector<GPUResourceViewDirectHandle> directHandles;
@@ -182,7 +182,7 @@ GPUResourceViewHandle GPUFoundation::AllocUAV(std::size_t frames, GPUResourceHan
     return viewContextTable_.InsertView(frames, directHandles.data(), viewAllocator_);
 }
 
-GPUResourceViewTable GPUFoundation::BuildViewTable(std::size_t tableSize, GPUShaderVisibleResourceViewDesc const* descriptions)
+GPUResourceViewTable GPUDelegate::BuildViewTable(std::size_t tableSize, GPUShaderVisibleResourceViewDesc const* descriptions)
 {
     std::vector<GPUResourceViewHandle> handles;
     handles.resize(tableSize);

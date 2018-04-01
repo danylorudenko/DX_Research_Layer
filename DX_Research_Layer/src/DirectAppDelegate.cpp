@@ -50,18 +50,27 @@ struct Vertex
 	UV uv_;
 };
 
-void DirectAppDelegate::start(Application& application)
+Direct3DAppDelegate::Direct3DAppDelegate()
+    : mainWindow{ nullptr }
+    , winProcDelegate_{}
+    , gpuDelegate_{ nullptr }
+    , gameTimer_{}
+    , mainUpdateIterator_{ 0 }
+    , windowText_{ 0 }
+{ }
+
+void Direct3DAppDelegate::start(Application& application)
 {
     winProcDelegate_ = DirectWinProcDelegate{ this };
     application.window().winProcHandler(&winProcDelegate_);
     
-    auto constexpr framesCount = DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
+    auto constexpr framesCount = DXRL::GPUDelegate::SWAP_CHAIN_BUFFER_COUNT;
 
 
-    gpuFoundation_ = std::make_unique<DXRL::GPUFoundation>(application);
+    gpuDelegate_ = std::make_unique<DXRL::GPUDelegate>(application);
     gameTimer_.Reset();
 
-    auto& initializationEngine = gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>();
+    auto& initializationEngine = gpuDelegate_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>();
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -103,10 +112,10 @@ void DirectAppDelegate::start(Application& application)
 	std::memcpy(indexData + indexBytes, planeIndexData, sizeof(planeIndexData));
 
 
-    auto uploadVertexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes + sizeof(planeVertexData)), D3D12_RESOURCE_STATE_GENERIC_READ);
-    auto vertexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes + sizeof(planeVertexData)), D3D12_RESOURCE_STATE_COPY_DEST);
-    auto uploadIndexBuffer = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes + sizeof(planeIndexData)), D3D12_RESOURCE_STATE_GENERIC_READ);
-    auto indexBuffer = gpuFoundation_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes + sizeof(planeIndexData)), D3D12_RESOURCE_STATE_COPY_DEST);
+    auto uploadVertexBuffer = gpuDelegate_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes + sizeof(planeVertexData)), D3D12_RESOURCE_STATE_GENERIC_READ);
+    auto vertexBuffer = gpuDelegate_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(vertexBytes + sizeof(planeVertexData)), D3D12_RESOURCE_STATE_COPY_DEST);
+    auto uploadIndexBuffer = gpuDelegate_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes + sizeof(planeIndexData)), D3D12_RESOURCE_STATE_GENERIC_READ);
+    auto indexBuffer = gpuDelegate_->AllocDefaultResource(CD3DX12_RESOURCE_DESC::Buffer(indexBytes + sizeof(planeIndexData)), D3D12_RESOURCE_STATE_COPY_DEST);
 
 
     BYTE* mappedVertexData = nullptr;
@@ -169,10 +178,10 @@ void DirectAppDelegate::start(Application& application)
 	albedoMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 	UINT64 albedoCopyableSize = 0;
-	gpuFoundation_->Device()->GetCopyableFootprints(&albedoMapDesc, 0, 1, 0, nullptr, nullptr, nullptr, &albedoCopyableSize);
+	gpuDelegate_->Device()->GetCopyableFootprints(&albedoMapDesc, 0, 1, 0, nullptr, nullptr, nullptr, &albedoCopyableSize);
 
-	DXRL::GPUResourceHandle albedoMapUploadHeap = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(albedoCopyableSize), D3D12_RESOURCE_STATE_GENERIC_READ);
-	DXRL::GPUResourceHandle albedoMap = gpuFoundation_->AllocDefaultResource(albedoMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+	DXRL::GPUResourceHandle albedoMapUploadHeap = gpuDelegate_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(albedoCopyableSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+	DXRL::GPUResourceHandle albedoMap = gpuDelegate_->AllocDefaultResource(albedoMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
 	D3D12_SUBRESOURCE_DATA albedoSubData;
 	albedoSubData.pData = albedoData;
@@ -203,7 +212,7 @@ void DirectAppDelegate::start(Application& application)
 	albedoViewDesc.Texture2D.PlaneSlice = 0;
 	albedoViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-	DXRL::GPUResourceViewHandle albedoView = gpuFoundation_->AllocSRV(1, &albedoMap, &albedoViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	DXRL::GPUResourceViewHandle albedoView = gpuDelegate_->AllocSRV(1, &albedoMap, &albedoViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	//////////////////////
 
@@ -228,7 +237,7 @@ void DirectAppDelegate::start(Application& application)
 	normalMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 	
 
-	DXRL::GPUResourceHandle normalMap = gpuFoundation_->AllocDefaultResource(normalMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+	DXRL::GPUResourceHandle normalMap = gpuDelegate_->AllocDefaultResource(normalMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 	
 	D3D12_SUBRESOURCE_DATA normalSubData;
 	normalSubData.pData = normalData;
@@ -258,7 +267,7 @@ void DirectAppDelegate::start(Application& application)
 	normalViewDesc.Texture2D.PlaneSlice = 0;
 	normalViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-	DXRL::GPUResourceViewHandle normalView = gpuFoundation_->AllocSRV(1, &normalMap, &normalViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	DXRL::GPUResourceViewHandle normalView = gpuDelegate_->AllocSRV(1, &normalMap, &normalViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	//////////////////////
 
@@ -283,7 +292,7 @@ void DirectAppDelegate::start(Application& application)
 	metallnessMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 
-	DXRL::GPUResourceHandle metallnessMap = gpuFoundation_->AllocDefaultResource(metallnessMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+	DXRL::GPUResourceHandle metallnessMap = gpuDelegate_->AllocDefaultResource(metallnessMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
 	D3D12_SUBRESOURCE_DATA metallnessSubData;
 	metallnessSubData.pData = metallnessData;
@@ -313,7 +322,7 @@ void DirectAppDelegate::start(Application& application)
 	metallnessViewDesc.Texture2D.PlaneSlice = 0;
 	metallnessViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-	DXRL::GPUResourceViewHandle metallnessView = gpuFoundation_->AllocSRV(1, &metallnessMap, &metallnessViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	DXRL::GPUResourceViewHandle metallnessView = gpuDelegate_->AllocSRV(1, &metallnessMap, &metallnessViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	//////////////////////
 
@@ -338,7 +347,7 @@ void DirectAppDelegate::start(Application& application)
 	roughnessMapDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 
-	DXRL::GPUResourceHandle roughnessMap = gpuFoundation_->AllocDefaultResource(roughnessMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
+	DXRL::GPUResourceHandle roughnessMap = gpuDelegate_->AllocDefaultResource(roughnessMapDesc, D3D12_RESOURCE_STATE_COPY_DEST);
 
 	D3D12_SUBRESOURCE_DATA roughnessSubData;
 	roughnessSubData.pData = roughnessData;
@@ -368,7 +377,7 @@ void DirectAppDelegate::start(Application& application)
 	roughnessViewDesc.Texture2D.PlaneSlice = 0;
 	roughnessViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
-	DXRL::GPUResourceViewHandle roughnessView = gpuFoundation_->AllocSRV(1, &roughnessMap, &roughnessViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	DXRL::GPUResourceViewHandle roughnessView = gpuDelegate_->AllocSRV(1, &roughnessMap, &roughnessViewDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 
     /////////////////////////////////////////////////////////////////////////////
@@ -380,7 +389,7 @@ void DirectAppDelegate::start(Application& application)
     auto constexpr sceneConstBufferSize = (sizeof(sceneBufferData_) + 255) & ~255;
     DXRL::GPUResourceHandle constBufferHandles[framesCount];
     for (std::size_t i = 0; i < framesCount; i++) {
-        constBufferHandles[i] = gpuFoundation_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(sceneConstBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
+        constBufferHandles[i] = gpuDelegate_->AllocUploadResource(CD3DX12_RESOURCE_DESC::Buffer(sceneConstBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ);
     }
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC sceneCbvDesc[framesCount];
@@ -389,7 +398,7 @@ void DirectAppDelegate::start(Application& application)
         sceneCbvDesc[i].SizeInBytes = sceneConstBufferSize;
     }
     
-    sceneBuffer_ = gpuFoundation_->AllocCBV(framesCount, constBufferHandles, sceneCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
+    sceneBuffer_ = gpuDelegate_->AllocCBV(framesCount, constBufferHandles, sceneCbvDesc, D3D12_RESOURCE_STATE_GENERIC_READ);
 
 
 	triangleRootSignature.PushRootArgument(0, DXRL::GPUResourceViewTable{ 1, &sceneBuffer_ });
@@ -404,7 +413,7 @@ void DirectAppDelegate::start(Application& application)
 
     auto pipelineState = CreatePipelineState(rootSignature);
     DXRL::GPUPipelineState trianglePipelineState_{ pipelineState };
-    auto& graphicsGraphNode = gpuFoundation_->FrameGraph().AddGraphicsNode(nullptr, gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature));
+    auto& graphicsGraphNode = gpuDelegate_->FrameGraph().AddGraphicsNode(nullptr, gpuDelegate_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>(), std::move(trianglePipelineState_), std::move(triangleRootSignature));
 
 	std::size_t constexpr renderItemsCount = 3;
 	DXRL::GPURenderItem renderItem[renderItemsCount];
@@ -419,7 +428,7 @@ void DirectAppDelegate::start(Application& application)
 		renderItem[i].indexBuffer_ = indexBuffer;
 		renderItem[i].indexBufferDescriptor_ = ibView;
 		renderItem[i].indexCount_ = header.indexCount_;
-		renderItem[i].CreateTransformBuffer(framesCount, 2, *gpuFoundation_);
+		renderItem[i].CreateTransformBuffer(framesCount, 2, *gpuDelegate_);
 
 		graphicsGraphNode.ImportRenderItem(std::move(renderItem[i]));
 	}
@@ -445,13 +454,13 @@ void DirectAppDelegate::start(Application& application)
 	//planeRenderItem.indexBuffer_ = indexBuffer;
 	//planeRenderItem.indexBufferDescriptor_ = planeIbView;
 	//planeRenderItem.indexCount_ = 6;
-	//planeRenderItem.CreateTransformBuffer(framesCount, 1, *gpuFoundation_);
+	//planeRenderItem.CreateTransformBuffer(framesCount, 1, *gpuDelegate_);
 
 	//graphicsGraphNode.ImportRenderItem(std::move(planeRenderItem));
 
 	/////////////////////////////////////////////////////////////
 
-    auto swapChainRTV = gpuFoundation_->SwapChainRTV();
+    auto swapChainRTV = gpuDelegate_->SwapChainRTV();
     graphicsGraphNode.ImportRenderTargets(1, &swapChainRTV);
     DXRL::Color clearColor{ 0.1f, 0.11f, 0.12f, 1.0f };
     graphicsGraphNode.ImportClearColors(&clearColor, 1);
@@ -459,8 +468,8 @@ void DirectAppDelegate::start(Application& application)
     D3D12_RESOURCE_DESC depthStencilDesc;
     depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    depthStencilDesc.Height = DXRL::GPUFoundation::HEIGHT;
-    depthStencilDesc.Width = DXRL::GPUFoundation::WIDTH;
+    depthStencilDesc.Height = DXRL::GPUDelegate::HEIGHT;
+    depthStencilDesc.Width = DXRL::GPUDelegate::WIDTH;
     depthStencilDesc.DepthOrArraySize = 1;
     depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     depthStencilDesc.Alignment = 0;
@@ -470,7 +479,7 @@ void DirectAppDelegate::start(Application& application)
     depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     DXRL::GPUResourceHandle depthStencilBuffers_[framesCount];
     for (size_t i = 0; i < framesCount; i++) {
-        depthStencilBuffers_[i] = gpuFoundation_->AllocDefaultResource(depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+        depthStencilBuffers_[i] = gpuDelegate_->AllocDefaultResource(depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
     }
 
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
@@ -478,7 +487,7 @@ void DirectAppDelegate::start(Application& application)
     dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
     dsvDesc.Texture2D.MipSlice = 0;
-    auto depthStencilView = gpuFoundation_->AllocDSV(framesCount, depthStencilBuffers_, dsvDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    auto depthStencilView = gpuDelegate_->AllocDSV(framesCount, depthStencilBuffers_, dsvDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
     DXRL::GPUDepthStencilSettings dsSettings{};
     dsSettings.ActivateDepth();
@@ -493,17 +502,17 @@ void DirectAppDelegate::start(Application& application)
     viewport.TopLeftY = 0.0f;
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
-    viewport.Width = static_cast<float>(DXRL::GPUFoundation::WIDTH);
-    viewport.Height = static_cast<float>(DXRL::GPUFoundation::HEIGHT);
-    CD3DX12_RECT scissorRect{ 0, 0, static_cast<LONG>(DXRL::GPUFoundation::WIDTH), static_cast<LONG>(DXRL::GPUFoundation::HEIGHT) };
+    viewport.Width = static_cast<float>(DXRL::GPUDelegate::WIDTH);
+    viewport.Height = static_cast<float>(DXRL::GPUDelegate::HEIGHT);
+    CD3DX12_RECT scissorRect{ 0, 0, static_cast<LONG>(DXRL::GPUDelegate::WIDTH), static_cast<LONG>(DXRL::GPUDelegate::HEIGHT) };
     graphicsGraphNode.ImportViewportScissor(viewport, scissorRect);
 
 
-    auto& presentNode_ = gpuFoundation_->FrameGraph().AddPresentNode(graphicsGraphNode, gpuFoundation_->SwapChain(), gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>());
+    auto& presentNode_ = gpuDelegate_->FrameGraph().AddPresentNode(graphicsGraphNode, gpuDelegate_->SwapChain(), gpuDelegate_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>());
     presentNode_.ImportRenderTarget(swapChainRTV);
     
 
-    gpuFoundation_->FrameGraph().ParseGraphToQueue();
+    gpuDelegate_->FrameGraph().ParseGraphToQueue();
 
     initializationEngine.FlushReset();
 
@@ -511,32 +520,32 @@ void DirectAppDelegate::start(Application& application)
     camera_.NearPlane(0.1f);
     camera_.FarPlane(1000.0f);
     camera_.Fow(60.0f);
-    camera_.AspectRatio(static_cast<float>(DXRL::GPUFoundation::WIDTH) / static_cast<float>(DXRL::GPUFoundation::HEIGHT));
+    camera_.AspectRatio(static_cast<float>(DXRL::GPUDelegate::WIDTH) / static_cast<float>(DXRL::GPUDelegate::HEIGHT));
 }
 
-void DirectAppDelegate::update(Application& application)
+void Direct3DAppDelegate::update(Application& application)
 {
-    std::size_t const normalizedFrameIndex = frameIndex_ % DXRL::GPUFoundation::SWAP_CHAIN_BUFFER_COUNT;
+    std::size_t const normalizedFrameIndex = mainUpdateIterator_ % DXRL::GPUDelegate::SWAP_CHAIN_BUFFER_COUNT;
     CustomAction(normalizedFrameIndex);
-    Draw(normalizedFrameIndex);
+    MainUpdate(normalizedFrameIndex);
 
     gameTimer_.Tick();
     DisplayFrameTime(application, Timer().DeltaTime());
 
-    ++frameIndex_;
+    ++mainUpdateIterator_;
 }
 
-void DirectAppDelegate::shutdown(Application& application)
+void Direct3DAppDelegate::shutdown(Application& application)
 {
 
 }
 
-PerformanceTimer& DirectAppDelegate::Timer()
+PerformanceTimer& Direct3DAppDelegate::Timer()
 {
     return gameTimer_;
 }
 
-void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTime)
+void Direct3DAppDelegate::DisplayFrameTime(Application& application, float drawTime)
 {
     windowText_.resize(0);
     windowText_ = L"SPF: ";
@@ -549,7 +558,7 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
     SetWindowText(windowHandle, windowText_.c_str());
 }
 
-Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignature()
+Microsoft::WRL::ComPtr<ID3D12RootSignature> Direct3DAppDelegate::CreateRootSignature()
 {
     CD3DX12_ROOT_PARAMETER rootParameters[3];
     CD3DX12_DESCRIPTOR_RANGE ranges[3];
@@ -588,17 +597,17 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignatu
     }
     
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-    gpuFoundation_->CreateRootSignature(signature, rootSignature);
+    gpuDelegate_->CreateRootSignature(signature, rootSignature);
     return rootSignature;
 }
 
-Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature)
+Microsoft::WRL::ComPtr<ID3D12PipelineState> Direct3DAppDelegate::CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature)
 {
     Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
     Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
 
-    gpuFoundation_->CompileShader(L"Shaders\\CookTorrance.hlsl", vertexShader, "VS", "vs_5_0");
-    gpuFoundation_->CompileShader(L"Shaders\\CookTorrance.hlsl", pixelShader, "PS", "ps_5_0");
+    gpuDelegate_->CompileShader(L"Shaders\\CookTorrance.hlsl", vertexShader, "VS", "vs_5_0");
+    gpuDelegate_->CompileShader(L"Shaders\\CookTorrance.hlsl", pixelShader, "PS", "ps_5_0");
 
     // Define the vertex input layout.
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
@@ -626,24 +635,24 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     psoDesc.SampleMask = UINT_MAX;
     psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     psoDesc.NumRenderTargets = 1;
-    psoDesc.RTVFormats[0] = DXRL::GPUFoundation::backBufferFormat_;
+    psoDesc.RTVFormats[0] = DXRL::GPUDelegate::backBufferFormat_;
     psoDesc.SampleDesc.Count = 1;
     psoDesc.SampleDesc.Quality = 0;
 
     Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
-    gpuFoundation_->CreatePSO(pipelineState, &psoDesc);
+    gpuDelegate_->CreatePSO(pipelineState, &psoDesc);
     return pipelineState;
 }
 
-void DirectAppDelegate::Draw(std::size_t frameIndex)
+void Direct3DAppDelegate::MainUpdate(std::size_t frameIndex)
 {
-    auto& graph = gpuFoundation_->FrameGraph();
+    auto& graph = gpuDelegate_->FrameGraph();
     auto& graphIterator = graph.GraphQueueStart();
     auto& graphEnd = graph.GraphQueueEnd();
     
-    auto& directEngine = gpuFoundation_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>();
+    auto& directEngine = gpuDelegate_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>();
 
-    gpuFoundation_->SetDefaultDescriptorHeaps();
+    gpuDelegate_->SetDefaultDescriptorHeaps();
 
     while (graphIterator != graphEnd) {
         (*graphIterator)->Process(frameIndex);
@@ -651,7 +660,7 @@ void DirectAppDelegate::Draw(std::size_t frameIndex)
     }
 }
 
-void DirectAppDelegate::CustomAction(std::size_t frameIndex)
+void Direct3DAppDelegate::CustomAction(std::size_t frameIndex)
 {
 	float constexpr PIXEL_TO_ANGLE = 0.3f;
 
@@ -725,7 +734,7 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 
 LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    DirectAppDelegate* directAppDelegate = reinterpret_cast<DirectAppDelegate*>(appDelegate_);
+    Direct3DAppDelegate* directAppDelegate = reinterpret_cast<Direct3DAppDelegate*>(appDelegate_);
 
 	mouseXDelta_ = mouseYDelta_ = 0.0f;
 

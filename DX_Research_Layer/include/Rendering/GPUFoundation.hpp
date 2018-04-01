@@ -13,16 +13,16 @@
 namespace DXRL
 {
 
-class GPUFoundation
+class GPUDelegate
 {
 public:
-    GPUFoundation();
-    GPUFoundation(Application& application);
-    GPUFoundation(GPUFoundation const&) = delete;
-    GPUFoundation(GPUFoundation&& rhs);
+    GPUDelegate();
+    GPUDelegate(Application& application);
+    GPUDelegate(GPUDelegate const&) = delete;
+    GPUDelegate(GPUDelegate&& rhs);
 
-    GPUFoundation& operator=(GPUFoundation const&) = delete;
-    GPUFoundation& operator=(GPUFoundation&&);
+    GPUDelegate& operator=(GPUDelegate const&) = delete;
+    GPUDelegate& operator=(GPUDelegate&&);
 
     static constexpr UINT WIDTH = 800;
     static constexpr UINT HEIGHT = 600;

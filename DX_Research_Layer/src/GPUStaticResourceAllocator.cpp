@@ -6,7 +6,7 @@ namespace DXRL
 
 GPUStaticResourceAllocator::GPUStaticResourceAllocator() = default;
 
-GPUStaticResourceAllocator::GPUStaticResourceAllocator(GPUFoundation& foundation) :
+GPUStaticResourceAllocator::GPUStaticResourceAllocator(GPUDelegate& foundation) :
     foundation_{ &foundation }
 { }
 

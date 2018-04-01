@@ -12,6 +12,7 @@ class GPUResource
 public:
 
     DXRL_DEFINE_UNCOPYABLE_MOVABLE_DEFAULT(GPUResource)
+    ~GPUResource() = default;
     
     GPUResource(Microsoft::WRL::ComPtr<ID3D12Resource>&& resourcePtr, D3D12_RESOURCE_STATES state, wchar_t const* name = L"GPUResource");
     

@@ -4,7 +4,7 @@
 namespace DXRL
 {
 	
-void GPURenderItem::CreateTransformBuffer(std::size_t frames, std::size_t bindSlot, GPUFoundation& foundation)
+void GPURenderItem::CreateTransformBuffer(std::size_t frames, std::size_t bindSlot, GPUDelegate& foundation)
 {
 	D3D12_RESOURCE_DESC rd{};
 	rd.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;

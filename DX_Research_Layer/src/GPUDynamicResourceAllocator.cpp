@@ -17,7 +17,7 @@ GPUDynamicResourcePtr& GPUDynamicResourcePtr::operator=(GPUDynamicResourcePtr&& 
 
 GPUDynamicResourceAllocator::GPUDynamicResourceAllocator() = default;
 
-GPUDynamicResourceAllocator::GPUDynamicResourceAllocator(GPUFoundation& foundation, D3D12_HEAP_TYPE type, std::size_t size, std::size_t chunkSize) :
+GPUDynamicResourceAllocator::GPUDynamicResourceAllocator(GPUDelegate& foundation, D3D12_HEAP_TYPE type, std::size_t size, std::size_t chunkSize) :
     defaultHeap_{ nullptr }, heapSize_{ 0 }, heapType_{ (D3D12_HEAP_TYPE)0 }, chunkSize_{ 0 }
 {
     auto const& device = foundation.Device();

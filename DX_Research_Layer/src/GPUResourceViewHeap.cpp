@@ -6,7 +6,7 @@ namespace DXRL
 
 GPUResourceViewHeap::GPUResourceViewHeap() = default;
 
-GPUResourceViewHeap::GPUResourceViewHeap(GPUFoundation& foundation, D3D12_DESCRIPTOR_HEAP_TYPE type, std::size_t capacity) :
+GPUResourceViewHeap::GPUResourceViewHeap(GPUDelegate& foundation, D3D12_DESCRIPTOR_HEAP_TYPE type, std::size_t capacity) :
     type_{ type }, heapCapacity_{ capacity }
 {
     auto& device = foundation.Device();

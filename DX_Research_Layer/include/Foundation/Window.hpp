@@ -62,13 +62,16 @@ public:
 
 	NativeHandle nativeHandle() const;
 
-	std::uint32_t width() const;
-	std::uint32_t height() const;
+	std::uint32_t Width() const;
+	std::uint32_t Height() const;
 
-	LRESULT handleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
     void winProcHandler(WinProcDelegate* winProcDelegate) { winProcDelegate_ = winProcDelegate; }
 
+	static LRESULT CALLBACK HandleEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 private:
+    LRESULT HandleEventsInternal(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 	RECT frame() const;
 
 private:

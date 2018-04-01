@@ -6,7 +6,7 @@ namespace DXRL
 
 GPUResourceViewAllocator::GPUResourceViewAllocator() = default;
 
-GPUResourceViewAllocator::GPUResourceViewAllocator(GPUFoundation& foundation) :
+GPUResourceViewAllocator::GPUResourceViewAllocator(GPUDelegate& foundation) :
     foundation_{ &foundation }
 {
     rtvHeap_ = GPUResourceViewHeap{ *foundation_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, RTV_HEAP_CAPACITY };

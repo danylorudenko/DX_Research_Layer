@@ -6,7 +6,7 @@ namespace DXRL
 
 GPUSwapChain::GPUSwapChain() = default;
 
-GPUSwapChain::GPUSwapChain(GPUFoundation& foundation, HWND windowHandle, DXGI_FORMAT backBufferFormat, std::size_t width, std::size_t height, std::size_t bufferCount)
+GPUSwapChain::GPUSwapChain(GPUDelegate& foundation, HWND windowHandle, DXGI_FORMAT backBufferFormat, std::size_t width, std::size_t height, std::size_t bufferCount)
 {
     DXGI_SWAP_CHAIN_DESC swapChainDesc;
     swapChainDesc.BufferDesc.Format = backBufferFormat;

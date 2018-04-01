@@ -5,7 +5,7 @@
 namespace DXRL
 {
 
-class GPUFoundation;
+class GPUDelegate;
 
 class GPUCapabilities
 {
@@ -17,9 +17,9 @@ public:
     GPUCapabilities& operator=(GPUCapabilities const&) = delete;
     GPUCapabilities& operator=(GPUCapabilities&&) = delete;
 
-    static std::wstring ListAdapters(GPUFoundation& gpuAccess);
+    static std::wstring ListAdapters(GPUDelegate& gpuAccess);
 
-    static Microsoft::WRL::ComPtr<ID3D12Device> GenerateStandardDeviceQuery(GPUFoundation& gpuAccess);
+    static Microsoft::WRL::ComPtr<ID3D12Device> GenerateStandardDeviceQuery(GPUDelegate& gpuAccess);
 };
 
 }

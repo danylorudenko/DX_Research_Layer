@@ -7,13 +7,13 @@
 namespace DXRL
 {
 
-class GPUFoundation;
+class GPUDelegate;
 
 class GPUSwapChain
 {
 public:
     GPUSwapChain();
-    GPUSwapChain(GPUFoundation& foundation, HWND windowHandle, DXGI_FORMAT backBufferFormat, std::size_t width, std::size_t height, std::size_t bufferCount);
+    GPUSwapChain(GPUDelegate& foundation, HWND windowHandle, DXGI_FORMAT backBufferFormat, std::size_t width, std::size_t height, std::size_t bufferCount);
     GPUSwapChain(GPUSwapChain const&) = delete;
     GPUSwapChain(GPUSwapChain&& rhs);
 

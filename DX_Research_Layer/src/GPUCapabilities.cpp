@@ -5,7 +5,7 @@
 namespace DXRL
 {
 
-std::wstring GPUCapabilities::ListAdapters(GPUFoundation& gpuAccess)
+std::wstring GPUCapabilities::ListAdapters(GPUDelegate& gpuAccess)
 {
     std::wstringstream output;
     auto& factory = gpuAccess.DXGIFactory();
@@ -42,7 +42,7 @@ std::wstring GPUCapabilities::ListAdapters(GPUFoundation& gpuAccess)
     return output.str();
 }
 
-Microsoft::WRL::ComPtr<ID3D12Device> GPUCapabilities::GenerateStandardDeviceQuery(GPUFoundation& gpuAccess)
+Microsoft::WRL::ComPtr<ID3D12Device> GPUCapabilities::GenerateStandardDeviceQuery(GPUDelegate& gpuAccess)
 {
     Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter{ nullptr };
     auto& factory = gpuAccess.DXGIFactory();
