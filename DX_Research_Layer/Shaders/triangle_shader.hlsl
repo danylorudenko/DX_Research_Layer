@@ -8,9 +8,10 @@ static const float CLAMP_256 = 1.0f / 256.0f;
 
 cbuffer SceneBuffer : register(b0)
 {
-    float4x4 projectionMatrix;
-    float4x4 viewMatrix;
-    float3 cameraPosition;
+    float4x4 scene_projectionMatrix;
+    float4x4 scene_viewMatrix;
+    float3 scene_cameraPosition;
+	float3 scene_lightDirection;
 };
 
 Texture2D albedoMap				: register(t0);
@@ -39,7 +40,7 @@ PSInput VS(float3 position : POSITION, float3 normal : NORMAL, float3 tangent : 
 
     float4 positionW = mul(float4(position, 1.0f), worldMatrix);
     result.PosW = positionW.xyz;
-    result.PosH = mul(mul(positionW, viewMatrix), projectionMatrix);
+    result.PosH = mul(mul(positionW, scene_viewMatrix), scene_projectionMatrix);
 	result.uv = uv;
 
 	float3 tW = mul(normalize(float4(tangent, 0.0f)), worldMatrix).xyz;
@@ -123,7 +124,7 @@ float4 PS(PSInput input) : SV_TARGET
 	const float3 nA = float3(textureNormal * 2.0f) - 1.0f;
 	const float3 n = normalize(mul(float3(nA), input.tbn));
     const float3 l = normalize(float3(0.0f, 1.0f, 0.0f));
-	const float3 v = normalize(cameraPosition.xyz - input.PosW);
+	const float3 v = normalize(scene_cameraPosition.xyz - input.PosW);
 	const float3 h = normalize(l + v);
 	const float  ndotl = max(dot(n, l), 0.0f);
 	const float  ndoth = max(dot(n, h), 0.0f);

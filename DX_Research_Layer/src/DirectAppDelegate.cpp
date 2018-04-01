@@ -424,28 +424,28 @@ void DirectAppDelegate::start(Application& application)
 		graphicsGraphNode.ImportRenderItem(std::move(renderItem[i]));
 	}
 
-	D3D12_VERTEX_BUFFER_VIEW planeVbView{};
-	planeVbView.BufferLocation = vertexBuffer.Resource().Get()->GetGPUVirtualAddress() + vertexBytes;
-	planeVbView.SizeInBytes = static_cast<UINT>(sizeof(planeVertexData));
-	planeVbView.StrideInBytes = sizeof(Vertex);
-
-	D3D12_INDEX_BUFFER_VIEW planeIbView{};
-	planeIbView.BufferLocation = indexBuffer.Resource().Get()->GetGPUVirtualAddress() + indexBytes;
-	planeIbView.Format = DXGI_FORMAT_R32_UINT;
-	planeIbView.SizeInBytes = static_cast<UINT>(sizeof(planeIndexData));
-
-	DXRL::GPURenderItem planeRenderItem{};
-	planeRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, -2.0f, 0.0f });
-	planeRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
-	planeRenderItem.transform_.Scale(6.0f);
-	planeRenderItem.vertexBuffer_ = vertexBuffer;
-	planeRenderItem.vertexBufferDescriptor_ = planeVbView;
-	planeRenderItem.vertexCount_ = 4;
-	planeRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	planeRenderItem.indexBuffer_ = indexBuffer;
-	planeRenderItem.indexBufferDescriptor_ = planeIbView;
-	planeRenderItem.indexCount_ = 6;
-	planeRenderItem.CreateTransformBuffer(framesCount, 1, *gpuFoundation_);
+	//D3D12_VERTEX_BUFFER_VIEW planeVbView{};
+	//planeVbView.BufferLocation = vertexBuffer.Resource().Get()->GetGPUVirtualAddress() + vertexBytes;
+	//planeVbView.SizeInBytes = static_cast<UINT>(sizeof(planeVertexData));
+	//planeVbView.StrideInBytes = sizeof(Vertex);
+	//
+	//D3D12_INDEX_BUFFER_VIEW planeIbView{};
+	//planeIbView.BufferLocation = indexBuffer.Resource().Get()->GetGPUVirtualAddress() + indexBytes;
+	//planeIbView.Format = DXGI_FORMAT_R32_UINT;
+	//planeIbView.SizeInBytes = static_cast<UINT>(sizeof(planeIndexData));
+	//
+	//DXRL::GPURenderItem planeRenderItem{};
+	//planeRenderItem.transform_.Position(DirectX::XMFLOAT3A{ 0.0f, -2.0f, 0.0f });
+	//planeRenderItem.transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 0.0f, 0.0f, 0.0f });
+	//planeRenderItem.transform_.Scale(6.0f);
+	//planeRenderItem.vertexBuffer_ = vertexBuffer;
+	//planeRenderItem.vertexBufferDescriptor_ = planeVbView;
+	//planeRenderItem.vertexCount_ = 4;
+	//planeRenderItem.primitiveTopology_ = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	//planeRenderItem.indexBuffer_ = indexBuffer;
+	//planeRenderItem.indexBufferDescriptor_ = planeIbView;
+	//planeRenderItem.indexCount_ = 6;
+	//planeRenderItem.CreateTransformBuffer(framesCount, 1, *gpuFoundation_);
 
 	//graphicsGraphNode.ImportRenderItem(std::move(planeRenderItem));
 
@@ -544,12 +544,6 @@ void DirectAppDelegate::DisplayFrameTime(Application& application, float drawTim
 
     windowText_ += L";    FPS: ";
     windowText_ += std::to_wstring(1 / drawTime);
-
-	//windowText_ += L"     Roughness: ";
-	//windowText_ += std::to_wstring(sceneBufferData_.cameraPosition_roghness_.w);
-	//
-	//windowText_ += L"     Metalness: ";
-	//windowText_ += std::to_wstring(sceneBufferData_.metalness);
 
     HWND windowHandle = application.window().nativeHandle();
     SetWindowText(windowHandle, windowText_.c_str());
@@ -708,7 +702,7 @@ void DirectAppDelegate::CustomAction(std::size_t frameIndex)
 	/////////////////////////////////
 
 	const auto& cameraPos = camera_.Transform().Position();
-	sceneBufferData_.cameraPosition = cameraPos;
+	sceneBufferData_.cameraPosition_ = cameraPos;
 	sceneBufferData_.perspectiveMatrix_ = camera_.PerspectiveMatrix();
     sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
 	
@@ -736,12 +730,6 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
         return 0;
 	case WM_LBUTTONDOWN:
 		rotationOn = !rotationOn;
-		if(rotationOn) {
-			//ShowCursor(false);
-		}
-		else {
-			//ShowCursor(true);
-		}
 		return 0;
     case WM_MOUSEMOVE: {
 		int xMouse = static_cast<int>(LOWORD(lParam));
@@ -750,10 +738,6 @@ LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LP
         if (rotationOn) {
 			mouseXDelta_ = static_cast<float>(xMouse - prevMouseX_);
 			mouseYDelta_ = static_cast<float>(yMouse - prevMouseY_);
-
-			//RECT winRect;
-			//GetWindowRect(hwnd, &winRect);
-			//ClipCursor(&winRect);
         }
 
 		prevMouseX_ = xMouse;
