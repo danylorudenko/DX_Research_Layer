@@ -1,4 +1,4 @@
-#include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceViewAllocator.hpp>
 #include <Rendering\GPUFoundation.hpp>
 
 namespace DXRL

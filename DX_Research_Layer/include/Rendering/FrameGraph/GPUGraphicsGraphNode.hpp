@@ -2,11 +2,11 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUGraphNode.hpp>
 #include <Rendering\Data\GPURenderItem.hpp>
-#include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
-#include <Rendering\Data\Resource\GPUResourceHandle.hpp>
-#include <Rendering\Data\GPUDepthStencilSettings.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceView.hpp>
+#include <Rendering\Resource\GPUResourceHandle.hpp>
+#include <Rendering\PipelineState\GPUDepthStencilSettings.hpp>
 
 namespace DXRL
 {

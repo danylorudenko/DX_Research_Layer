@@ -1,4 +1,4 @@
-#include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
+#include <Rendering\Resource\GPUStaticResourceAllocator.hpp>
 #include <Rendering\GPUFoundation.hpp>
 
 namespace DXRL
@@ -27,7 +27,7 @@ GPUResourceHandle GPUStaticResourceAllocator::AllocDefault(D3D12_RESOURCE_DESC c
             initialState,
             nullptr,
             IID_PPV_ARGS(tempResourcePtr.GetAddressOf()));
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
     }
 
     committedResources_.push_back(std::make_unique<GPUResource>(std::move(tempResourcePtr), initialState));
@@ -47,7 +47,7 @@ GPUResourceHandle GPUStaticResourceAllocator::AllocUpload(D3D12_RESOURCE_DESC co
             initialState,
             nullptr,
             IID_PPV_ARGS(tempResourcePtr.GetAddressOf()));
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
     }
 
     committedResources_.push_back(std::make_unique<GPUResource>(std::move(tempResourcePtr), initialState));

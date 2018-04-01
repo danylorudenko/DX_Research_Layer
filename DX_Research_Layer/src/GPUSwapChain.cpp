@@ -1,4 +1,4 @@
-#include <Rendering\GPUSwapChain.hpp>
+#include <Rendering\GPUEngine\GPUSwapChain.hpp>
 #include <Rendering\GPUFoundation.hpp>
 
 namespace DXRL
@@ -32,7 +32,7 @@ GPUSwapChain::GPUSwapChain(GPUFoundation& foundation, HWND windowHandle, DXGI_FO
         auto queuePtr = foundation.Engine<GPU_ENGINE_TYPE_DIRECT>().CommandQueue();
 
         auto const result = factory->CreateSwapChain(queuePtr, &swapChainDesc, swapChainHandle_.GetAddressOf());
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
     }
 
     bufferCount_ = bufferCount;
@@ -42,7 +42,7 @@ GPUSwapChain::GPUSwapChain(GPUFoundation& foundation, HWND windowHandle, DXGI_FO
     for (size_t i = 0; i < bufferCount_; i++) {
         Microsoft::WRL::ComPtr<ID3D12Resource> temp{ nullptr };
         auto const result = swapChainHandle_->GetBuffer(static_cast<UINT>(i), IID_PPV_ARGS(temp.GetAddressOf()));
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
         renderBuffers_.push_back(GPUResource{ std::move(temp), D3D12_RESOURCE_STATE_COMMON });
     }
 }

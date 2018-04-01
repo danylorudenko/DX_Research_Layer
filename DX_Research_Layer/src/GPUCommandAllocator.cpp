@@ -1,4 +1,4 @@
-#include <Rendering\GPUCommandAllocator.hpp>
+#include <Rendering\GPUEngine\GPUCommandAllocator.hpp>
 
 namespace DXRL
 {
@@ -9,7 +9,7 @@ GPUCommandAllocator::GPUCommandAllocator(ID3D12Device* device, D3D12_COMMAND_LIS
 {
     {
         auto const result = device->CreateCommandAllocator(type, IID_PPV_ARGS(&commandAllocator_));
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
     }
 }
 

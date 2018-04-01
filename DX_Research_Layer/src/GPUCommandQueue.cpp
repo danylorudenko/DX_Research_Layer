@@ -1,5 +1,5 @@
-#include <Rendering\GPUCommandQueue.hpp>
-#include <Rendering\GPUCommandList.hpp>
+#include <Rendering\GPUEngine\GPUCommandQueue.hpp>
+#include <Rendering\GPUEngine\GPUCommandList.hpp>
 
 namespace DXRL
 {
@@ -14,7 +14,7 @@ GPUCommandQueue::GPUCommandQueue(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE t
     queueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 
-    ThrowIfFailed(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue_)));
+    DXRL_THROW_IF_FAILED(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue_)));
 }
 
 GPUCommandQueue::GPUCommandQueue(GPUCommandQueue&& rhs)

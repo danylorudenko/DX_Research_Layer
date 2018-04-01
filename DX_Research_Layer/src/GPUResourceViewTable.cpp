@@ -1,5 +1,5 @@
-#include <Rendering\Data\Resource\ResourceView\GPUResourceViewTable.hpp>
-#include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceViewTable.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceView.hpp>
 
 namespace DXRL
 {

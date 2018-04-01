@@ -1,4 +1,4 @@
-#include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceView.hpp>
 
 namespace DXRL
 {

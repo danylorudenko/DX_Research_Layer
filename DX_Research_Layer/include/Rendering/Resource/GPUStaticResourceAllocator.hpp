@@ -2,8 +2,8 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\Resource\GPUResourceHandle.hpp>
-#include <Rendering\Data\Resource\GPUResource.hpp>
+#include <Rendering\Resource\GPUResourceHandle.hpp>
+#include <Rendering\Resource\GPUResource.hpp>
 
 namespace DXRL
 {

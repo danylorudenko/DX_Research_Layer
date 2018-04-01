@@ -1,21 +1,13 @@
-#include <Rendering\Data\Resource\GPUResource.hpp>
+#include <Rendering\Resource\GPUResource.hpp>
 
 namespace DXRL
 {
 
-GPUResource::GPUResource() = default;
-
 GPUResource::GPUResource(Microsoft::WRL::ComPtr<ID3D12Resource>&& resourcePtr, D3D12_RESOURCE_STATES initialState, wchar_t const* name) :
     resourcePtr_(resourcePtr), state_(initialState)
 {
-    AssignID3D12ResourceDebugName(name);
+    resourcePtr_->SetName(name);
 }
-
-GPUResource::GPUResource(GPUResource&& rhs) = default;
-
-GPUResource& GPUResource::operator=(GPUResource&& rhs) = default;
-
-GPUResource::~GPUResource() = default;
 
 D3D12_RESOURCE_STATES GPUResource::State() const
 {

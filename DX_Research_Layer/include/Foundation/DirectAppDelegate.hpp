@@ -6,8 +6,8 @@
 #include <Foundation\PerformanceTimer.hpp>
 #include <Rendering\GPUFoundation.hpp>
 #include <Rendering\Data\SceneConstantBuffer.hpp>
-#include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
-#include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUGraphicsGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Math\Camera.hpp>
 
 class DirectWinProcDelegate : public WinProcDelegate

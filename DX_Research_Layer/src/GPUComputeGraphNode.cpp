@@ -1,4 +1,4 @@
-#include <Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUComputeGraphNode.hpp>
 
 namespace DXRL
 {

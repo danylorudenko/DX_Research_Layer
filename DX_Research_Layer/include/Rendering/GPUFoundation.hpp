@@ -3,12 +3,12 @@
 #include <pch.hpp>
 
 #include <Foundation\Application.hpp>
-#include <Rendering\GPUEngine.hpp>
-#include <Rendering\GPUSwapChain.hpp>
-#include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
-#include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
-#include <Rendering\Data\Resource\GPUResourceViewContextTable.hpp>
-#include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
+#include <Rendering\GPUEngine\GPUEngine.hpp>
+#include <Rendering\GPUEngine\GPUSwapChain.hpp>
+#include <Rendering\Resource\GPUStaticResourceAllocator.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceViewAllocator.hpp>
+#include <Rendering\Resource\GPUResourceViewContextTable.hpp>
+#include <Rendering\FrameGraph\GPUFrameGraph.hpp>
 
 namespace DXRL
 {

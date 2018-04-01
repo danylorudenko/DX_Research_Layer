@@ -4,8 +4,8 @@
 #include <3rdParty\stb_image.h>
 
 #include <Foundation\DirectAppDelegate.hpp>
-#include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
-#include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUGraphicsGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Rendering\Data\GPURenderItem.hpp>
 
 struct VertHeader
@@ -584,7 +584,7 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> DirectAppDelegate::CreateRootSignatu
 		//
 		//}
 		
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
     }
     
     Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;

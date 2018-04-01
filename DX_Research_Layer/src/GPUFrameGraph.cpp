@@ -1,4 +1,4 @@
-#include <Rendering\Data\FrameGraph\GPUFrameGraph.hpp>
+#include <Rendering\FrameGraph\GPUFrameGraph.hpp>
 
 namespace DXRL
 {

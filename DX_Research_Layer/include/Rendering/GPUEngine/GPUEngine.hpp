@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include <Rendering\GPUCommandList.hpp>
-#include <Rendering\GPUCommandQueue.hpp>
+#include <Rendering\GPUEngine\GPUCommandList.hpp>
+#include <Rendering\GPUEngine\GPUCommandQueue.hpp>
 
 namespace DXRL
 {

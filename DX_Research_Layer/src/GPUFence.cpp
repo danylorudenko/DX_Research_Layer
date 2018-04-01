@@ -1,5 +1,5 @@
-#include <Rendering\GPUFence.hpp>
-#include <Rendering\GPUCommandAllocator.hpp>
+#include <Rendering\GPUEngine\GPUFence.hpp>
+#include <Rendering\GPUEngine\GPUCommandAllocator.hpp>
 
 namespace DXRL
 {
@@ -8,7 +8,7 @@ GPUFence::GPUFence() = default;
 
 GPUFence::GPUFence(ID3D12Device* device)
 {
-    ThrowIfFailed(device->CreateFence(0U, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_)));
+    DXRL_THROW_IF_FAILED(device->CreateFence(0U, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_)));
     event_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 }
 

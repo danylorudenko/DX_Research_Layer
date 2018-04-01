@@ -1,4 +1,4 @@
-#include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUGraphicsGraphNode.hpp>
 
 namespace DXRL
 {

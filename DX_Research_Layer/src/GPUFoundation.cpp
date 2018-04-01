@@ -1,5 +1,5 @@
 #include <Rendering\GPUFoundation.hpp>
-#include <Foundation\GPUCapabilities.hpp>
+#include <Rendering\Misc\GPUCapabilities.hpp>
 
 namespace DXRL
 {
@@ -37,13 +37,13 @@ void GPUFoundation::InitializeD3D12()
 #if defined(DEBUG) || defined(_DEBUG)
     {
         auto const result = D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_));
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
         debugController_->EnableDebugLayer();
 
         {
             Microsoft::WRL::ComPtr<ID3D12Debug1> debugController1{ nullptr };
             auto const result = debugController_->QueryInterface(IID_PPV_ARGS(debugController1.GetAddressOf()));
-            ThrowIfFailed(result);
+            DXRL_THROW_IF_FAILED(result);
         }
     }
 #endif
@@ -74,7 +74,7 @@ void GPUFoundation::ResetAll()
 void GPUFoundation::CreateRootSignature(Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSignature, Microsoft::WRL::ComPtr<ID3D12RootSignature>& dest)
 {
     auto const result = device_->CreateRootSignature(0, serializedRootSignature->GetBufferPointer(), serializedRootSignature->GetBufferSize(), IID_PPV_ARGS(&dest));
-    ThrowIfFailed(result);
+    DXRL_THROW_IF_FAILED(result);
 }
 
 void GPUFoundation::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DBlob>& dest, LPCSTR entryPoint, LPCSTR type)
@@ -86,14 +86,14 @@ void GPUFoundation::CompileShader(LPCWSTR fileName, Microsoft::WRL::ComPtr<ID3DB
 #endif
     {
         auto const result = D3DCompileFromFile(fileName, nullptr, nullptr, entryPoint, type, compileFlags, 0, &dest, nullptr);
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
     }
 }
 
 void GPUFoundation::CreatePSO(Microsoft::WRL::ComPtr<ID3D12PipelineState>& dest, D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc)
 {
     auto const result = device_->CreateGraphicsPipelineState(desc, IID_PPV_ARGS(&dest));
-    ThrowIfFailed(result);
+    DXRL_THROW_IF_FAILED(result);
 }
 
 GPUResourceHandle GPUFoundation::AllocDefaultResource(D3D12_RESOURCE_DESC const& desc, D3D12_RESOURCE_STATES initialState)

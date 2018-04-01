@@ -1,4 +1,4 @@
-#include <Rendering\Data\GPUPipelineState.hpp>
+#include <Rendering\PipelineState\GPUPipelineState.hpp>
 
 namespace DXRL
 {

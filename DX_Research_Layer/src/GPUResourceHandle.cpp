@@ -1,7 +1,7 @@
-#include <Rendering\Data\Resource\GPUResourceHandle.hpp>
-#include <Rendering\Data\Resource\GPUStaticResourceAllocator.hpp>
-#include <Rendering\Data\Resource\GPUResourceViewContextTable.hpp>
-#include <Rendering\Data\Resource\ResourceView\GPUResourceViewAllocator.hpp>
+#include <Rendering\Resource\GPUResourceHandle.hpp>
+#include <Rendering\Resource\GPUStaticResourceAllocator.hpp>
+#include <Rendering\Resource\GPUResourceViewContextTable.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceViewAllocator.hpp>
 
 namespace DXRL
 {

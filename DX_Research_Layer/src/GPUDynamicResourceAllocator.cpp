@@ -1,4 +1,4 @@
-#include <Rendering\Data\Resource\GPUDynamicResourceAllocator.hpp>
+#include <Rendering\Resource\GPUDynamicResourceAllocator.hpp>
 
 namespace DXRL
 {
@@ -38,7 +38,7 @@ GPUDynamicResourceAllocator::GPUDynamicResourceAllocator(GPUFoundation& foundati
         // Attampt to create GPU heap.
 
         auto const result = device->CreateHeap(&heapDesc, IID_PPV_ARGS(defaultHeap_.GetAddressOf()));
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
         heapSize_ = size;
         heapType_ = type;
         chunkSize_ = chunkSize;

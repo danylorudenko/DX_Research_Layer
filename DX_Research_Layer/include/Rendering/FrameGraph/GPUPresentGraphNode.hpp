@@ -2,8 +2,8 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\FrameGraph\GPUGraphNode.hpp>
-#include <Rendering\GPUSwapChain.hpp>
+#include <Rendering\FrameGraph\GPUGraphNode.hpp>
+#include <Rendering\GPUEngine\GPUSwapChain.hpp>
 
 namespace DXRL
 {

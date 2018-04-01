@@ -2,9 +2,9 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\FrameGraph\GPUGraphicsGraphNode.hpp>
-#include <Rendering\Data\FrameGraph\GPUComputeGraphNode.hpp>
-#include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUGraphicsGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUComputeGraphNode.hpp>
+#include <Rendering\FrameGraph\GPUPresentGraphNode.hpp>
 
 namespace DXRL
 {

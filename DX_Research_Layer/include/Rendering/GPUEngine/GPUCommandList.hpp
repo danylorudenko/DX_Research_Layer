@@ -2,8 +2,8 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUCommandAllocator.hpp>
-#include <Rendering\GPUCommandQueue.hpp>
+#include <Rendering\GPUEngine\GPUCommandAllocator.hpp>
+#include <Rendering\GPUEngine\GPUCommandQueue.hpp>
 
 namespace DXRL
 {

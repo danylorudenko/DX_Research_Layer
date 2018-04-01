@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUFence.hpp>
+#include <Rendering\GPUEngine\GPUFence.hpp>
 
 namespace DXRL
 {

@@ -2,7 +2,7 @@
 
 #include <pch.hpp>
 
-#include <Rendering\Data\Resource\ResourceView\GPUResourceViewTable.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceViewTable.hpp>
 
 namespace DXRL
 {

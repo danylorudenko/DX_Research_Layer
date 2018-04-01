@@ -2,9 +2,9 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUEngine.hpp>
-#include <Rendering\Data\GPURootSignature.hpp>
-#include <Rendering\Data\GPUPipelineState.hpp>
+#include <Rendering\GPUEngine\GPUEngine.hpp>
+#include <Rendering\RootSignature\GPURootSignature.hpp>
+#include <Rendering\PipelineState\GPUPipelineState.hpp>
 
 namespace DXRL
 {

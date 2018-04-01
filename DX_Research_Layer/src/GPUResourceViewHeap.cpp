@@ -1,4 +1,4 @@
-#include <Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceViewHeap.hpp>
 #include <Rendering\GPUFoundation.hpp>
 
 namespace DXRL
@@ -23,7 +23,7 @@ GPUResourceViewHeap::GPUResourceViewHeap(GPUFoundation& foundation, D3D12_DESCRI
             &heapDesc,
             IID_PPV_ARGS(heapHandle_.GetAddressOf())
         );
-        ThrowIfFailed(result);
+        DXRL_THROW_IF_FAILED(result);
     }
 }
 

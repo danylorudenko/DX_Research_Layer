@@ -1,6 +1,6 @@
-#include <Rendering\Data\GPURootSignature.hpp>
-#include <Rendering\GPUEngine.hpp>
-#include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
+#include <Rendering\RootSignature\GPURootSignature.hpp>
+#include <Rendering\GPUEngine\GPUEngine.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceView.hpp>
 
 namespace DXRL
 {

@@ -3,7 +3,7 @@
 #include <pch.hpp>
 
 #include <Rendering\GPUFoundation.hpp>
-#include <Rendering\Data\Resource\GPUResource.hpp>
+#include <Rendering\Resource\GPUResource.hpp>
 
 namespace DXRL
 {

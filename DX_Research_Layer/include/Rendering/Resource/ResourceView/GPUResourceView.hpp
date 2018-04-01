@@ -2,11 +2,11 @@
 
 #include <pch.hpp>
 
-#include <Rendering\GPUEngine.hpp>
+#include <Rendering\GPUEngine\GPUEngine.hpp>
 
-#include <Rendering\Data\Resource\GPUResource.hpp>
-#include <Rendering\Data\Resource\GPUResourceHandle.hpp>
-#include <Rendering\Data\Resource\ResourceView\GPUResourceViewHeap.hpp>
+#include <Rendering\Resource\GPUResource.hpp>
+#include <Rendering\Resource\GPUResourceHandle.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceViewHeap.hpp>
 
 namespace DXRL
 {

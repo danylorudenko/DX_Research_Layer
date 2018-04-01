@@ -1,5 +1,5 @@
-#include <Rendering\Data\FrameGraph\GPUPresentGraphNode.hpp>
-#include <Rendering\Data\Resource\ResourceView\GPUResourceView.hpp>
+#include <Rendering\FrameGraph\GPUPresentGraphNode.hpp>
+#include <Rendering\Resource\ResourceView\GPUResourceView.hpp>
 
 namespace DXRL
 {

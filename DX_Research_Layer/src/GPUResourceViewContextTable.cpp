@@ -1,4 +1,4 @@
-#include <Rendering\Data\Resource\GPUResourceViewContextTable.hpp>
+#include <Rendering\Resource\GPUResourceViewContextTable.hpp>
 
 namespace DXRL
 {
