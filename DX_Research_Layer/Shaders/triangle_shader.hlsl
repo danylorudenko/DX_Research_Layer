@@ -116,14 +116,13 @@ float4 PS(PSInput input) : SV_TARGET
 {
 	const float3 ambient = float3(0.01f, 0.01f, 0.015f);
 
-	const float3 textureAlbedo = pow(albedoMap.Sample(samplr, input.uv).xyz/* + float3(0.5f, 0.0f, 0.0f)*/, TO_LINEAR);
+	const float3 textureAlbedo = pow(albedoMap.Sample(samplr, input.uv).xyz/* + (float3(255.0f, 247.0f, 167.0f) / 255.0f)*/, TO_LINEAR);
 	const float  textureMetalness = metalnessMap.Sample(samplr, input.uv).r;
 	const float  textureRoughness = roughnessMap.Sample(samplr, input.uv).r;
 	const float3 textureNormal	= normalMap.Sample(samplr, input.uv).xyz;
 
 	const float3 nA = float3(textureNormal * 2.0f) - 1.0f;
 	const float3 n = normalize(mul(float3(nA), input.tbn));
-    //const float3 l = normalize(float3(0.0f, 1.0f, 0.0f));
 	const float3 l = normalize(scene_lightDirection);
 	const float3 v = normalize(scene_cameraPosition.xyz - input.PosW);
 	const float3 h = normalize(l + v);
