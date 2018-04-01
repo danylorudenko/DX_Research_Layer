@@ -597,8 +597,8 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> DirectAppDelegate::CreatePipelineSta
     Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
     Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
 
-    gpuFoundation_->CompileShader(L"Shaders\\triangle_shader.hlsl", vertexShader, "VS", "vs_5_0");
-    gpuFoundation_->CompileShader(L"Shaders\\triangle_shader.hlsl", pixelShader, "PS", "ps_5_0");
+    gpuFoundation_->CompileShader(L"Shaders\\CookTorrance.hlsl", vertexShader, "VS", "vs_5_0");
+    gpuFoundation_->CompileShader(L"Shaders\\CookTorrance.hlsl", pixelShader, "PS", "ps_5_0");
 
     // Define the vertex input layout.
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
