@@ -1,4 +1,5 @@
 #include <Foundation\Application.hpp>
+#include <Memory/Memory.hpp>
 
 Application::Application(HINSTANCE instance) : window_{ instance, L"DirectX Sample", 800, 600 }, delegate_{}, process_{ instance } {}
 
@@ -27,7 +28,7 @@ int Application::run()
 {
 	assert(delegate_);
 
-	delegate_->start(*this);
+	delegate_->start();
 
 	MSG message{};
 	message.message = window_ ? WM_NULL : WM_QUIT;
@@ -37,11 +38,11 @@ int Application::run()
 			TranslateMessage(&message);
             DispatchMessage(&message);
 		} else {
-			delegate_->update(*this);
+			delegate_->update();
 		}
 	}
 
-	delegate_->shutdown(*this);
+	delegate_->shutdown();
 
 	return 0;
 }

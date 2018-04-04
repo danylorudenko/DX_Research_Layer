@@ -170,7 +170,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\DirectAppDelegate.cpp" />
+    <ClCompile Include="src\Direct3DAppDelegate.cpp" />
     <ClCompile Include="src\GPUCapabilities.cpp" />
     <ClCompile Include="src\GPUComputeGraphNode.cpp" />
     <ClCompile Include="src\GPUDynamicResourceAllocator.cpp" />
@@ -196,6 +196,7 @@
     <ClCompile Include="src\GPURootSignature.cpp" />
     <ClCompile Include="src\GPUSwapChain.cpp" />
     <ClCompile Include="src\GPUEngine.cpp" />
+    <ClCompile Include="src\Memory.cpp" />
     <ClCompile Include="src\PerformanceTimer.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Transform.cpp" />
@@ -205,6 +206,8 @@
   <ItemGroup>
     <ClInclude Include="include\3rdParty\stb_image.h" />
     <ClInclude Include="include\3rdParty\d3dx12.h" />
+    <ClInclude Include="include\Memory\Memory.hpp" />
+    <ClInclude Include="include\Rendering\Data\Vertex.hpp" />
     <ClInclude Include="include\Rendering\FrameGraph\GPUComputeGraphNode.hpp" />
     <ClInclude Include="include\Rendering\FrameGraph\GPUGraphicsGraphNode.hpp" />
     <ClInclude Include="include\Rendering\FrameGraph\GPUPresentGraphNode.hpp" />
@@ -235,7 +238,7 @@
     <ClInclude Include="include\Rendering\FrameGraph\GPUGraphNode.hpp" />
     <ClInclude Include="include\Rendering\Resource\GPUResource.hpp" />
     <ClInclude Include="include\Foundation\Application.hpp" />
-    <ClInclude Include="include\Foundation\DirectAppDelegate.hpp" />
+    <ClInclude Include="include\Foundation\Direct3DAppDelegate.hpp" />
     <ClInclude Include="include\Foundation\PerformanceTimer.hpp" />
     <ClInclude Include="include\Rendering\Data\SceneConstantBuffer.hpp" />
     <ClInclude Include="include\Foundation\Window.hpp" />

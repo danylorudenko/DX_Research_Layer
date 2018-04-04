@@ -3,10 +3,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <3rdParty\stb_image.h>
 
-#include <Foundation\DirectAppDelegate.hpp>
+#include <Foundation\Direct3DAppDelegate.hpp>
 #include <Rendering\FrameGraph\GPUGraphicsGraphNode.hpp>
 #include <Rendering\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Rendering\Data\GPURenderItem.hpp>
+#include <Rendering\Data\Vertex.hpp>
 
 struct VertHeader
 {
@@ -16,58 +17,25 @@ struct VertHeader
     std::uint32_t indexSize_ = 0;
 };
 
-struct Pos
-{
-	float x, y, z;
-};
-
-struct Normal
-{
-	float x, y, z;
-};
-
-struct Tangent
-{
-	float x, y, z;
-};
-
-struct Bitangent
-{
-	float x, y, z;
-};
-
-struct UV
-{
-	float u, v;
-};
-
-struct Vertex
-{
-	Pos position_;
-	Normal normal_;
-	Tangent tangent_;
-	Bitangent bitangent_;
-	UV uv_;
-};
-
-Direct3DAppDelegate::Direct3DAppDelegate()
-    : mainWindow{ nullptr }
+Direct3DAppDelegate::Direct3DAppDelegate(Application& application)
+    : Application::Delegate{ application }
+    , mainWindow{ nullptr }
     , winProcDelegate_{}
     , gpuDelegate_{ nullptr }
     , gameTimer_{}
     , mainUpdateIterator_{ 0 }
-    , windowText_{ 0 }
+    , windowText_{}
 { }
 
-void Direct3DAppDelegate::start(Application& application)
+void Direct3DAppDelegate::start()
 {
     winProcDelegate_ = DirectWinProcDelegate{ this };
-    application.window().winProcHandler(&winProcDelegate_);
+    MainApplication().window().winProcHandler(&winProcDelegate_);
     
     auto constexpr framesCount = DXRL::GPUDelegate::SWAP_CHAIN_BUFFER_COUNT;
+    /*
 
-
-    gpuDelegate_ = std::make_unique<DXRL::GPUDelegate>(application);
+    gpuDelegate_ = std::make_unique<DXRL::GPUDelegate>(MainApplication());
     gameTimer_.Reset();
 
     auto& initializationEngine = gpuDelegate_->Engine<DXRL::GPU_ENGINE_TYPE_DIRECT>();
@@ -419,7 +387,7 @@ void Direct3DAppDelegate::start(Application& application)
 	DXRL::GPURenderItem renderItem[renderItemsCount];
 	for (std::size_t i = 0; i < renderItemsCount; i++) {
 		renderItem[i].transform_.Position(DirectX::XMFLOAT3A{ static_cast<float>(i * 1.7f) - 1.7f , 0.0f, 0.0f });
-		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ /*90.0f, (i * -45.0f) + 45.0f*/0.0f, 0.0f, 0.0f });
+		renderItem[i].transform_.RotationRollPitchYaw(DirectX::XMFLOAT3A{ 90.0f, (i * -45.0f) + 45.0f0.0f, 0.0f, 0.0f });
 		renderItem[i].transform_.Scale(0.8f);
 		renderItem[i].vertexBuffer_ = vertexBuffer;
 		renderItem[i].vertexBufferDescriptor_ = vbView;
@@ -521,11 +489,13 @@ void Direct3DAppDelegate::start(Application& application)
     camera_.FarPlane(1000.0f);
     camera_.Fow(60.0f);
     camera_.AspectRatio(static_cast<float>(DXRL::GPUDelegate::WIDTH) / static_cast<float>(DXRL::GPUDelegate::HEIGHT));
+
+    */
 }
 
-void Direct3DAppDelegate::update(Application& application)
+void Direct3DAppDelegate::update()
 {
-    std::size_t const normalizedFrameIndex = mainUpdateIterator_ % DXRL::GPUDelegate::SWAP_CHAIN_BUFFER_COUNT;
+    /*std::size_t const normalizedFrameIndex = mainUpdateIterator_ % DXRL::GPUDelegate::SWAP_CHAIN_BUFFER_COUNT;
     CustomAction(normalizedFrameIndex);
     MainUpdate(normalizedFrameIndex);
 
@@ -533,9 +503,10 @@ void Direct3DAppDelegate::update(Application& application)
     DisplayFrameTime(application, Timer().DeltaTime());
 
     ++mainUpdateIterator_;
+    */
 }
 
-void Direct3DAppDelegate::shutdown(Application& application)
+void Direct3DAppDelegate::shutdown()
 {
 
 }
@@ -558,91 +529,91 @@ void Direct3DAppDelegate::DisplayFrameTime(Application& application, float drawT
     SetWindowText(windowHandle, windowText_.c_str());
 }
 
-Microsoft::WRL::ComPtr<ID3D12RootSignature> Direct3DAppDelegate::CreateRootSignature()
-{
-    CD3DX12_ROOT_PARAMETER rootParameters[3];
-    CD3DX12_DESCRIPTOR_RANGE ranges[3];
+//Microsoft::WRL::ComPtr<ID3D12RootSignature> Direct3DAppDelegate::CreateRootSignature()
+//{
+//    CD3DX12_ROOT_PARAMETER rootParameters[3];
+//    CD3DX12_DESCRIPTOR_RANGE ranges[3];
+//
+//    ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+//    rootParameters[0].InitAsDescriptorTable(1, ranges);
+//
+//	ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0);
+//	rootParameters[1].InitAsDescriptorTable(1, ranges + 1);
+//
+//    ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+//    rootParameters[2].InitAsDescriptorTable(1, ranges + 2);
+//
+//    D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+//
+//	CD3DX12_STATIC_SAMPLER_DESC samplerDesc;
+//	samplerDesc.Init(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
+//
+//
+//    CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+//    rootSignatureDesc.Init(3, rootParameters, 1, &samplerDesc, rootSignatureFlags);
+//
+//    Microsoft::WRL::ComPtr<ID3DBlob> signature;
+//    Microsoft::WRL::ComPtr<ID3DBlob> errors;
+//
+//    {
+//        auto const result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors);
+//
+//		//if (errors->GetBufferSize() > 0) {
+//		//	char* error = new char[errors->GetBufferSize()];
+//		//	std::memcpy(error, errors->GetBufferPointer(), errors->GetBufferSize());
+//		//
+//		//}
+//		
+//        DXRL_THROW_IF_FAILED(result);
+//    }
+//    
+//    Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+//    gpuDelegate_->CreateRootSignature(signature, rootSignature);
+//    return rootSignature;
+//}
 
-    ranges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-    rootParameters[0].InitAsDescriptorTable(1, ranges);
-
-	ranges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 0);
-	rootParameters[1].InitAsDescriptorTable(1, ranges + 1);
-
-    ranges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-    rootParameters[2].InitAsDescriptorTable(1, ranges + 2);
-
-    D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-	CD3DX12_STATIC_SAMPLER_DESC samplerDesc;
-	samplerDesc.Init(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
-
-
-    CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-    rootSignatureDesc.Init(3, rootParameters, 1, &samplerDesc, rootSignatureFlags);
-
-    Microsoft::WRL::ComPtr<ID3DBlob> signature;
-    Microsoft::WRL::ComPtr<ID3DBlob> errors;
-
-    {
-        auto const result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signature, &errors);
-
-		//if (errors->GetBufferSize() > 0) {
-		//	char* error = new char[errors->GetBufferSize()];
-		//	std::memcpy(error, errors->GetBufferPointer(), errors->GetBufferSize());
-		//
-		//}
-		
-        DXRL_THROW_IF_FAILED(result);
-    }
-    
-    Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-    gpuDelegate_->CreateRootSignature(signature, rootSignature);
-    return rootSignature;
-}
-
-Microsoft::WRL::ComPtr<ID3D12PipelineState> Direct3DAppDelegate::CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature)
-{
-    Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
-    Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
-
-    gpuDelegate_->CompileShader(L"Shaders\\CookTorrance.hlsl", vertexShader, "VS", "vs_5_0");
-    gpuDelegate_->CompileShader(L"Shaders\\CookTorrance.hlsl", pixelShader, "PS", "ps_5_0");
-
-    // Define the vertex input layout.
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 48, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-    };
-
-    // Setup pipeline state, which inludes setting shaders.
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-    psoDesc.InputLayout = { inputElementDescs, 5 };
-    psoDesc.pRootSignature = rootSignature.Get();
-    psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
-    psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
-    psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    psoDesc.DepthStencilState.DepthEnable = TRUE;
-    psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-    psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-    psoDesc.DepthStencilState.StencilEnable = FALSE;
-    psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    psoDesc.SampleMask = UINT_MAX;
-    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    psoDesc.NumRenderTargets = 1;
-    psoDesc.RTVFormats[0] = DXRL::GPUDelegate::backBufferFormat_;
-    psoDesc.SampleDesc.Count = 1;
-    psoDesc.SampleDesc.Quality = 0;
-
-    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
-    gpuDelegate_->CreatePSO(pipelineState, &psoDesc);
-    return pipelineState;
-}
+//Microsoft::WRL::ComPtr<ID3D12PipelineState> Direct3DAppDelegate::CreatePipelineState(Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature)
+//{
+//    Microsoft::WRL::ComPtr<ID3DBlob> vertexShader;
+//    Microsoft::WRL::ComPtr<ID3DBlob> pixelShader;
+//
+//    gpuDelegate_->CompileShader(L"Shaders\\CookTorrance.hlsl", vertexShader, "VS", "vs_5_0");
+//    gpuDelegate_->CompileShader(L"Shaders\\CookTorrance.hlsl", pixelShader, "PS", "ps_5_0");
+//
+//    // Define the vertex input layout.
+//    D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+//    {
+//        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+//        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+//		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+//		{ "BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+//		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 48, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+//    };
+//
+//    // Setup pipeline state, which inludes setting shaders.
+//    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+//    psoDesc.InputLayout = { inputElementDescs, 5 };
+//    psoDesc.pRootSignature = rootSignature.Get();
+//    psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
+//    psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
+//    psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+//    psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+//    psoDesc.DepthStencilState.DepthEnable = TRUE;
+//    psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+//    psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+//    psoDesc.DepthStencilState.StencilEnable = FALSE;
+//    psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+//    psoDesc.SampleMask = UINT_MAX;
+//    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+//    psoDesc.NumRenderTargets = 1;
+//    psoDesc.RTVFormats[0] = DXRL::GPUDelegate::backBufferFormat_;
+//    psoDesc.SampleDesc.Count = 1;
+//    psoDesc.SampleDesc.Quality = 0;
+//
+//    Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
+//    gpuDelegate_->CreatePSO(pipelineState, &psoDesc);
+//    return pipelineState;
+//}
 
 void Direct3DAppDelegate::MainUpdate(std::size_t frameIndex)
 {
@@ -660,77 +631,77 @@ void Direct3DAppDelegate::MainUpdate(std::size_t frameIndex)
     }
 }
 
-void Direct3DAppDelegate::CustomAction(std::size_t frameIndex)
-{
-	float constexpr PIXEL_TO_ANGLE = 0.3f;
-
-	cameraTargetPitch_ += winProcDelegate_.mouseYDelta_ * PIXEL_TO_ANGLE * DEGREE_TO_RAD;
-	cameraTargetYaw_ += winProcDelegate_.mouseXDelta_ * PIXEL_TO_ANGLE * DEGREE_TO_RAD;
-
-	camera_.Transform().Rotation(DirectX::XMQuaternionRotationRollPitchYaw(cameraTargetPitch_, cameraTargetYaw_, 0.0f));
-	
-	/////////////////////////////////
-
-	float constexpr SPEED_PER_FRAME = 0.02f;
-
-	auto pos = camera_.Transform().PositionSIMD();
-	auto forward = camera_.Transform().ForwardSIMD();
-	auto right = camera_.Transform().RightSIMD();
-
-	if (winProcDelegate_.WPressed()) {
-		pos = DirectX::XMVectorAdd(pos, DirectX::XMVectorMultiply(forward, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
-	}
-	if (winProcDelegate_.SPressed()) {
-		pos = DirectX::XMVectorSubtract(pos, DirectX::XMVectorMultiply(forward, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
-	}
-	if (winProcDelegate_.APressed()) {
-		pos = DirectX::XMVectorAdd(pos, DirectX::XMVectorMultiply(right, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
-	}
-	if (winProcDelegate_.DPressed()) {
-		pos = DirectX::XMVectorSubtract(pos, DirectX::XMVectorMultiply(right, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
-	}
-	camera_.Transform().Position(pos);
-
-
-	//auto static clip = [](float val, float l, float h) -> float { return (std::max)(l, (std::min)(val, h)); };
-	//float constexpr STEP = 0.001f;
-	//if (winProcDelegate_.UPressed()) {
-	//	sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w + STEP, 0.0f, 1.0f);
-	//}
-	//if (winProcDelegate_.JPressed()) {
-	//	sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w - STEP, 0.0f, 1.0f);
-	//}
-	//if (winProcDelegate_.IPressed()) {
-	//	sceneBufferData_.metalness = clip(sceneBufferData_.metalness + STEP, 0.0f, 1.0f);
-	//}
-	//if (winProcDelegate_.KPressed()) {
-	//	sceneBufferData_.metalness = clip(sceneBufferData_.metalness - STEP, 0.0f, 1.0f);
-	//}
-
-
-	/////////////////////////////////
-
-	const auto& cameraPos = camera_.Transform().Position();
-	sceneBufferData_.projectionMatrix_ = camera_.PerspectiveMatrix();
-    sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
-	sceneBufferData_.cameraPosition_ = DirectX::XMFLOAT3A{ cameraPos.x, cameraPos.y, cameraPos.z };
-
-	const auto t = Timer().TotalTime();
-	const auto lx = DirectX::XMScalarCos(t);
-	const auto lz = DirectX::XMScalarSin(t);
-	sceneBufferData_.lightDirection_ = DirectX::XMFLOAT3A{ lx, 0.0f, lz };
-	
-    char* mappedCameraData = nullptr;
-    auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
-
-	int kek = sizeof(sceneBufferData_);
-
-    cameraBuffer.Get()->Map(0, nullptr, (void**)&mappedCameraData);
-    std::memcpy(mappedCameraData, &sceneBufferData_, sizeof(sceneBufferData_));
-
-    D3D12_RANGE writtenRange{ 0, sizeof(sceneBufferData_) };
-    cameraBuffer.Get()->Unmap(0, &writtenRange);
-}
+//void Direct3DAppDelegate::CustomAction(std::size_t frameIndex)
+//{
+//	float constexpr PIXEL_TO_ANGLE = 0.3f;
+//
+//	cameraTargetPitch_ += winProcDelegate_.mouseYDelta_ * PIXEL_TO_ANGLE * DEGREE_TO_RAD;
+//	cameraTargetYaw_ += winProcDelegate_.mouseXDelta_ * PIXEL_TO_ANGLE * DEGREE_TO_RAD;
+//
+//	camera_.Transform().Rotation(DirectX::XMQuaternionRotationRollPitchYaw(cameraTargetPitch_, cameraTargetYaw_, 0.0f));
+//	
+//	/////////////////////////////////
+//
+//	float constexpr SPEED_PER_FRAME = 0.02f;
+//
+//	auto pos = camera_.Transform().PositionSIMD();
+//	auto forward = camera_.Transform().ForwardSIMD();
+//	auto right = camera_.Transform().RightSIMD();
+//
+//	if (winProcDelegate_.WPressed()) {
+//		pos = DirectX::XMVectorAdd(pos, DirectX::XMVectorMultiply(forward, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
+//	}
+//	if (winProcDelegate_.SPressed()) {
+//		pos = DirectX::XMVectorSubtract(pos, DirectX::XMVectorMultiply(forward, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
+//	}
+//	if (winProcDelegate_.APressed()) {
+//		pos = DirectX::XMVectorAdd(pos, DirectX::XMVectorMultiply(right, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
+//	}
+//	if (winProcDelegate_.DPressed()) {
+//		pos = DirectX::XMVectorSubtract(pos, DirectX::XMVectorMultiply(right, DirectX::XMVectorReplicate(SPEED_PER_FRAME)));
+//	}
+//	camera_.Transform().Position(pos);
+//
+//
+//	//auto static clip = [](float val, float l, float h) -> float { return (std::max)(l, (std::min)(val, h)); };
+//	//float constexpr STEP = 0.001f;
+//	//if (winProcDelegate_.UPressed()) {
+//	//	sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w + STEP, 0.0f, 1.0f);
+//	//}
+//	//if (winProcDelegate_.JPressed()) {
+//	//	sceneBufferData_.cameraPosition_roghness_.w = clip(sceneBufferData_.cameraPosition_roghness_.w - STEP, 0.0f, 1.0f);
+//	//}
+//	//if (winProcDelegate_.IPressed()) {
+//	//	sceneBufferData_.metalness = clip(sceneBufferData_.metalness + STEP, 0.0f, 1.0f);
+//	//}
+//	//if (winProcDelegate_.KPressed()) {
+//	//	sceneBufferData_.metalness = clip(sceneBufferData_.metalness - STEP, 0.0f, 1.0f);
+//	//}
+//
+//
+//	/////////////////////////////////
+//
+//	const auto& cameraPos = camera_.Transform().Position();
+//	sceneBufferData_.projectionMatrix_ = camera_.PerspectiveMatrix();
+//    sceneBufferData_.viewMatrix_ = camera_.ViewMatrix();
+//	sceneBufferData_.cameraPosition_ = DirectX::XMFLOAT3A{ cameraPos.x, cameraPos.y, cameraPos.z };
+//
+//	const auto t = Timer().TotalTime();
+//	const auto lx = DirectX::XMScalarCos(t);
+//	const auto lz = DirectX::XMScalarSin(t);
+//	sceneBufferData_.lightDirection_ = DirectX::XMFLOAT3A{ lx, 0.0f, lz };
+//	
+//    char* mappedCameraData = nullptr;
+//    auto& cameraBuffer = sceneBuffer_.View(frameIndex).Resource();
+//
+//	int kek = sizeof(sceneBufferData_);
+//
+//    cameraBuffer.Get()->Map(0, nullptr, (void**)&mappedCameraData);
+//    std::memcpy(mappedCameraData, &sceneBufferData_, sizeof(sceneBufferData_));
+//
+//    D3D12_RANGE writtenRange{ 0, sizeof(sceneBufferData_) };
+//    cameraBuffer.Get()->Unmap(0, &writtenRange);
+//}
 
 LRESULT DirectWinProcDelegate::operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {

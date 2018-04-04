@@ -10,11 +10,20 @@ public:
 	class Delegate
 	{
 	public:
+        Delegate(Application& application) : application_{ &application } { }
+
+        DXRL_DEFINE_UNCOPYABLE_MOVABLE_DEFAULT(Delegate)
+
 		virtual ~Delegate() = default;
 
-		virtual void start(Application& application) = 0;
-		virtual void update(Application& application) = 0;
-		virtual void shutdown(Application& application) = 0;
+		virtual void start() = 0;
+		virtual void update() = 0;
+		virtual void shutdown() = 0;
+
+        Application& MainApplication() { return *application_; }
+
+    private:
+        Application* application_;
 	};
 
 public:

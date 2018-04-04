@@ -44,18 +44,17 @@ public:
 class Direct3DAppDelegate : public Application::Delegate
 {
 public:
-    Direct3DAppDelegate();
+    Direct3DAppDelegate(Application& application);
 
-    virtual void start(Application& application) override;
-    virtual void update(Application& application) override;
-    virtual void shutdown(Application& application) override;
+    virtual void start() override;
+    virtual void update() override;
+    virtual void shutdown() override;
 
     PerformanceTimer& Timer();
     void DisplayFrameTime(Application& application, float drawTime);
 
     void MainUpdate(std::size_t frameIndex);
 
-    
 public:
     
     Window const* mainWindow;
