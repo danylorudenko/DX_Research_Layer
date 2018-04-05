@@ -20,10 +20,10 @@ class Bytes
 public:
     Bytes(Size bytesCount);
     Bytes(Bytes const& bytes);
-    virtual operator Size() const;
-    virtual operator Bytes() const;
 
-    Bytes& operator+(Bytes bytes);
+    operator Size() const;
+
+    Bytes& operator+=(const Bytes& bytes);
 
 protected:
     Size bytesCount_;
@@ -34,7 +34,6 @@ class Kibibytes : public Bytes
 {
 public:
     Kibibytes(Size bytesCount);
-    virtual operator Size() const override;
 };
 
 ////////////////////////////////////////
@@ -42,7 +41,6 @@ class Mibibytes : public Kibibytes
 {
 public:
     Mibibytes(Size bytesCount);
-    virtual operator Size() const override;
 };
 
 ////////////////////////////////////////
@@ -50,8 +48,9 @@ class Gibibytes : public Mibibytes
 {
 public:
     Gibibytes(Size bytesCount);
-    virtual operator Size() const override;
 };
+
+Bytes operator+(const Bytes& lhs, const Bytes& rhs);
 
 }
 
