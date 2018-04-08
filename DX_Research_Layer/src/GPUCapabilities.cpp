@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\Misc\GPUCapabilities.hpp>
 
 #include <Rendering\GPUFoundation.hpp>

@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\FrameGraph\GPUPresentGraphNode.hpp>
 #include <Rendering\Resource\ResourceView\GPUResourceView.hpp>
 

@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\RootSignature\GPURootSignature.hpp>
 #include <Rendering\GPUEngine\GPUEngine.hpp>
 #include <Rendering\Resource\ResourceView\GPUResourceView.hpp>

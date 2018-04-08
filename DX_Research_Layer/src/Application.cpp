@@ -1,5 +1,6 @@
+#include <pch.hpp>
+
 #include <Foundation\Application.hpp>
-#include <Memory/Memory.hpp>
 
 Application::Application(HINSTANCE instance) : window_{ instance, L"DirectX Sample", 800, 600 }, delegate_{}, process_{ instance } {}
 

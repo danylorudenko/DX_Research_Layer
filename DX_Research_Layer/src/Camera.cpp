@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Math\Camera.hpp>
 
 namespace Math

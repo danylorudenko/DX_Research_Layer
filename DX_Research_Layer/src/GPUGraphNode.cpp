@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\FrameGraph\GPUGraphNode.hpp>
 
 namespace DXRL

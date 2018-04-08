@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\FrameGraph\GPUComputeGraphNode.hpp>
 
 namespace DXRL

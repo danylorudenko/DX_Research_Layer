@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\GPUEngine\GPUFence.hpp>
 #include <Rendering\GPUEngine\GPUCommandAllocator.hpp>
 

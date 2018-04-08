@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\GPUEngine\GPUCommandList.hpp>
 #include <Rendering\GPUEngine\GPUCommandQueue.hpp>
 

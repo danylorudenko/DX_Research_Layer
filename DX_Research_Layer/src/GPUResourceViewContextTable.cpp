@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\Resource\GPUResourceViewContextTable.hpp>
 
 namespace DXRL

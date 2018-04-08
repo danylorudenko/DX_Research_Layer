@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\Resource\ResourceView\GPUResourceViewAllocator.hpp>
 #include <Rendering\GPUFoundation.hpp>
 

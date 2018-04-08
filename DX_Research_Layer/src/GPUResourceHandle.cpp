@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\Resource\GPUResourceHandle.hpp>
 #include <Rendering\Resource\GPUStaticResourceAllocator.hpp>
 #include <Rendering\Resource\GPUResourceViewContextTable.hpp>

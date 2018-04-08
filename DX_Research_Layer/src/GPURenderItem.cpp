@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\Data\GPURenderItem.hpp>
 #include <Rendering\GPUFoundation.hpp>
 

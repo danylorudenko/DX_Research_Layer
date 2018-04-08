@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\Resource\GPUDynamicResourceAllocator.hpp>
 
 namespace DXRL

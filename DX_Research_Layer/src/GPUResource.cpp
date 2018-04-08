@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\Resource\GPUResource.hpp>
 
 namespace DXRL

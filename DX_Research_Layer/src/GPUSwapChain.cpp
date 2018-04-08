@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\GPUEngine\GPUSwapChain.hpp>
 #include <Rendering\GPUFoundation.hpp>
 

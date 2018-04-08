@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\GPUEngine\GPUEngine.hpp>
 
 namespace DXRL

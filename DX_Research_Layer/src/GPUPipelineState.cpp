@@ -1,3 +1,5 @@
+#include <pch.hpp>
+
 #include <Rendering\PipelineState\GPUPipelineState.hpp>
 
 namespace DXRL
