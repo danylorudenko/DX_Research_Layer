@@ -20,4 +20,14 @@ using Size = std::size_t;
 using Single = float;
 using Double = double;
 
+using String = std::string;
+using WideString = std::wstring;
+
+using VoidPtr = void*;
+using PtrDiff = std::ptrdiff_t;
+
+template<typename T>
+using UniquePtr = std::unique_ptr<T>;
+
+
 }

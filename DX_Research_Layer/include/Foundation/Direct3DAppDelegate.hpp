@@ -1,22 +1,17 @@
 #pragma once
 
-#include <pch.hpp>
-
+#include <Foundation\Macro.hpp>
+#include <Foundation\Types.hpp>
 #include <Foundation\Application.hpp>
 #include <Foundation\PerformanceTimer.hpp>
 #include <Rendering\GPUFoundation.hpp>
-#include <Rendering\Data\SceneConstantBuffer.hpp>
-#include <Rendering\FrameGraph\GPUGraphicsGraphNode.hpp>
-#include <Rendering\FrameGraph\GPUPresentGraphNode.hpp>
-#include <Math\Camera.hpp>
 
 class DirectWinProcDelegate : public WinProcDelegate
 {
 public:
-    DirectWinProcDelegate() = default;
+    DXRL_DEFINE_UNCOPYABLE_MOVABLE_DEFAULT(DirectWinProcDelegate)
+
     DirectWinProcDelegate(void* appDelegate) : WinProcDelegate{ appDelegate } {}
-    DirectWinProcDelegate(DirectWinProcDelegate&&) = default;
-    DirectWinProcDelegate& operator=(DirectWinProcDelegate&&) = default;
 
     virtual LRESULT operator()(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 
@@ -35,10 +30,10 @@ public:
 	float mouseXDelta_;
 	float mouseYDelta_;
 
-	std::uint32_t keyMap_ = 0; // WASD UJIK
+	DXRL::U32 keyMap_ = 0; // WASD UJIK
 
-    int prevMouseX_;
-    int prevMouseY_;
+    DXRL::S32 prevMouseX_;
+    DXRL::S32 prevMouseY_;
 };
 
 class Direct3DAppDelegate : public Application::Delegate
@@ -50,20 +45,20 @@ public:
     virtual void update() override;
     virtual void shutdown() override;
 
-    PerformanceTimer& Timer();
-    void DisplayFrameTime(Application& application, float drawTime);
+    DXRL::PerformanceTimer& Timer();
+    void DisplayFrameTime(Application& application, DXRL::Single drawTime);
 
-    void MainUpdate(std::size_t frameIndex);
+    void MainUpdate(DXRL::U64 frameIndex);
 
 public:
     
     Window const* mainWindow;
     DirectWinProcDelegate winProcDelegate_;
+    DXRL::WideString windowText_;
 
-    std::unique_ptr<DXRL::GPUDelegate> gpuDelegate_;
+    DXRL::UniquePtr<DXRL::GPUDelegate> gpuDelegate_;
 
-    PerformanceTimer gameTimer_;
-    UINT64 mainUpdateIterator_;
+    DXRL::PerformanceTimer gameTimer_;
+    DXRL::U64 mainUpdateIterator_;
 
-    std::wstring windowText_;
 };

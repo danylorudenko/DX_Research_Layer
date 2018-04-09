@@ -1,5 +1,8 @@
 #pragma once
 
+namespace DXRL
+{
+
 class PerformanceTimer
 {
 public:
@@ -20,3 +23,5 @@ private:
     __int64 currTime_;
 
 };
+
+}

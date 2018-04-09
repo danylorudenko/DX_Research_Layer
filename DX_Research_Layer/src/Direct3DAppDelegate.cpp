@@ -516,7 +516,7 @@ PerformanceTimer& Direct3DAppDelegate::Timer()
     return gameTimer_;
 }
 
-void Direct3DAppDelegate::DisplayFrameTime(Application& application, float drawTime)
+void Direct3DAppDelegate::DisplayFrameTime(Application& application, DXRL::Single drawTime)
 {
     windowText_.resize(0);
     windowText_ = L"SPF: ";
@@ -615,7 +615,7 @@ void Direct3DAppDelegate::DisplayFrameTime(Application& application, float drawT
 //    return pipelineState;
 //}
 
-void Direct3DAppDelegate::MainUpdate(std::size_t frameIndex)
+void Direct3DAppDelegate::MainUpdate(DXRL::U64 frameIndex)
 {
     auto& graph = gpuDelegate_->FrameGraph();
     auto& graphIterator = graph.GraphQueueStart();

@@ -120,6 +120,9 @@
     <ClCompile Include="src\Bytes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Allocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pch.hpp">
@@ -239,12 +242,6 @@
     <ClInclude Include="include\Foundation\Direct3DAppDelegate.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Memory\Memory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Memory\Bytes.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Foundation\Types.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -252,6 +249,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Foundation\Constant.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Memory\Bytes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Memory\Memory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Container\StaticArray.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Container\DynamicArray.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Memory\Allocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

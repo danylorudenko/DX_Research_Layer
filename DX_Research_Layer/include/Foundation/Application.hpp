@@ -10,10 +10,9 @@ public:
 	class Delegate
 	{
 	public:
-        Delegate(Application& application) : application_{ &application } { }
-
         DXRL_DEFINE_UNCOPYABLE_MOVABLE_DEFAULT(Delegate)
 
+        explicit Delegate(Application& application) : application_{ &application } { }
 		virtual ~Delegate() = default;
 
 		virtual void start() = 0;
@@ -27,14 +26,10 @@ public:
 	};
 
 public:
-	explicit Application(HINSTANCE instance);
-	~Application();
-
-	Application(Application const&) = delete;
-	Application(Application&&);
-
-	Application& operator=(Application const&) = delete;
-	Application& operator=(Application&&);
+	DXRL_DEFINE_UNCOPYABLE_MOVABLE(Application)
+    
+    explicit Application(HINSTANCE instance);
+    ~Application();
 
 	int run();
 
