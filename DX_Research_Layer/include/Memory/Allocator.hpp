@@ -9,6 +9,7 @@ namespace DXRL
 namespace Memory
 {
 
+////////////////////////////////////////
 class LinearAllocator
 {
 public:
@@ -20,12 +21,6 @@ public:
 
     void* Alloc(Size size, Size alignment = 0);
 
-    //template<typename T>
-    //T* Alloc(Size count = 1, Size alignment = alignof(T))
-    //{   
-    //    return reinterpret_cast<T>(Alloc(CalculateSize(sizeof(T), alignment) * count, alignment);
-    //}
-
     template<typename ALLOC>
     ALLOC* AllocChildAllocator(Size chunkSize)
     {
@@ -33,9 +28,6 @@ public:
     }
 
     void Reset();
-
-private:
-    Size CalculateSize(Size size, Size alignment = 0);
 
 private:
 

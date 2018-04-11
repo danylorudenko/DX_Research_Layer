@@ -11,9 +11,6 @@ namespace DXRL
 namespace Memory
 {
 
-using Byte = U8;
-using BytePtr = U8 * ;
-
 ////////////////////////////////////////
 class Bytes
 {

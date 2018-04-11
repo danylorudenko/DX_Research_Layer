@@ -266,6 +266,9 @@
     <ClInclude Include="include\Memory\Allocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Memory\Pointer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX_Research_Layer.rc">

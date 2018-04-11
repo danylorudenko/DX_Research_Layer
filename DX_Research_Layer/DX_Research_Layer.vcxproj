@@ -392,6 +392,7 @@
     <ClInclude Include="include\Memory\Allocator.hpp" />
     <ClInclude Include="include\Memory\Bytes.hpp" />
     <ClInclude Include="include\Memory\Memory.hpp" />
+    <ClInclude Include="include\Memory\Pointer.hpp" />
     <ClInclude Include="include\Rendering\Data\Vertex.hpp" />
     <ClInclude Include="include\Rendering\FrameGraph\GPUComputeGraphNode.hpp" />
     <ClInclude Include="include\Rendering\FrameGraph\GPUGraphicsGraphNode.hpp" />

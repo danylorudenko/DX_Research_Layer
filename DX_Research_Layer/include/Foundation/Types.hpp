@@ -17,17 +17,26 @@ using U64 = std::uint64_t;
 
 using Size = std::size_t;
 
+using Byte = U8;
+
 using Single = float;
 using Double = double;
 
 using String = std::string;
 using WideString = std::wstring;
 
+
+namespace Memory
+{
+
 using VoidPtr = void*;
+using BytePtr = U8*;
+using UintPtr = std::uintptr_t;
 using PtrDiff = std::ptrdiff_t;
 
 template<typename T>
 using UniquePtr = std::unique_ptr<T>;
 
+} // namespace Memory
 
-}
+} // namespace DXRL

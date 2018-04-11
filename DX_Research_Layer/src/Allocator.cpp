@@ -28,9 +28,9 @@ LinearAllocator::~LinearAllocator()
         delete[] mainChunk_;
 }
 
-Size LinearAllocator::CalculateSize(Size size, Size alignment)
+void LinearAllocator::Reset()
 {
-
+    allocated_ = 0;
 }
 
 } // namespace Memory
