@@ -32,7 +32,7 @@ inline T* PtrAlign(T* ptr, U alignment)
     UintPtr ptrLocal = reinterpret_cast<UintPtr>(ptr);
     UintPtr alignmentLocal = static_cast<Size>(alignment);
 
-    return reinterpret_cast<T*>((ptrLocal + (alignmentLocal - 1)) & (alignmentLocal));
+    return reinterpret_cast<T*>((ptrLocal + (alignmentLocal - 1)) & (~alignmentLocal));
 }
 
 template<typename T, typename U>

@@ -19,14 +19,8 @@ public:
     
     ~LinearAllocator();
 
-    void* Alloc(Size size, Size alignment = 0);
-
-    template<typename ALLOC>
-    ALLOC* AllocChildAllocator(Size chunkSize)
-    {
-        return ALLOC{ Alloc(chunkSize), chunkSize, false };
-    }
-
+    VoidPtr Alloc(Size size, Size alignment = 0);
+    
     void Reset();
 
 private:

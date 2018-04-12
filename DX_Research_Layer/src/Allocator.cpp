@@ -1,6 +1,7 @@
 #include <pch.hpp>
 
 #include <Memory\Memory.hpp>
+#include <Memory\Pointer.hpp>
 
 namespace DXRL
 {
@@ -26,6 +27,17 @@ LinearAllocator::~LinearAllocator()
 {
     if (isOwner_)
         delete[] mainChunk_;
+}
+
+VoidPtr LinearAllocator::Alloc(Size size, Size alignment)
+{
+    VoidPtr freeAddress = PtrAdd(mainChunk_, allocated_);
+    Size allocationSize = CalcSizeWithAlignment(size, alignment, 0);
+
+    VoidPtr alignedResult = PtrAlign(freeAddress, alignment);
+    allocated_ += allocationSize;
+
+    return alignedResult;
 }
 
 void LinearAllocator::Reset()
