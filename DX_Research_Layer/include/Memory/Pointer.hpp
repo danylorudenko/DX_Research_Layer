@@ -42,7 +42,7 @@ inline UintPtr PtrAlignmentAdjustment(T* ptr, U alignment)
     return alignedPtr - reinterpret_cast<UintPtr>(ptr);
 }
 
-template<typename T, typename U, typename V>
+template<typename T, typename U, typename V = S32>
 inline T CalcSizeWithAlignment(T size, U alignment, V additionalDataSize = 0)
 {
     return static_cast<T>(
@@ -51,6 +51,7 @@ inline T CalcSizeWithAlignment(T size, U alignment, V additionalDataSize = 0)
         : additionalDataSize
         );
 }
+
 
 }
 
