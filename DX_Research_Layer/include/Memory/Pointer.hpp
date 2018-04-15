@@ -9,9 +9,19 @@ namespace Memory
 {
 
 ////////////////////////////////////////
-inline PtrDiff PtrNegate(VoidPtr lhs, VoidPtr rhs)
+inline PtrDiff PtrDifference(VoidPtr lhs, VoidPtr rhs)
 {
     return static_cast<PtrDiff>(reinterpret_cast<UintPtr>(lhs) - reinterpret_cast<UintPtr>(rhs));
+}
+
+inline VoidPtr PtrNegate(VoidPtr lhs, Size rhs)
+{
+    return reinterpret_cast<VoidPtr>(reinterpret_cast<UintPtr>(lhs) - static_cast<UintPtr>(rhs));
+}
+
+inline VoidPtr PtrAdd(VoidPtr lhs, Size rhs)
+{
+    return reinterpret_cast<VoidPtr>(reinterpret_cast<UintPtr>(lhs) + static_cast<UintPtr>(rhs));
 }
 
 inline VoidPtr PtrAdd(VoidPtr lhs, PtrDiff rhs)
@@ -32,7 +42,7 @@ inline T* PtrAlign(T* ptr, U alignment)
     UintPtr ptrLocal = reinterpret_cast<UintPtr>(ptr);
     UintPtr alignmentLocal = static_cast<Size>(alignment);
 
-    return reinterpret_cast<T*>((ptrLocal + (alignmentLocal - 1)) & (~alignmentLocal));
+    return reinterpret_cast<T*>((ptrLocal + alignmentLocal - 1) & (~alignmentLocal));
 }
 
 template<typename T, typename U>

@@ -13,51 +13,50 @@ LinearAllocator::LinearAllocator()
     : mainChunk_{ nullptr }
     , mainChunkSize_{ 0 }
     , isOwner_{ false }
-    , allocated_{ 0 }
+    , freeAddress_{ nullptr }
 { }
 
 LinearAllocator::LinearAllocator(LinearAllocator&& rhs)
-    : mainChunk_{ rhs.mainChunk_ }
-    , mainChunkSize_{ rhs.mainChunkSize_ }
-    , isOwner_{ rhs.isOwner_ }
-    , allocated_{ rhs.allocated_ }
 {
-    rhs.mainChunk_ = nullptr;
-    rhs.mainChunkSize_ = 0;
-    rhs.isOwner_ = false;
-    rhs.allocated_ = 0;
+    operator=(std::move(rhs));
 }
 
 LinearAllocator& LinearAllocator::operator=(LinearAllocator&& rhs)
 {
-    mainChunk_ = rhs.mainChunk_;            rhs.mainChunk_ = nullptr;
-    mainChunkSize_ = rhs.mainChunkSize_;    rhs.mainChunkSize_ = 0;
-    isOwner_ = rhs.isOwner_;                rhs.isOwner_ = false;
-    allocated_ = rhs.allocated_;            rhs.allocated_ = 0;
+    if (!IsNull())
+        Reset();
+
+    mainChunk_ = rhs.mainChunk_;
+    mainChunkSize_ = rhs.mainChunkSize_;
+    isOwner_ = rhs.isOwner_;
+    freeAddress_ = rhs.freeAddress_;
+
+    rhs.isOwner_ = false;
+    rhs.Reset();
 }
 
 LinearAllocator::LinearAllocator(VoidPtr chunk, Size size, bool isOwner)
     : mainChunk_{ nullptr }
     , mainChunkSize_{ size }
     , isOwner_{ isOwner }
-    , allocated_{ 0 }
+    , freeAddress_{ chunk }
 { }
 
 LinearAllocator::~LinearAllocator()
 {
-    if (isOwner_)
-        delete[] mainChunk_;
+    Reset();
 }
 
 VoidPtr LinearAllocator::Alloc(Size size, Size alignment)
 {
-    VoidPtr freeAddress = PtrAdd(mainChunk_, allocated_);
     Size allocationSize = CalcSizeWithAlignment(size, alignment);
 
-    VoidPtr alignedResult = PtrAlign(freeAddress, alignment);
-    allocated_ += allocationSize;
+    VoidPtr allocationResult = PtrAlign(freeAddress_, alignment);
+    freeAddress_ = PtrAdd(freeAddress_, allocationSize);
 
-    return alignedResult;
+    assert((PtrDifference(mainChunk_, PtrAdd(freeAddress_, allocationSize)) < mainChunkSize_) && "Allocation exceeds chunk size!");
+
+    return allocationResult;
 }
 
 VoidPtr LinearAllocator::AllocArray(Size unitSize, Size count, Size unitAlignment)
@@ -65,9 +64,129 @@ VoidPtr LinearAllocator::AllocArray(Size unitSize, Size count, Size unitAlignmen
     return Alloc(unitSize * count, unitAlignment);
 }
 
+void LinearAllocator::FreeAll()
+{
+    freeAddress_ = mainChunk_;
+}
+
 void LinearAllocator::Reset()
 {
-    allocated_ = 0;
+    if(isOwner_)
+        delete[] mainChunk_;
+
+    mainChunk_ = nullptr;
+    mainChunkSize_ = 0;
+    isOwner_ = false;
+    freeAddress_ = nullptr;
+}
+
+bool LinearAllocator::IsNull() const
+{
+    return mainChunk_ == nullptr;
+}
+
+////////////////////////////////////////
+StackAllocator::StackAllocator()
+    : mainChunk_{ nullptr }
+    , mainChunkSize_{ 0 }
+    , isOwner_{ false }
+    , stackTopPtr_{ nullptr }
+{ }
+
+StackAllocator::StackAllocator(VoidPtr chunk, Size size, bool isOwner = false)
+    : mainChunk_{ chunk }
+    , mainChunkSize_{ size }
+    , isOwner_{ isOwner }
+    , stackTopPtr_{ chunk }
+{ }
+
+StackAllocator::StackAllocator(StackAllocator&& rhs)
+{
+    operator=(std::move(rhs));
+}
+
+StackAllocator& StackAllocator::operator=(StackAllocator&& rhs)
+{
+    if(!IsNull())
+        Reset();
+    
+    mainChunk_ = rhs.mainChunk_;
+    mainChunkSize_ = rhs.mainChunkSize_;
+    isOwner_ = rhs.isOwner_;
+    stackTopPtr_ = rhs.stackTopPtr_;
+
+    rhs.isOwner_ = false;
+    rhs.Reset();
+}
+
+StackAllocator::~StackAllocator()
+{
+    Reset();
+}
+
+VoidPtr StackAllocator::Alloc(Size size, Size alignment)
+{
+    Size allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocHeader));
+    
+    assert((PtrDifference(mainChunk_, PtrAdd(stackTopPtr_, allocationSize)) < mainChunkSize_) && "Allocation exceeds chunk size!");
+
+    VoidPtr const headerAdjustedTop = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
+    VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);
+
+    AllocHeader* const headerPtr = reinterpret_cast<AllocHeader*>(PtrNegate(allocationResult, sizeof(AllocHeader)));
+    headerPtr->allocationStart_ = stackTopPtr_;
+    headerPtr->singleHeader_.allocationSize_ = allocationSize;
+
+    stackTopPtr_ = PtrAdd(stackTopPtr_, allocationSize);
+
+    return allocationResult;
+}
+
+VoidPtr StackAllocator::AllocArray(Size unitSize, Size unitCount, Size alignment)
+{
+    Size const allocationSize = CalcSizeWithAlignment(unitSize * unitCount, alignment, sizeof(AllocHeader));
+
+    VoidPtr const headerAdjustedTop = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
+    VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);
+    
+    AllocHeader* const headerPtr = reinterpret_cast<AllocHeader*>(PtrNegate(allocationResult, sizeof(AllocHeader)));
+    headerPtr->allocationStart_ = stackTopPtr_;
+    headerPtr->arrayHeader_.unitsCount_ = unitCount;
+    headerPtr->arrayHeader_.unitSize_ = unitSize;
+
+    stackTopPtr_ = PtrAdd(stackTopPtr_, allocationSize);
+
+    return allocationResult;
+}
+
+void StackAllocator::Free(VoidPtr ptr)
+{
+    Size constexpr headerSize = sizeof(AllocHeader);
+
+    AllocHeader const* header = reinterpret_cast<AllocHeader*>(PtrNegate(ptr, headerSize));
+    VoidPtr const allocationStart = header->allocationStart_;
+
+}
+
+void StackAllocator::FreeArray(VoidPtr arrayPtr)
+{
+
+}
+
+void StackAllocator::Reset()
+{
+    if(isOwner_)
+        delete[] mainChunk_;
+    
+    mainChunk_ = nullptr;
+    mainChunkSize_ = 0;
+    isOwner_ = false;
+    stackTopPtr_ = nullptr;
+}
+
+bool StackAllocator::IsNull() const
+{
+    return mainChunk_ == nullptr;
 }
 
 } // namespace Memory

@@ -18,47 +18,50 @@ public:
     LinearAllocator(VoidPtr chunk, Size size, bool isOwner = false);
     ~LinearAllocator();
 
-    template<typename T, typename U = U32>
-    T* Alloc(U count = 1)
-    {
-        Size constexpr typeSize = sizeof(T);
-        Size constexpr typeAlignment = alignof(T);
+    VoidPtr Alloc(Size size, Size alignment = 4);
+    VoidPtr AllocArray(Size unitSize, Size count = 1, Size unitAlignment = 4);
 
-        VoidPtr const allocationResult = Alloc(typeSize * count, typeAlignment);
-        return reinterpret_cast<T*>(allocationResult);
-    }
-
-    template<typename T, typename U = U32>
-    VoidPtr Alloc(T size, U alignment = 0)
-    {
-        Size const sizeLocal = static_cast<Size>(size);
-        Size const alignmentLocal = static_cast<Size>(size);
-
-        return Alloc(sizeLocal, alignmentLocal);
-    }
-
-    template<typename TResult, typename T, typename U = U32, typename V = Size>
-    TResult* AllocArray(T unitSize, U count = 1, V unitAlignment = alignof(TResult))
-    {
-        Size const unitSizeLocal = static_cast<Size>(unitSize);
-        Size const localCount = static_cast<Size>(count);
-        Size const unitAlignmentLocal = static_cast<Size>(unitAlignment);
-
-        VoidPtr allocationResult = AllocArray(unitSizeLocal, unitAlignmentLocal, sizeLocal);
-        return reinterpret_cast<TResult*>(allocationResult);
-    }
-
-    VoidPtr Alloc(Size size, Size alignment = 0);
-    VoidPtr AllocArray(Size unitSize, Size count = 1, Size unitAlignment = 0);
+    void FreeAll();
     void Reset();
+
+    bool IsNull() const;
+
+
+    template<typename TResult, typename ...TArgs>
+    TResult* Alloc(TArgs&&... args)
+    {
+        Size constexpr typeSize = sizeof(TResult);
+        Size constexpr typeAlignment = alignof(TResult);
+
+        VoidPtr const allocationResult = Alloc(typeSize, typeAlignment);
+        return new (allocationResult) TResult(args...);
+    }
+
+    template<typename TResult, typename... TArgs>
+    TResult* AllocArray(Size count = 1, TArgs&&... args)
+    {
+        Size constexpr typeSize = sizeof(TResult);
+        Size constexpr typeAlignment = alignof(TResult);
+
+        TResult* arrayStart = reinterpret_cast<TResult*>(AllocArray(typeSize, count, typeAlignment));
+
+        for (Size i = 0; i < count; i++)
+        {
+            new (arrayStart + i) TResult{ args... };
+        }
+
+        return arrayStart;
+    }
+
 
 private:
     VoidPtr mainChunk_;
     Size mainChunkSize_;
     bool isOwner_;
 
-    Size allocated_;
+    VoidPtr freeAddress_;
 };
+
 
 
 ////////////////////////////////////////
@@ -66,8 +69,74 @@ class StackAllocator
 {
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(StackAllocator)
+
     StackAllocator(VoidPtr chunk, Size size, bool isOwner = false);
     ~StackAllocator();
+
+    VoidPtr Alloc(Size size, Size alignment = 0);
+    VoidPtr AllocArray(Size unitSize, Size unitCount = 1, Size alignment = 4);
+
+    void Free(VoidPtr ptr);
+    void FreeArray(VoidPtr ptr);
+
+    void Reset();
+
+    bool IsNull() const;
+
+    template<typename TResult, typename... TArgs>
+    TResult* Alloc(TArgs&&... args)
+    {
+        VoidPtr allocationResult = Alloc(sizeof(TResult), alignof(TResult));
+        return new (allocationResult) TResult{ args... };
+    }
+
+    template<typename TResult, typename... TArgs>
+    TResult* AllocArray(Size count, TArgs&&... args)
+    {
+        Size constexpr typeSize = sizeof(TResult);
+        Size constexpr typeAlignment = sizeof(TResult);
+        
+        TResult* arrayStart = reinterpret_cast<TResult*>(AllocArray(typeSize, count, typeAlignment));
+        
+        for (Size i = 0; i < count; i++)
+        {
+            new (arrayStart + i) TResult{ args... };
+        }
+
+        return arrayStart;
+    }
+
+
+private:
+    VoidPtr mainChunk_;
+    Size mainChunkSize_;
+    bool isOwner_;
+
+    VoidPtr stackTopPtr_;
+
+
+private:
+    struct AllocHeaderSingle
+    {
+        Size allocationSize_;
+    };
+
+    struct AllocHeaderArray
+    {
+        Size unitSize_;
+        Size unitsCount_;
+    };
+
+    struct AllocHeader
+    {
+        Size allocationScope_;
+        VoidPtr allocationStart_;
+        union
+        {
+            AllocHeaderSingle singleHeader_;
+            AllocHeaderArray arrayHeader_;
+        };
+    };
 };
 
 

@@ -49,7 +49,7 @@
 
 #define DXRL_DEFINE_UNCOPYABLE_MOVABLE(className)                               \
                                                                                 \
-    className() = default;                                                      \
+    className();                                                                \
     className(className const&) = delete;                                       \
     className& operator=(className const&) = delete;                            \
                                                                                 \
@@ -61,32 +61,19 @@
 
 ////////////////////////////////////////
 
-#ifndef DXRL_DEFINE_COPYABLE_DEFAULT_MOVABLE_DEFAULT
+#ifndef DXRL_DEFINE_COPYABLE_MOVABLE_DEFAULT
 
-#define DXRL_DEFINE_COPYABLE_DEFAULT_MOVABLE_DEFAULT(className)                 \
+#define DXRL_DEFINE_COPYABLE_MOVABLE_DEFAULT(className)                         \
                                                                                 \
     className() = default;                                                      \
     className(className const&) = default;                                      \
     className& operator=(className const&) = default;                           \
                                                                                 \
-    className(className&&);                                                     \
-    className& operator=(className&&);                                          \
+    className(className&&) = default;                                           \
+    className& operator=(className&&) = default;                                \
                                                                                 \
 
-#endif // DXRL_DEFINE_COPYABLE_DEFAULT_MOVABLE_DEFAULT
+#endif // DXRL_DEFINE_COPYABLE_MOVABLE_DEFAULT
 
 ////////////////////////////////////////
-
-#ifndef DXRL_DEFINE_COPYABLE_DEFAULT_MOVABLE
-
-#define DXRL_DEFINE_COPYABLE_DEFAULT_MOVABLE(className)                         \
-                                                                                \
-    className() = default;                                                      \
-    className(className const&) = default;                                      \
-    className& operator=(className const&) = default;                           \
-                                                                                \
-    className(className&&);                                                     \
-    className& operator=(className&&);                                          \
-
-#endif // DXRL_DEFINE_COPYABLE_DEFAULT_MOVABLE
 
