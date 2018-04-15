@@ -113,9 +113,11 @@ private:
     bool isOwner_;
 
     VoidPtr stackTopPtr_;
+    Size currentStackScope_;
 
 
 private:
+    
     struct AllocHeaderSingle
     {
         Size allocationSize_;
@@ -129,6 +131,13 @@ private:
 
     struct AllocHeader
     {
+        enum AllocType : Byte
+        {
+            Single,
+            Array
+        };
+        
+        
         Size allocationScope_;
         VoidPtr allocationStart_;
         union
@@ -136,6 +145,8 @@ private:
             AllocHeaderSingle singleHeader_;
             AllocHeaderArray arrayHeader_;
         };
+
+        AllocType type_;
     };
 };
 
