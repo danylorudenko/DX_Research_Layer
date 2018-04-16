@@ -56,7 +56,7 @@ public:
     DirectWinProcDelegate winProcDelegate_;
     DXRL::WideString windowText_;
 
-    DXRL::UniquePtr<DXRL::GPUDelegate> gpuDelegate_;
+    DXRL::Memory::UniquePtr<DXRL::GPUDelegate> gpuDelegate_;
 
     DXRL::PerformanceTimer gameTimer_;
     DXRL::U64 mainUpdateIterator_;

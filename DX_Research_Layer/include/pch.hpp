@@ -33,6 +33,7 @@
 
 ////////////////////////////////////////
 
+#include <Foundation\Types.hpp>
 #include <Foundation\Constant.hpp>
 #include <Foundation\Macro.hpp>
 #include <Memory\Memory.hpp>

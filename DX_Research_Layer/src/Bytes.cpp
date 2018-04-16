@@ -52,8 +52,8 @@ Mibibytes::Mibibytes(Size mibibytesCount) :
 
 
 ////////////////////////////////////////
-Gibibytes::Gibibytes(Size bytesCount)
-    : Mibibytes{ bytesCount * 1024 }
+Gibibytes::Gibibytes(Size gibibytesCount)
+    : Mibibytes{ gibibytesCount * 1024 }
 { }
 
 

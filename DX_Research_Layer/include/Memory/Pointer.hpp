@@ -24,17 +24,6 @@ inline VoidPtr PtrAdd(VoidPtr lhs, Size rhs)
     return reinterpret_cast<VoidPtr>(reinterpret_cast<UintPtr>(lhs) + static_cast<UintPtr>(rhs));
 }
 
-inline VoidPtr PtrAdd(VoidPtr lhs, PtrDiff rhs)
-{
-    return reinterpret_cast<VoidPtr>(reinterpret_cast<UintPtr>(lhs) + static_cast<UintPtr>(rhs));
-}
-
-inline VoidPtr PtrAdd(VoidPtr lhs, UintPtr rhs)
-{
-    return reinterpret_cast<VoidPtr>(reinterpret_cast<UintPtr>(lhs) + rhs);
-}
-
-
 ////////////////////////////////////////
 template<typename T, typename U>
 inline T* PtrAlign(T* ptr, U alignment)

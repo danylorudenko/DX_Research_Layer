@@ -33,10 +33,12 @@ LinearAllocator& LinearAllocator::operator=(LinearAllocator&& rhs)
 
     rhs.isOwner_ = false;
     rhs.Reset();
+
+    return *this;
 }
 
 LinearAllocator::LinearAllocator(VoidPtr chunk, Size size, bool isOwner)
-    : mainChunk_{ nullptr }
+    : mainChunk_{ chunk }
     , mainChunkSize_{ size }
     , isOwner_{ isOwner }
     , freeAddress_{ chunk }
@@ -54,7 +56,7 @@ VoidPtr LinearAllocator::Alloc(Size size, Size alignment)
     VoidPtr allocationResult = PtrAlign(freeAddress_, alignment);
     freeAddress_ = PtrAdd(freeAddress_, allocationSize);
 
-    assert((PtrDifference(mainChunk_, PtrAdd(freeAddress_, allocationSize)) < mainChunkSize_) && "Allocation exceeds chunk size!");
+    assert((PtrDifference(mainChunk_, PtrAdd(freeAddress_, allocationSize)) < static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
     return allocationResult;
 }
@@ -94,7 +96,7 @@ StackAllocator::StackAllocator()
     , currentStackScope_{ 0 }
 { }
 
-StackAllocator::StackAllocator(VoidPtr chunk, Size size, bool isOwner = false)
+StackAllocator::StackAllocator(VoidPtr chunk, Size size, bool isOwner)
     : mainChunk_{ chunk }
     , mainChunkSize_{ size }
     , isOwner_{ isOwner }
@@ -120,6 +122,8 @@ StackAllocator& StackAllocator::operator=(StackAllocator&& rhs)
 
     rhs.isOwner_ = false;
     rhs.Reset();
+
+    return *this;
 }
 
 StackAllocator::~StackAllocator()
@@ -131,7 +135,7 @@ VoidPtr StackAllocator::Alloc(Size size, Size alignment)
 {
     Size allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocHeader));
     
-    assert((PtrDifference(mainChunk_, PtrAdd(stackTopPtr_, allocationSize)) < mainChunkSize_) && "Allocation exceeds chunk size!");
+    assert((PtrDifference(mainChunk_, PtrAdd(stackTopPtr_, allocationSize)) < static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
     VoidPtr const headerAdjustedTop = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
     VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);

@@ -2,6 +2,9 @@
 
 #include <Foundation\PerformanceTimer.hpp>
 
+namespace DXRL
+{
+
 PerformanceTimer::PerformanceTimer() :
     deltaTime_(-1.0),
     baseTime_(0),
@@ -44,4 +47,6 @@ void PerformanceTimer::Tick()
     if (deltaTime_ < 0.0) {
         deltaTime_ = 0.0;
     }
+}
+
 }

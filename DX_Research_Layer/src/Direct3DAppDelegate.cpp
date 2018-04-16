@@ -511,7 +511,7 @@ void Direct3DAppDelegate::shutdown()
 
 }
 
-PerformanceTimer& Direct3DAppDelegate::Timer()
+DXRL::PerformanceTimer& Direct3DAppDelegate::Timer()
 {
     return gameTimer_;
 }

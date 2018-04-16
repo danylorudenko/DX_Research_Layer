@@ -32,21 +32,21 @@ protected:
 class Kibibytes : public Bytes
 {
 public:
-    Kibibytes(Size bytesCount);
+    Kibibytes(Size kibiBytesCount);
 };
 
 ////////////////////////////////////////
 class Mibibytes : public Kibibytes
 {
 public:
-    Mibibytes(Size bytesCount);
+    Mibibytes(Size mibiBytesCount);
 };
 
 ////////////////////////////////////////
 class Gibibytes : public Mibibytes
 {
 public:
-    Gibibytes(Size bytesCount);
+    Gibibytes(Size gibiBytesCount);
 };
 
 Bytes operator+(const Bytes& lhs, const Bytes& rhs);
