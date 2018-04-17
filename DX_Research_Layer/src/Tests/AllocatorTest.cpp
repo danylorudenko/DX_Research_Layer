@@ -1,34 +1,116 @@
 #include <pch.hpp>
+#include <chrono>
 
 #include <Memory\Allocator.hpp>
 
-struct TestStruct
+struct CharBuffer32
 {
-    char content[512];
+    char content[32];
 };
 
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ PSTR pCmdLine, _In_ int nShowCmd)
+struct CharBuffer256
+{
+    char content[256];
+};
+
+struct CharBuffer1024
+{
+    char content[1024];
+};
+
+int main()
 {
     using namespace DXRL;
 
     std::string const testString{ "THIS IS A TEST STRING!" };
+    Size constexpr allocationsCount = 1024;
 
-    Memory::Mibibytes const memorySize{ 1 };
-    Memory::VoidPtr memory = malloc(memorySize);
+    ///////////////////////////////////////////////////
 
-    Memory::LinearAllocator allocator{ memory, memorySize };
+    Memory::VoidPtr* linearAllocations = new Memory::VoidPtr[allocationsCount];
+    Memory::VoidPtr* newAllocations = new Memory::VoidPtr[allocationsCount];
 
-    auto* charBuffer0 = allocator.Alloc<TestStruct>();
-    auto* charBuffer1 = allocator.Alloc<TestStruct>();
-    auto* charBuffer2 = allocator.Alloc<TestStruct>();
-    
-    strcpy_s(charBuffer0->content, sizeof(TestStruct), testString.c_str());
-    strcpy_s(charBuffer1->content, sizeof(TestStruct), testString.c_str());
-    strcpy_s(charBuffer2->content, sizeof(TestStruct), testString.c_str());
+
+    Memory::Bytes linearChunkSize{ sizeof(CharBuffer32) * allocationsCount * 1024 };
+    Memory::VoidPtr linearMemoryChunk = malloc(linearChunkSize);
+    Memory::LinearAllocator allocator{ linearMemoryChunk, linearChunkSize };
+
+    //////////////////////////////////////
+    // LINEAR TEST START
+    auto linearStart = std::chrono::system_clock::now();
+
+    for (Size i = 0; i < allocationsCount; ++i) {
+        Size const id = i % 3;
+        switch (id)
+        {
+        case 0:
+            *(linearAllocations + i) = allocator.Alloc(sizeof(CharBuffer32));
+            break;
+        case 1:
+            *(linearAllocations + i) = allocator.Alloc(sizeof(CharBuffer256));
+            break;
+        case 2:
+            *(linearAllocations + i) = allocator.Alloc(sizeof(CharBuffer1024));
+            break;
+        }
+        
+        //strcpy_s((*linearAllocations + i)->content, sizeof(CharBuffer32), testString.c_str());
+    }
 
     allocator.FreeAll();
+    free(linearMemoryChunk);
 
-    free(memory);
+    auto linearEnd = std::chrono::system_clock::now();
+    // LINEAR TEST END
+    //////////////////////////////////////
+    auto linearDuration = linearEnd - linearStart;
+    std::cout << allocationsCount << " linear allocations: " << linearDuration.count() << " nanoseconds" << std::endl << std::endl;
 
+
+
+
+    //////////////////////////////////////
+    // NEW TEST START
+    auto newStart = std::chrono::system_clock::now();
+
+    for (Size i = 0; i < allocationsCount; ++i) {
+        for (Size i = 0; i < allocationsCount; ++i) {
+            Size const id = i % 3;
+            switch (id)
+            {
+            case 0:
+                *(linearAllocations + i) = malloc(sizeof(CharBuffer32));
+                break;
+            case 1:
+                *(linearAllocations + i) = malloc(sizeof(CharBuffer256));
+                break;
+            case 2:
+                *(linearAllocations + i) = malloc(sizeof(CharBuffer1024));
+                break;
+            }
+
+            //strcpy_s((*linearAllocations + i)->content, sizeof(CharBuffer32), testString.c_str());
+        }
+        //strcpy_s((*(newAllocations + i))->content, sizeof(CharBuffer32), testString.c_str());
+        free(*(newAllocations + i));
+    }
+
+    //for (Size i = 0; i < allocationsCount; ++i) {
+    //    
+    //}
+
+    auto newEnd = std::chrono::system_clock::now();
+    // NEW TEST END
+    //////////////////////////////////////
+
+    auto newDuration = newEnd - newStart;
+    std::cout << allocationsCount << " new allocations: " << newDuration.count() << " nanoseconds" << std::endl << std::endl;
+
+    ////////////////////////////////////////////////////
+
+    delete[] linearAllocations;
+    delete[] newAllocations;
+
+    system("pause");
     return 0;
 }

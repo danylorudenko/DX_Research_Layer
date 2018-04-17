@@ -53,10 +53,11 @@ VoidPtr LinearAllocator::Alloc(Size size, Size alignment)
 {
     Size allocationSize = CalcSizeWithAlignment(size, alignment);
 
+    assert((PtrDifference(PtrAdd(freeAddress_, allocationSize), mainChunk_) <= static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
+
     VoidPtr allocationResult = PtrAlign(freeAddress_, alignment);
     freeAddress_ = PtrAdd(freeAddress_, allocationSize);
 
-    assert((PtrDifference(mainChunk_, PtrAdd(freeAddress_, allocationSize)) < static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
     return allocationResult;
 }
@@ -135,7 +136,7 @@ VoidPtr StackAllocator::Alloc(Size size, Size alignment)
 {
     Size allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocHeader));
     
-    assert((PtrDifference(mainChunk_, PtrAdd(stackTopPtr_, allocationSize)) < static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
+    assert((PtrDifference(PtrAdd(stackTopPtr_, allocationSize), mainChunk_) < static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
     VoidPtr const headerAdjustedTop = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
     VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);
@@ -154,6 +155,8 @@ VoidPtr StackAllocator::Alloc(Size size, Size alignment)
 VoidPtr StackAllocator::AllocArray(Size unitSize, Size unitCount, Size alignment)
 {
     Size const allocationSize = CalcSizeWithAlignment(unitSize * unitCount, alignment, sizeof(AllocHeader));
+
+    assert((PtrDifference(PtrAdd(stackTopPtr_, allocationSize), mainChunk_) < static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
     VoidPtr const headerAdjustedTop = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
     VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);
