@@ -1,7 +1,9 @@
 #include <pch.hpp>
 #include <chrono>
+#include <random>
 
 #include <Memory\Allocator.hpp>
+#include <Memory\Pointer.hpp>
 
 struct CharBuffer32
 {
@@ -22,8 +24,13 @@ int main()
 {
     using namespace DXRL;
 
+    std::random_device device{};
+    std::default_random_engine engine{ device() };
+
+    std::uniform_int_distribution<> uniform_dist{ 100, 10000 };
+    
     std::string const testString{ "THIS IS A TEST STRING!" };
-    Size constexpr allocationsCount = 1024;
+    Size constexpr allocationsCount = 10000;
 
     ///////////////////////////////////////////////////
 
@@ -31,36 +38,23 @@ int main()
     Memory::VoidPtr* newAllocations = new Memory::VoidPtr[allocationsCount];
 
 
-    Memory::Bytes linearChunkSize{ sizeof(CharBuffer32) * allocationsCount * 1024 };
+    Memory::Bytes linearChunkSize{ allocationsCount * 10000 };
     Memory::VoidPtr linearMemoryChunk = malloc(linearChunkSize);
-    Memory::LinearAllocator allocator{ linearMemoryChunk, linearChunkSize };
+    Memory::LinearAllocator allocator{ linearMemoryChunk, linearChunkSize, true };
 
     //////////////////////////////////////
     // LINEAR TEST START
-    auto linearStart = std::chrono::system_clock::now();
+    auto linearStart = std::chrono::high_resolution_clock::now();;
 
     for (Size i = 0; i < allocationsCount; ++i) {
-        Size const id = i % 3;
-        switch (id)
-        {
-        case 0:
-            *(linearAllocations + i) = allocator.Alloc(sizeof(CharBuffer32));
-            break;
-        case 1:
-            *(linearAllocations + i) = allocator.Alloc(sizeof(CharBuffer256));
-            break;
-        case 2:
-            *(linearAllocations + i) = allocator.Alloc(sizeof(CharBuffer1024));
-            break;
-        }
-        
-        //strcpy_s((*linearAllocations + i)->content, sizeof(CharBuffer32), testString.c_str());
+        char* ptr = reinterpret_cast<char*>(allocator.Alloc(uniform_dist(engine)));
+        strcpy_s(ptr, 80, testString.c_str());
     }
 
-    allocator.FreeAll();
-    free(linearMemoryChunk);
+    allocator.Reset();
 
-    auto linearEnd = std::chrono::system_clock::now();
+    auto linearEnd = std::chrono::high_resolution_clock::now();
+    
     // LINEAR TEST END
     //////////////////////////////////////
     auto linearDuration = linearEnd - linearStart;
@@ -71,40 +65,24 @@ int main()
 
     //////////////////////////////////////
     // NEW TEST START
-    auto newStart = std::chrono::system_clock::now();
+    auto newStart = std::chrono::high_resolution_clock::now();;
 
     for (Size i = 0; i < allocationsCount; ++i) {
-        for (Size i = 0; i < allocationsCount; ++i) {
-            Size const id = i % 3;
-            switch (id)
-            {
-            case 0:
-                *(linearAllocations + i) = malloc(sizeof(CharBuffer32));
-                break;
-            case 1:
-                *(linearAllocations + i) = malloc(sizeof(CharBuffer256));
-                break;
-            case 2:
-                *(linearAllocations + i) = malloc(sizeof(CharBuffer1024));
-                break;
-            }
+        char* ptr = reinterpret_cast<char*>(malloc(uniform_dist(engine)));
+        *(newAllocations + i) = ptr;
+        strcpy_s(ptr, 80, testString.c_str());
+    }
 
-            //strcpy_s((*linearAllocations + i)->content, sizeof(CharBuffer32), testString.c_str());
-        }
-        //strcpy_s((*(newAllocations + i))->content, sizeof(CharBuffer32), testString.c_str());
+    for (Size i = 0; i < allocationsCount; ++i) {
         free(*(newAllocations + i));
     }
 
-    //for (Size i = 0; i < allocationsCount; ++i) {
-    //    
-    //}
-
-    auto newEnd = std::chrono::system_clock::now();
+    auto newEnd = std::chrono::high_resolution_clock::now();;
     // NEW TEST END
     //////////////////////////////////////
 
     auto newDuration = newEnd - newStart;
-    std::cout << allocationsCount << " new allocations: " << newDuration.count() << " nanoseconds" << std::endl << std::endl;
+    std::cout << allocationsCount << " ___new allocations: " << newDuration.count() << " nanoseconds" << std::endl << std::endl;
 
     ////////////////////////////////////////////////////
 
