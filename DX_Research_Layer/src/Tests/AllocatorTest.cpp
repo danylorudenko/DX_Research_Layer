@@ -24,22 +24,26 @@ int main()
     ///////////////////////////////////////////////////
 
     Size constexpr allocationsCount = 10;
-    
-    Memory::Bytes linearChunkSize{ sizeof(CharBuffer32) * allocationsCount * 2 };
+    CharBuffer32* allocations[allocationsCount];
+
+
+    Memory::Mibibytes linearChunkSize{ 10 };
     Memory::VoidPtr linearMemoryChunk = malloc(linearChunkSize);
-    Memory::LinearAllocator allocator{ linearMemoryChunk, linearChunkSize, true };
-    
+    Memory::StackAllocator allocator{ linearMemoryChunk, linearChunkSize, true };
+
     for (Size i = 0; i < allocationsCount; ++i) {
         CharBuffer32* buffer = allocator.Alloc<CharBuffer32>();
         strcpy_s(buffer->content, sizeof(CharBuffer32), testString);
+        *(allocations + i) = buffer;
+
     }
 
-    //Memory::VoidPtr ptr = reinterpret_cast<Memory::VoidPtr>(12);
-    //Memory::VoidPtr alignedPtr = Memory::PtrAlign(ptr, 8);
-    //
-    //std::bitset<64> bitsetPtr{ reinterpret_cast<Memory::UintPtr>(ptr) };
-    //std::bitset<64> bitsetAligned{ reinterpret_cast<Memory::UintPtr>(alignedPtr) };
-    //std::cout << bitsetPtr << std::endl << bitsetAligned << std::endl;
+    for (Size i = 9; i >= 7; --i) {
+        allocator.Free(*(allocations + i));
+    }
+
+    CharBuffer32* buffer = allocator.Alloc<CharBuffer32>();
+    strcpy_s(buffer->content, sizeof(CharBuffer32), testString);
     
     system("pause");
     return 0;

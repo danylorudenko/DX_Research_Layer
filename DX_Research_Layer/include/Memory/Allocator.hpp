@@ -74,7 +74,7 @@ public:
     ~StackAllocator();
 
     VoidPtr Alloc(Size size, Size alignment = 0);
-    VoidPtr AllocArray(Size unitSize, Size unitCount = 1, Size alignment = 4);
+    VoidPtr AllocArray(Size unitSize, Size Count = 1, Size alignment = 4);
 
     void Free(VoidPtr ptr);
     void FreeArray(VoidPtr ptr);
@@ -139,7 +139,6 @@ private:
         
         
         Size allocationScope_;
-        VoidPtr allocationStart_;
         union
         {
             AllocHeaderSingle singleHeader_;

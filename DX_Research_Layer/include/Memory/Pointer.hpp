@@ -44,11 +44,7 @@ inline UintPtr PtrAlignmentAdjustment(T* ptr, U alignment)
 template<typename T, typename U, typename V = S32>
 inline T CalcSizeWithAlignment(T size, U alignment, V additionalDataSize = 0)
 {
-    return static_cast<T>(
-        (static_cast<T>(alignment - 1) > static_cast<T>(additionalDataSize))
-        ? alignment - 1
-        : additionalDataSize
-        ) + size;
+    return static_cast<T>(size + (alignment - 1) + additionalDataSize);
 }
 
 

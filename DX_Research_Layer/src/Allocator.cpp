@@ -75,7 +75,7 @@ void LinearAllocator::FreeAll()
 void LinearAllocator::Reset()
 {
     if(isOwner_)
-        delete[] mainChunk_;
+        free(mainChunk_);
 
     mainChunk_ = nullptr;
     mainChunkSize_ = 0;
@@ -106,6 +106,11 @@ StackAllocator::StackAllocator(VoidPtr chunk, Size size, bool isOwner)
 { }
 
 StackAllocator::StackAllocator(StackAllocator&& rhs)
+    : mainChunk_{ nullptr }
+    , mainChunkSize_{ 0 }
+    , isOwner_{ false }
+    , stackTopPtr_{ nullptr }
+    , currentStackScope_{ 0 }
 {
     operator=(std::move(rhs));
 }
@@ -136,14 +141,13 @@ VoidPtr StackAllocator::Alloc(Size size, Size alignment)
 {
     Size allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocHeader));
     
-    assert((PtrDifference(PtrAdd(stackTopPtr_, allocationSize), mainChunk_) < static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
+    assert((PtrDifference(PtrAdd(stackTopPtr_, allocationSize), mainChunk_) <= static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
     VoidPtr const headerAdjustedTop = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
     VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);
 
     AllocHeader* const headerPtr = reinterpret_cast<AllocHeader*>(PtrNegate(allocationResult, sizeof(AllocHeader)));
     headerPtr->allocationScope_ = ++currentStackScope_;
-    headerPtr->allocationStart_ = stackTopPtr_;
     headerPtr->singleHeader_.allocationSize_ = allocationSize;
     headerPtr->type_ = AllocHeader::Single;
 
@@ -156,14 +160,13 @@ VoidPtr StackAllocator::AllocArray(Size unitSize, Size unitCount, Size alignment
 {
     Size const allocationSize = CalcSizeWithAlignment(unitSize * unitCount, alignment, sizeof(AllocHeader));
 
-    assert((PtrDifference(PtrAdd(stackTopPtr_, allocationSize), mainChunk_) < static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
+    assert((PtrDifference(PtrAdd(stackTopPtr_, allocationSize), mainChunk_) <= static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
     VoidPtr const headerAdjustedTop = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
     VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);
 
     AllocHeader* const headerPtr = reinterpret_cast<AllocHeader*>(PtrNegate(allocationResult, sizeof(AllocHeader)));
     headerPtr->allocationScope_ = ++currentStackScope_;
-    headerPtr->allocationStart_ = stackTopPtr_;
     headerPtr->arrayHeader_.unitsCount_ = unitCount;
     headerPtr->arrayHeader_.unitSize_ = unitSize;
     headerPtr->type_ = AllocHeader::Array;
@@ -181,7 +184,8 @@ void StackAllocator::Free(VoidPtr ptr)
     assert(header->allocationScope_ == currentStackScope_ && "Trying to free not-the-top scope of the stack!");
     assert(header->type_ == AllocHeader::Single && "Trying to free array-type allocation with regular Free()");
 
-    stackTopPtr_ = header->allocationStart_;
+    --currentStackScope_;
+    stackTopPtr_ = PtrNegate(stackTopPtr_, header->singleHeader_.allocationSize_);
 }
 
 void StackAllocator::FreeArray(VoidPtr arrayPtr)
@@ -192,13 +196,15 @@ void StackAllocator::FreeArray(VoidPtr arrayPtr)
     assert(header->allocationScope_ == currentStackScope_ && "Trying to free not-the-top scope of the stack!");
     assert(header->type_ == AllocHeader::Array && "Trying to free single-type allocation with FreeArray()");
 
-    stackTopPtr_ = header->allocationStart_;
+    --currentStackScope_;
+    Size const allocationSize = header->arrayHeader_.unitSize_ * header->arrayHeader_.unitSize_;
+    stackTopPtr_ = PtrNegate(stackTopPtr_, allocationSize);
 }
 
 void StackAllocator::Reset()
 {
     if(isOwner_)
-        delete[] mainChunk_;
+        free(mainChunk_);
     
     mainChunk_ = nullptr;
     mainChunkSize_ = 0;
