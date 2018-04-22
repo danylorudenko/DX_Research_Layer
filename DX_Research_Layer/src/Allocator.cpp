@@ -88,6 +88,11 @@ bool LinearAllocator::IsNull() const
     return mainChunk_ == nullptr;
 }
 
+Size LinearAllocator::ChunkSize() const
+{
+    return mainChunkSize_;
+}
+
 ////////////////////////////////////////
 StackAllocator::StackAllocator()
     : mainChunk_{ nullptr }
@@ -216,6 +221,11 @@ void StackAllocator::Reset()
 bool StackAllocator::IsNull() const
 {
     return mainChunk_ == nullptr;
+}
+
+Size StackAllocator::ChunkSize() const
+{
+    return mainChunkSize_;
 }
 
 } // namespace Memory

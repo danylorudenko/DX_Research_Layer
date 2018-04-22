@@ -25,6 +25,7 @@ public:
     void Reset();
 
     bool IsNull() const;
+    Size ChunkSize() const;
 
 
     template<typename TResult, typename ...TArgs>
@@ -82,6 +83,7 @@ public:
     void Reset();
 
     bool IsNull() const;
+    Size ChunkSize() const;
 
     template<typename TResult, typename... TArgs>
     TResult* Alloc(TArgs&&... args)
@@ -104,6 +106,21 @@ public:
         }
 
         return arrayStart;
+    }
+
+    template<typename T>
+    void Free(T* data)
+    {
+        data->~T();
+        Free(data);
+    }
+
+    template<typename T>
+    void FreeArray(Size count, T* dataArray)
+    {
+        for (Size i = 0; i < count; ++i) {
+            (dataArray + i)->~T();
+        }
     }
 
 
@@ -147,6 +164,41 @@ private:
 
         AllocType type_;
     };
+};
+
+
+////////////////////////////////////////
+template<typename T>
+class PoolAllocator
+{
+private:
+    struct PoolMember
+    {
+        T* data_;
+        PoolMember* prev_;
+        PoolMember* next_;
+    }
+
+public:
+    DXRL_DEFINE_UNCOPYABLE_MOVABLE(PoolAllocator<T>)
+
+    PoolAllocator(VoidPtr mainChunk, Size mainChunkSize, bool isOwner = false);
+    ~PoolAllocator();
+
+    template<typename... TArgs>
+    T* Pop(TArgs&&... args);
+    void Push(T* data);
+
+    bool IsNull() const;
+    Size ChunkSize() const;
+
+private:
+    VoidPtr mainChunk_;
+    Size mainChunkSize_;
+
+    PoolMember* listStart_;
+    PoolMember* listEnd_;
+
 };
 
 
