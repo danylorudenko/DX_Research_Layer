@@ -192,25 +192,27 @@ public:
         , poolSize_{ 0 }
         , allocationsCount_{ 0 }
         , isOwner_{ false }
+        , requiresDestruction_{ true }
     { }
 
-    PoolAllocator(VoidPtr mainChunk, Size mainChunkSize, bool requiresDestruction = false, bool isOwner = false)
+    PoolAllocator(VoidPtr mainChunk, Size mainChunkSize, bool requiresDestruction = true, bool isOwner = false)
         : mainChunk_{ mainChunk }
         , mainChunkSize_{ mainChunkSize }
         , freeListStart_{ nullptr }
         , poolSize_{ 0 }
         , allocationsCount_{ 0 }
         , isOwner_{ isOwner }
+        , requiresDestruction_{ requiresDestruction }
     {
         Size constexpr poolMemberSize = sizeof(PoolMember);
         Size constexpr poolMemberAlignment = alignof(PoolMember);
         
         poolSize_ = (mainChunkSize_ - poolMemberAlignment) / poolMemberSize;
 
-        freeListStart_ = reinterpret_cast<PoolMember*>PtrAlign(mainChunk_, poolMemberAlignment);
+        freeListStart_ = reinterpret_cast<PoolMember*>(PtrAlign(mainChunk_, poolMemberAlignment));
         Size const iEnd = poolSize_ - 1;
         for (Size i = 0; i < iEnd; ++i) {
-            freeListStart_[i].nextFree_ = freeListStart_[i + 1];
+            freeListStart_[i].nextFree_ = (freeListStart_ + (i + 1));
         }
     }
 
@@ -221,6 +223,7 @@ public:
         , poolSize_{ rhs.poolSize_ }
         , allocationsCount{ rhs.allocationsCount }
         , isOwner_{ rhs.isOwner_ }
+        , requiresDestruction_{ rhs.requiresDestruction_ }
     {
         rhs.allocationsCount_ = 0;
         rhs.isOwner_ = false;
@@ -238,6 +241,7 @@ public:
         poolSize_ = rhs.poolSize_;
         allocationsCount = rhs.allocationsCount;
         isOwner_ = rhs.isOwner_;
+        requiresDestruction_ = rhs.requiresDestruction_;
 
         rhs.allocationsCount_ = 0;
         rhs.isOwner_ = false;
@@ -246,7 +250,7 @@ public:
 
     void Reset()
     {
-        assert(allocationsCount_ == 0 && "Can't reset PoolAllocator unless all allocations are released.");
+        assert(requiresDestruction_ ? (allocationsCount_ == 0) : true && "Can't reset PoolAllocator unless all allocations are released.");
         
         if (isOwner_) 
             free(mainChunk_);
@@ -257,6 +261,7 @@ public:
         freeListStart_ = nullptr;
         poolSize_ = 0;
         isOwner_ = false;
+        requiresDestruction_ = true;
     }
 
     ~PoolAllocator()
@@ -270,17 +275,18 @@ public:
         assert( allocationsCount_ < poolSize_ && "No more free members in the pool.");
 
         T* result = reinterpret_cast<T*>(freeListStart_);
-        freeListStart_ = freeListStart_.nextFree_;
+        freeListStart_ = freeListStart_->nextFree_;
 
         ++allocationsCount_;
         return new (result) T{ args... };
     }
+
     void Push(T* data)
     {
         data->~T();
 
-        PoolMember* newFreeMember = reinterpret_cast<T*>(data);
-        newFreeMember.nextFree_ = freeListStart_;
+        PoolMember* newFreeMember = reinterpret_cast<PoolMember*>(data);
+        newFreeMember->nextFree_ = freeListStart_;
         freeListStart_ = newFreeMember;
         --allocationsCount_;
     }
@@ -300,6 +306,7 @@ private:
     Size allocationsCount_;
 
     bool isOwner_;
+    bool requiresDestruction_;
 };
 
 
