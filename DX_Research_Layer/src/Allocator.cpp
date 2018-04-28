@@ -16,6 +16,10 @@ LinearAllocator::LinearAllocator()
 { }
 
 LinearAllocator::LinearAllocator(LinearAllocator&& rhs)
+    : mainChunk_{ nullptr }
+    , mainChunkSize_{ 0 }
+    , isOwner_{ false }
+    , freeAddress_{ nullptr }
 {
     operator=(std::move(rhs));
 }
@@ -96,25 +100,28 @@ Size LinearAllocator::ChunkSize() const
 StackAllocator::StackAllocator()
     : mainChunk_{ nullptr }
     , mainChunkSize_{ 0 }
-    , isOwner_{ false }
     , stackTopPtr_{ nullptr }
     , currentStackScope_{ 0 }
+    , isOwner_{ false }
+    , requiresDestruction_{ true }
 { }
 
-StackAllocator::StackAllocator(VoidPtr chunk, Size size, bool isOwner)
+StackAllocator::StackAllocator(VoidPtr chunk, Size size, bool requiresDestruction, bool isOwner)
     : mainChunk_{ chunk }
     , mainChunkSize_{ size }
-    , isOwner_{ isOwner }
     , stackTopPtr_{ chunk }
     , currentStackScope_{ 0 }
+    , isOwner_{ isOwner }
+    , requiresDestruction_{ requiresDestruction }
 { }
 
 StackAllocator::StackAllocator(StackAllocator&& rhs)
     : mainChunk_{ nullptr }
     , mainChunkSize_{ 0 }
-    , isOwner_{ false }
     , stackTopPtr_{ nullptr }
     , currentStackScope_{ 0 }
+    , isOwner_{ false }
+    , requiresDestruction_{ true }
 {
     operator=(std::move(rhs));
 }
@@ -207,6 +214,8 @@ void StackAllocator::FreeArray(VoidPtr arrayPtr)
 
 void StackAllocator::Reset()
 {
+    assert((requiresDestruction_ ? (currentStackScope_ == 0) : true) && "Stack allocator must be unwinded before destruction.");
+
     if(isOwner_)
         free(mainChunk_);
     
@@ -225,6 +234,76 @@ bool StackAllocator::IsNull() const
 Size StackAllocator::ChunkSize() const
 {
     return mainChunkSize_;
+}
+
+
+
+////////////////////////////////////////
+FreeListAllocator::FreeListAllocator()
+    : mainChunk_{ nullptr }
+    , mainChunkSize_{ 0 }
+    , firstFreeBlock_{ nullptr }
+    , isOwner_{ false }
+{ }
+
+FreeListAllocator::FreeListAllocator(VoidPtr mainChunk, Size mainChunkSize, bool isOwner)
+    : mainChunk_{ mainChunk }
+    , mainChunkSize_{ mainChunkSize }
+    , firstFreeBlock_{ nullptr }
+    , isOwner_{ isOwner }
+{
+    firstFreeBlock_ = reinterpret_cast<FreeBlock*>(mainChunk_);
+    firstFreeBlock_->size_ = mainChunkSize_;
+    firstFreeBlock_->nextFreeBlock_ = nullptr;
+}
+
+FreeListAllocator::FreeListAllocator(FreeListAllocator&& rhs)
+    : mainChunk_{ nullptr }
+    , mainChunkSize_{ 0 }
+    , firstFreeBlock_{ nullptr }
+    , isOwner_{ false }
+{
+    operator=(std::move(rhs));
+}
+
+FreeListAllocator& FreeListAllocator::operator=(FreeListAllocator&& rhs)
+{
+    if(!IsNull())
+        Reset();
+
+    mainChunk_ = rhs.mainChunk_;
+    mainChunkSize_ = rhs.mainChunkSize_;
+    firstFreeBlock_ = rhs.firstFreeBlock_;
+    isOwner_ = rhs.isOwner_;
+
+    rhs.isOwner_ = false;
+    rhs.Reset();
+}
+
+FreeListAllocator::~FreeListAllocator()
+{
+    Reset();
+}
+
+bool FreeListAllocator::IsNull() const
+{
+    return mainChunk_ == nullptr;
+}
+
+Size FreeListAllocator::ChunkSize() const
+{
+    return mainChunkSize_;
+}
+
+void FreeListAllocator::Reset()
+{
+    if(isOwner_)
+        free(mainChunk_);
+
+    mainChunk_ = nullptr;
+    mainChunkSize_ = 0;
+    firstFreeBlock_ = nullptr;
+    isOwner_ = false;
 }
 
 } // namespace Memory

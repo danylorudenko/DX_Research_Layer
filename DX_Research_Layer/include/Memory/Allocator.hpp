@@ -72,7 +72,7 @@ class StackAllocator
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(StackAllocator)
 
-    StackAllocator(VoidPtr chunk, Size size, bool isOwner = false);
+    StackAllocator(VoidPtr chunk, Size size, bool requiresDestruction = true, bool isOwner = false);
     ~StackAllocator();
 
     VoidPtr Alloc(Size size, Size alignment = 0);
@@ -128,11 +128,12 @@ public:
 private:
     VoidPtr mainChunk_;
     Size mainChunkSize_;
-    bool isOwner_;
 
     VoidPtr stackTopPtr_;
     Size currentStackScope_;
 
+    bool isOwner_;
+    bool requiresDestruction_;
 
 private:
     
@@ -217,17 +218,15 @@ public:
     }
 
     PoolAllocator(PoolAllocator<T>&& rhs)
-        : mainChunk_{ rhs.mainChunk_ }
-        , mainChunkSize_{ rhs.mainChunkSize_ }
-        , freeListStart_{ rhs.freeListStart_ }
-        , poolSize_{ rhs.poolSize_ }
-        , allocationsCount{ rhs.allocationsCount }
-        , isOwner_{ rhs.isOwner_ }
-        , requiresDestruction_{ rhs.requiresDestruction_ }
+        : mainChunk_{ nullptr }
+        , mainChunkSize_{ 0 }
+        , freeListStart_{ nullptr }
+        , poolSize_{ 0 }
+        , allocationsCount_{ 0 }
+        , isOwner_{ false }
+        , requiresDestruction_{ true }
     {
-        rhs.allocationsCount_ = 0;
-        rhs.isOwner_ = false;
-        rhs.Reset();
+        operator=(std::move(rhs));
     }
 
     PoolAllocator<T>& operator=(PoolAllocator<T>&& rhs)
@@ -248,9 +247,14 @@ public:
         rhs.Reset();
     }
 
+    ~PoolAllocator()
+    {
+        Reset();
+    }
+
     void Reset()
     {
-        assert(requiresDestruction_ ? (allocationsCount_ == 0) : true && "Can't reset PoolAllocator unless all allocations are released.");
+        assert((requiresDestruction_ ? (allocationsCount_ == 0) : true) && "Can't reset PoolAllocator unless all allocations are released.");
         
         if (isOwner_) 
             free(mainChunk_);
@@ -262,11 +266,6 @@ public:
         poolSize_ = 0;
         isOwner_ = false;
         requiresDestruction_ = true;
-    }
-
-    ~PoolAllocator()
-    {
-        Reset();
     }
 
     template<typename... TArgs>
@@ -307,6 +306,41 @@ private:
 
     bool isOwner_;
     bool requiresDestruction_;
+};
+
+
+
+////////////////////////////////////////
+class FreeListAllocator
+{
+private:
+    struct FreeBlock
+    {
+        Size size_;
+        VoidPtr nextFreeBlock_;
+    };
+
+public:
+    DXRL_DEFINE_UNCOPYABLE_MOVABLE(FreeListAllocator)
+
+    FreeListAllocator(VoidPtr mainChunk, Size mainChunkSize, bool isOwner);
+    ~FreeListAllocator();
+
+    VoidPtr Alloc(Size size, Size alignment);
+    void Free(VoidPtr ptr);
+
+    void Reset();
+
+    bool IsNull() const;
+    Size ChunkSize() const;
+
+private:
+    VoidPtr mainChunk_;
+    Size mainChunkSize_;
+
+    FreeBlock* firstFreeBlock_;
+
+    bool isOwner_;
 };
 
 
