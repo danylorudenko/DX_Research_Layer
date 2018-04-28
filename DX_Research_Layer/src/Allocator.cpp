@@ -1,7 +1,6 @@
 #include <pch.hpp>
 
 #include <Memory\Memory.hpp>
-#include <Memory\Pointer.hpp>
 
 namespace DXRL
 {

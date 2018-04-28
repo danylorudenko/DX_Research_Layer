@@ -2,6 +2,7 @@
 
 #include <Foundation\Macro.hpp>
 #include <Memory\Bytes.hpp>
+#include <Memory\Pointer.hpp>
 
 namespace DXRL
 {
@@ -112,7 +113,7 @@ public:
     void Free(T* data)
     {
         data->~T();
-        Free(data);
+        this->Free(reinterpret_cast<VoidPtr>(data));
     }
 
     template<typename T>
@@ -167,6 +168,8 @@ private:
 };
 
 
+
+
 ////////////////////////////////////////
 template<typename T>
 class PoolAllocator
@@ -174,31 +177,129 @@ class PoolAllocator
 private:
     struct PoolMember
     {
-        T* data_;
-        PoolMember* prev_;
-        PoolMember* next_;
-    }
+        T data_;
+        PoolMember* nextFree_;
+    };
 
 public:
-    DXRL_DEFINE_UNCOPYABLE_MOVABLE(PoolAllocator<T>)
+    PoolAllocator(PoolAllocator<T> const&) = delete;
+    PoolAllocator<T>& operator=(PoolAllocator<T> const& rhs) = delete;
 
-    PoolAllocator(VoidPtr mainChunk, Size mainChunkSize, bool isOwner = false);
-    ~PoolAllocator();
+    PoolAllocator()
+        : mainChunk_{ nullptr }
+        , mainChunkSize_{ 0 }
+        , freeListStart_{ nullptr }
+        , poolSize_{ 0 }
+        , allocationsCount_{ 0 }
+        , isOwner_{ false }
+    { }
+
+    PoolAllocator(VoidPtr mainChunk, Size mainChunkSize, bool requiresDestruction = false, bool isOwner = false)
+        : mainChunk_{ mainChunk }
+        , mainChunkSize_{ mainChunkSize }
+        , freeListStart_{ nullptr }
+        , poolSize_{ 0 }
+        , allocationsCount_{ 0 }
+        , isOwner_{ isOwner }
+    {
+        Size constexpr poolMemberSize = sizeof(PoolMember);
+        Size constexpr poolMemberAlignment = alignof(PoolMember);
+        
+        poolSize_ = (mainChunkSize_ - poolMemberAlignment) / poolMemberSize;
+
+        freeListStart_ = reinterpret_cast<PoolMember*>PtrAlign(mainChunk_, poolMemberAlignment);
+        Size const iEnd = poolSize_ - 1;
+        for (Size i = 0; i < iEnd; ++i) {
+            freeListStart_[i].nextFree_ = freeListStart_[i + 1];
+        }
+    }
+
+    PoolAllocator(PoolAllocator<T>&& rhs)
+        : mainChunk_{ rhs.mainChunk_ }
+        , mainChunkSize_{ rhs.mainChunkSize_ }
+        , freeListStart_{ rhs.freeListStart_ }
+        , poolSize_{ rhs.poolSize_ }
+        , allocationsCount{ rhs.allocationsCount }
+        , isOwner_{ rhs.isOwner_ }
+    {
+        rhs.allocationsCount_ = 0;
+        rhs.isOwner_ = false;
+        rhs.Reset();
+    }
+
+    PoolAllocator<T>& operator=(PoolAllocator<T>&& rhs)
+    {
+        if(!IsNull())
+            Reset();
+        
+        mainChunk_ = rhs.mainChunk_;
+        mainChunkSize_ = rhs.mainChunkSize_;
+        freeListStart_ = rhs.freeListStart_;
+        poolSize_ = rhs.poolSize_;
+        allocationsCount = rhs.allocationsCount;
+        isOwner_ = rhs.isOwner_;
+
+        rhs.allocationsCount_ = 0;
+        rhs.isOwner_ = false;
+        rhs.Reset();
+    }
+
+    void Reset()
+    {
+        assert(allocationsCount_ == 0 && "Can't reset PoolAllocator unless all allocations are released.");
+        
+        if (isOwner_) 
+            free(mainChunk_);
+
+        mainChunk_ = nullptr;
+        mainChunkSize_ = 0;
+
+        freeListStart_ = nullptr;
+        poolSize_ = 0;
+        isOwner_ = false;
+    }
+
+    ~PoolAllocator()
+    {
+        Reset();
+    }
 
     template<typename... TArgs>
-    T* Pop(TArgs&&... args);
-    void Push(T* data);
+    T* Pop(TArgs&&... args)
+    {
+        assert( allocationsCount_ < poolSize_ && "No more free members in the pool.");
 
-    bool IsNull() const;
-    Size ChunkSize() const;
+        T* result = reinterpret_cast<T*>(freeListStart_);
+        freeListStart_ = freeListStart_.nextFree_;
+
+        ++allocationsCount_;
+        return new (result) T{ args... };
+    }
+    void Push(T* data)
+    {
+        data->~T();
+
+        PoolMember* newFreeMember = reinterpret_cast<T*>(data);
+        newFreeMember.nextFree_ = freeListStart_;
+        freeListStart_ = newFreeMember;
+        --allocationsCount_;
+    }
+
+    bool IsNull() const { return mainChunk_ == nullptr; }
+    Size ChunkSize() const { return mainChunkSize_; }
+
+    Size PoolSize() const { return poolSize_; }
+    
 
 private:
     VoidPtr mainChunk_;
     Size mainChunkSize_;
 
-    PoolMember* listStart_;
-    PoolMember* listEnd_;
+    PoolMember* freeListStart_;
+    Size poolSize_;
+    Size allocationsCount_;
 
+    bool isOwner_;
 };
 
 
