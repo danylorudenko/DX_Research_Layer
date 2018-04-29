@@ -317,16 +317,20 @@ private:
 
     struct AllocationHeader
     {
+        Size allocationSize_;
         U16 freeBlockStartOffset_;
     };
 
-    struct FreeBlock
+    struct FreeBlockHeader
     {
         Size size_;
-        FreeBlock* nextFreeBlock_;
+        FreeBlockHeader* nextFreeBlock_;
+
+        bool IsStartAdjacent(FreeBlockHeader* block);
+        bool IsEndAdjacent(FreeBlockHeader* block);
     };
 
-    static Size constexpr MIN_FREEBLOCK_TAIL = sizeof(FreeBlock) + 16;
+    static Size constexpr MIN_FREEBLOCK_TAIL = sizeof(FreeBlockHeader) + 16;
 
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(FreeListAllocator)
@@ -335,7 +339,7 @@ public:
     ~FreeListAllocator();
 
     VoidPtr Alloc(Size size, Size alignment);
-    void Free(VoidPtr ptr);
+    void Free(VoidPtr data);
 
     void Reset();
 
@@ -346,7 +350,7 @@ private:
     VoidPtr mainChunk_;
     Size mainChunkSize_;
 
-    FreeBlock* firstFreeBlock_;
+    FreeBlockHeader* firstFreeBlock_;
 
     bool isOwner_;
 };

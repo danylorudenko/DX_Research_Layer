@@ -154,8 +154,8 @@ VoidPtr StackAllocator::Alloc(Size size, Size alignment)
     
     assert((PtrDifference(PtrAdd(stackTopPtr_, allocationSize), mainChunk_) <= static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
-    VoidPtr const headerAdjustedTop = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
-    VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);
+    VoidPtr const topPlusHeader = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
+    VoidPtr const allocationResult = PtrAlign(topPlusHeader, alignment);
 
     AllocHeader* const headerPtr = reinterpret_cast<AllocHeader*>(PtrNegate(allocationResult, sizeof(AllocHeader)));
     headerPtr->allocationScope_ = ++currentStackScope_;
@@ -252,7 +252,7 @@ FreeListAllocator::FreeListAllocator(VoidPtr mainChunk, Size mainChunkSize, bool
     , firstFreeBlock_{ nullptr }
     , isOwner_{ isOwner }
 {
-    firstFreeBlock_ = reinterpret_cast<FreeBlock*>(mainChunk_);
+    firstFreeBlock_ = reinterpret_cast<FreeBlockHeader*>(mainChunk_);
     firstFreeBlock_->size_ = mainChunkSize_;
     firstFreeBlock_->nextFreeBlock_ = nullptr;
 }
@@ -310,8 +310,8 @@ VoidPtr FreeListAllocator::Alloc(Size size, Size alignment)
 {
     Size const allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocationHeader));
 
-    FreeBlock* prevBlock = nullptr;
-    FreeBlock* validBlock = firstFreeBlock_;
+    FreeBlockHeader* prevBlock = nullptr;
+    FreeBlockHeader* validBlock = firstFreeBlock_;
     
     while (validBlock->size_ < allocationSize) {
         prevBlock = validBlock;
@@ -328,18 +328,72 @@ VoidPtr FreeListAllocator::Alloc(Size size, Size alignment)
         prevBlock->nextFreeBlock_ = validBlock->nextFreeBlock_;
     }
     else {
-        FreeBlock* tailFreeBlock = reinterpret_cast<FreeBlock*>(PtrAdd(validBlock, allocationSize));
+        FreeBlockHeader* tailFreeBlock = reinterpret_cast<FreeBlockHeader*>(PtrAdd(validBlock, allocationSize));
         prevBlock->nextFreeBlock_ = tailFreeBlock;
 
         tailFreeBlock->nextFreeBlock_ = validBlock->nextFreeBlock_;
     }
 
-    VoidPtr result = PtrAlign(validBlock, alignment);
-    AllocationHeader* header = reinterpret_cast<AllocationHeader*>(PtrNegate(result, sizeof(AllocationHeader)));
+    VoidPtr const validBlockPlusHeader = PtrAdd(validBlock, sizeof(AllocationHeader));
+    VoidPtr const result = PtrAlign(validBlockPlusHeader, alignment);
+    AllocationHeader* const header = reinterpret_cast<AllocationHeader*>(PtrNegate(result, sizeof(AllocationHeader)));
+    header->allocationSize_ = allocationSize;
     header->freeBlockStartOffset_ = PtrDifference(result, validBlock);
 
     return result;
 }
+
+void FreeListAllocator::Free(VoidPtr data)
+{
+    AllocationHeader const* const allocationHeader = reinterpret_cast<AllocationHeader*>(PtrNegate(data, sizeof(AllocationHeader)));
+
+    VoidPtr const blockStart = PtrNegate(data, allocationHeader->freeBlockStartOffset_);
+    Size const blockSize = allocationHeader->allocationSize_;
+    FreeBlockHeader* blockHeader = reinterpret_cast<FreeBlockHeader*>(blockStart);
+
+    
+    if (PtrDifference(blockStart, firstFreeBlock_) < 0) {
+        // Released block is the earliest
+        if (blockHeader->IsEndAdjacent(firstFreeBlock_)) {
+            blockHeader->size_ = blockSize + firstFreeBlock_->size_;
+            blockHeader->nextFreeBlock_ = firstFreeBlock_->nextFreeBlock_;
+            firstFreeBlock_ = blockHeader;
+            return;
+        }
+        else {
+            blockHeader->nextFreeBlock_ = firstFreeBlock_;
+            blockHeader->size_ = blockSize;
+            firstFreeBlock_ = blockHeader;
+            return;
+        }
+    }
+
+    FreeBlockHeader* prevFreeBlock = firstFreeBlock_;
+    while (PtrDifference(prevFreeBlock->nextFreeBlock_, blockHeader) < 0) {
+        prevFreeBlock = prevFreeBlock->nextFreeBlock_;
+        if (prevFreeBlock->nextFreeBlock_ == nullptr) {
+            // Released block is the last one
+            prevFreeBlock->nextFreeBlock_ = blockHeader;
+            return;
+        }
+    }
+
+    // Released block is intermediate
+    blockHeader->nextFreeBlock_ = prevFreeBlock->nextFreeBlock_;
+    prevFreeBlock->nextFreeBlock_ = blockHeader;
+}
+
+bool FreeListAllocator::FreeBlockHeader::IsEndAdjacent(FreeListAllocator::FreeBlockHeader* block)
+{
+    VoidPtr thisEnd = PtrAdd(this, size_);
+    return thisEnd == block;
+}
+
+bool FreeListAllocator::FreeBlockHeader::IsStartAdjacent(FreeListAllocator::FreeBlockHeader* block)
+{
+    return block->IsEndAdjacent(this);
+}
+
 
 } // namespace Memory
 
