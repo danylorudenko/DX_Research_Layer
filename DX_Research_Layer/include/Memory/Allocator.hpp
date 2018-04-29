@@ -314,11 +314,19 @@ private:
 class FreeListAllocator
 {
 private:
+
+    struct AllocationHeader
+    {
+        U16 freeBlockStartOffset_;
+    };
+
     struct FreeBlock
     {
         Size size_;
-        VoidPtr nextFreeBlock_;
+        FreeBlock* nextFreeBlock_;
     };
+
+    static Size constexpr MIN_FREEBLOCK_TAIL = sizeof(FreeBlock) + 16;
 
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(FreeListAllocator)

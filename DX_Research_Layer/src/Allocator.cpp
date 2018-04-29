@@ -306,6 +306,41 @@ void FreeListAllocator::Reset()
     isOwner_ = false;
 }
 
+VoidPtr FreeListAllocator::Alloc(Size size, Size alignment)
+{
+    Size const allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocationHeader));
+
+    FreeBlock* prevBlock = nullptr;
+    FreeBlock* validBlock = firstFreeBlock_;
+    
+    while (validBlock->size_ < allocationSize) {
+        prevBlock = validBlock;
+        validBlock = validBlock->nextFreeBlock_;
+
+        if (validBlock == nullptr)
+            return nullptr;
+    }
+
+
+    Size const freeBlockTail = validBlock->size_ - allocationSize;
+
+    if (freeBlockTail < MIN_FREEBLOCK_TAIL) {
+        prevBlock->nextFreeBlock_ = validBlock->nextFreeBlock_;
+    }
+    else {
+        FreeBlock* tailFreeBlock = reinterpret_cast<FreeBlock*>(PtrAdd(validBlock, allocationSize));
+        prevBlock->nextFreeBlock_ = tailFreeBlock;
+
+        tailFreeBlock->nextFreeBlock_ = validBlock->nextFreeBlock_;
+    }
+
+    VoidPtr result = PtrAlign(validBlock, alignment);
+    AllocationHeader* header = reinterpret_cast<AllocationHeader*>(PtrNegate(result, sizeof(AllocationHeader)));
+    header->freeBlockStartOffset_ = PtrDifference(result, validBlock);
+
+    return result;
+}
+
 } // namespace Memory
 
 } // namespace DXRL
