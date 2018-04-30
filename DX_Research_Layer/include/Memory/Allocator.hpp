@@ -335,7 +335,7 @@ private:
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(FreeListAllocator)
 
-    FreeListAllocator(VoidPtr mainChunk, Size mainChunkSize, bool isOwner);
+    FreeListAllocator(VoidPtr mainChunk, Size mainChunkSize, bool isOwner = false);
     ~FreeListAllocator();
 
     VoidPtr Alloc(Size size, Size alignment);
@@ -345,6 +345,20 @@ public:
 
     bool IsNull() const;
     Size ChunkSize() const;
+
+    template<typename TResult, typename... TArgs>
+    TResult* Alloc()
+    {
+        return reinterpret_cast<TResult*>(Alloc(sizeof(TResult), alignof(TResult)));
+    }
+
+    template<typename T>
+    void Free(T* data)
+    {
+        data->~T();
+        Free(reinterpret_cast<VoidPtr>(data));
+    }
+    
 
 private:
     VoidPtr mainChunk_;
