@@ -368,24 +368,23 @@ void FreeListAllocator::Free(VoidPtr data)
     AllocationHeader const* const allocationHeader = reinterpret_cast<AllocationHeader*>(PtrNegate(data, sizeof(AllocationHeader)));
 
     VoidPtr const blockStart = PtrNegate(data, allocationHeader->freeBlockStartOffset_);
-    Size const blockSize = allocationHeader->allocationSize_;
-    FreeBlockHeader* blockHeader = reinterpret_cast<FreeBlockHeader*>(blockStart);
+    Size const releasedBlockSize = allocationHeader->allocationSize_;
+    FreeBlockHeader* releasedBlockHeader = reinterpret_cast<FreeBlockHeader*>(blockStart);
 
     
     if (firstFreeBlock_ != nullptr) {
         if (PtrDifference(blockStart, firstFreeBlock_) < 0) {
             // Released block is the earliest
 
-            if (blockHeader->IsEndAdjacent(firstFreeBlock_)) {
-                blockHeader->size_ = blockSize + firstFreeBlock_->size_;
-                blockHeader->nextFreeBlock_ = firstFreeBlock_->nextFreeBlock_;
-                firstFreeBlock_ = blockHeader;
+            releasedBlockHeader->size_ = releasedBlockSize;
+            if (releasedBlockHeader->TryMergeWithNextBlock(firstFreeBlock_)) {
+                releasedBlockHeader->nextFreeBlock_ = firstFreeBlock_->nextFreeBlock_;
+                firstFreeBlock_ = releasedBlockHeader;
                 return;
             }
             else {
-                blockHeader->nextFreeBlock_ = firstFreeBlock_;
-                blockHeader->size_ = blockSize;
-                firstFreeBlock_ = blockHeader;
+                releasedBlockHeader->nextFreeBlock_ = firstFreeBlock_;
+                firstFreeBlock_ = releasedBlockHeader;
                 return;
             }
         }
@@ -393,37 +392,38 @@ void FreeListAllocator::Free(VoidPtr data)
         // Released block is not the earliest
 
         FreeBlockHeader* prevFreeBlock = firstFreeBlock_;
-        while (PtrDifference(prevFreeBlock->nextFreeBlock_, blockHeader) < 0) {
+        while (PtrDifference(prevFreeBlock->nextFreeBlock_, releasedBlockHeader) < 0) {
             prevFreeBlock = prevFreeBlock->nextFreeBlock_;
             if (prevFreeBlock->nextFreeBlock_ == nullptr) {
                 // Released block is the last one
-                if (prevFreeBlock->IsEndAdjacent(blockHeader)) {
-                    prevFreeBlock->size_ += blockHeader->size_;
-                }
-                else {
-                    prevFreeBlock->nextFreeBlock_ = blockHeader;
+                releasedBlockHeader->size_ = releasedBlockSize;
+                if (!releasedBlockHeader->TryMergeWithPrevBlock(prevFreeBlock)) {
+                    prevFreeBlock->nextFreeBlock_ = releasedBlockHeader;
                 }
                 return;
             }
         }
 
         // Released block is intermediate
-        if (prevFreeBlock->IsEndAdjacent(blockHeader)) {
-            prevFreeBlock->size_ += blockHeader->size_;
-            if (prevFreeBlock->IsEndAdjacent(prevFreeBlock->nextFreeBlock_)) {
-                prevFreeBlock->size_ += prevFreeBlock->size_;
-            }
+
+        releasedBlockHeader->size_ = releasedBlockSize;
+
+        bool const nextMerged = releasedBlockHeader->TryMergeWithNextBlock(prevFreeBlock->nextFreeBlock_);
+        bool const prevMerged = releasedBlockHeader->TryMergeWithPrevBlock(prevFreeBlock);
+
+        if (prevMerged && nextMerged) {
+            prevFreeBlock->nextFreeBlock_ = prevFreeBlock->nextFreeBlock_->nextFreeBlock_;
         }
-        else if(blockHeader->IsEndAdjacent(prevFreeBlock->nextFreeBlock_)) {
-            blockHeader->size_ += prevFreeBlock->nextFreeBlock_->size_;
+        else if (!prevMerged && nextMerged) {
+            prevFreeBlock->nextFreeBlock_ = releasedBlockHeader;
         }
-        else {
-            blockHeader->nextFreeBlock_ = prevFreeBlock->nextFreeBlock_;
-            prevFreeBlock->nextFreeBlock_ = blockHeader;
+        else if (!prevMerged && !nextMerged) {
+            releasedBlockHeader->nextFreeBlock_ = prevFreeBlock->nextFreeBlock_;
+            prevFreeBlock->nextFreeBlock_ = releasedBlockHeader;
         }
     }
     else {
-        firstFreeBlock_ = blockHeader;
+        firstFreeBlock_ = releasedBlockHeader;
     }
 }
 
@@ -436,6 +436,24 @@ bool FreeListAllocator::FreeBlockHeader::IsEndAdjacent(FreeListAllocator::FreeBl
 bool FreeListAllocator::FreeBlockHeader::IsStartAdjacent(FreeListAllocator::FreeBlockHeader* block)
 {
     return block->IsEndAdjacent(this);
+}
+
+bool FreeListAllocator::FreeBlockHeader::TryMergeWithPrevBlock(FreeListAllocator::FreeBlockHeader* block)
+{
+    if (block->IsEndAdjacent(this)) {
+        block->size_ += size_;
+        return true;
+    }
+    return false;
+}
+
+bool FreeListAllocator::FreeBlockHeader::TryMergeWithNextBlock(FreeListAllocator::FreeBlockHeader* block)
+{
+    if (IsEndAdjacent(block)) {
+        size_ += block->size_;
+        return true;
+    }
+    return false;
 }
 
 

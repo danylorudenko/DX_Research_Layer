@@ -328,6 +328,9 @@ private:
 
         bool IsStartAdjacent(FreeBlockHeader* block);
         bool IsEndAdjacent(FreeBlockHeader* block);
+
+        bool TryMergeWithPrevBlock(FreeBlockHeader* block);
+        bool TryMergeWithNextBlock(FreeBlockHeader* block);
     };
 
     static Size constexpr MIN_FREEBLOCK_TAIL = sizeof(FreeBlockHeader) + 16;
