@@ -347,9 +347,10 @@ public:
     Size ChunkSize() const;
 
     template<typename TResult, typename... TArgs>
-    TResult* Alloc()
+    TResult* Alloc(TArgs&&... args)
     {
-        return reinterpret_cast<TResult*>(Alloc(sizeof(TResult), alignof(TResult)));
+        VoidPtr result = Alloc(sizeof(TResult), alignof(TResult));
+        return new (result) TResult{ args... };
     }
 
     template<typename T>

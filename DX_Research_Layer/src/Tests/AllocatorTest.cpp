@@ -8,6 +8,16 @@
 
 struct CharBuffer40
 {
+    CharBuffer40()
+    {
+        strcpy_s(content, sizeof(CharBuffer40), "111111111111111111111111111111");
+    }
+
+    ~CharBuffer40()
+    {
+        strcpy_s(content, sizeof(CharBuffer40), "999999999999999999999999999999");
+    }
+    
     union
     {
         //DXRL::U64 contentInt[5];
@@ -37,6 +47,7 @@ int main()
         strcpy_s(buffer->content, sizeof(CharBuffer40), testString);
     }
     
+    allocator.Free(*(allocations + 0));
     allocator.Free(*(allocations + 1));
 
     for (Size i = 3; i < 7; ++i) {

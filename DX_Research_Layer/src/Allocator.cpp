@@ -310,7 +310,10 @@ void FreeListAllocator::Reset()
 
 VoidPtr FreeListAllocator::Alloc(Size size, Size alignment)
 {
-    Size const allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocationHeader));
+    if (firstFreeBlock_ == nullptr)
+        return nullptr;
+    
+    Size allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocationHeader));
 
     FreeBlockHeader* prevBlock = nullptr;
     FreeBlockHeader* validBlock = firstFreeBlock_;
@@ -323,38 +326,41 @@ VoidPtr FreeListAllocator::Alloc(Size size, Size alignment)
             return nullptr;
     }
 
-    Size const freeBlockTail = validBlock->size_ - allocationSize;
+    Size const validBlockTailSize = validBlock->size_ - allocationSize;
+    FreeBlockHeader* const tailFreeBlockHeader = reinterpret_cast<FreeBlockHeader*>(PtrAdd(validBlock, allocationSize));
 
-
-    // Alloc from the first free block
     if (prevBlock == nullptr) {
-        if (freeBlockTail < MIN_FREEBLOCK_TAIL) {
-            // No free space left at all
-            firstFreeBlock_ = nullptr;
+        if (validBlockTailSize >= MIN_FREEBLOCK_TAIL) {
+            tailFreeBlockHeader->size_ = validBlockTailSize;
+            tailFreeBlockHeader->nextFreeBlock_ = validBlock->nextFreeBlock_;
+
+            firstFreeBlock_ = tailFreeBlockHeader;
         }
         else {
-            firstFreeBlock_ = reinterpret_cast<FreeBlockHeader*>(PtrAdd(validBlock, allocationSize));
+            allocationSize = validBlock->size_;
+            firstFreeBlock_ = validBlock->nextFreeBlock_;
         }
     }
     else {
-        if (freeBlockTail < MIN_FREEBLOCK_TAIL) {
-            prevBlock->nextFreeBlock_ = validBlock->nextFreeBlock_;
+        if (validBlockTailSize >= MIN_FREEBLOCK_TAIL) {
+            tailFreeBlockHeader->nextFreeBlock_ = validBlock->nextFreeBlock_;
+            tailFreeBlockHeader->size_ = validBlockTailSize;
+
+            prevBlock->nextFreeBlock_ = tailFreeBlockHeader;
         }
         else {
-            FreeBlockHeader* tailFreeBlock = reinterpret_cast<FreeBlockHeader*>(PtrAdd(validBlock, allocationSize));
-            prevBlock->nextFreeBlock_ = tailFreeBlock;
-
-            tailFreeBlock->nextFreeBlock_ = validBlock->nextFreeBlock_;
+            allocationSize = validBlock->size_;
+            prevBlock->nextFreeBlock_ = validBlock->nextFreeBlock_;
         }
-
-        VoidPtr const validBlockPlusHeader = PtrAdd(validBlock, sizeof(AllocationHeader));
-        VoidPtr const result = PtrAlign(validBlockPlusHeader, alignment);
-        AllocationHeader* const header = reinterpret_cast<AllocationHeader*>(PtrNegate(result, sizeof(AllocationHeader)));
-        header->allocationSize_ = allocationSize;
-        header->freeBlockStartOffset_ = static_cast<U16>(PtrDifference(result, validBlock));
-
-        return result;
     }
+
+    VoidPtr const validBlockPlusHeader = PtrAdd(validBlock, sizeof(AllocationHeader));
+    VoidPtr const result = PtrAlign(validBlockPlusHeader, alignment);
+    AllocationHeader* const header = reinterpret_cast<AllocationHeader*>(PtrNegate(result, sizeof(AllocationHeader)));
+    header->allocationSize_ = allocationSize;
+    header->freeBlockStartOffset_ = static_cast<U16>(PtrDifference(result, validBlock));
+
+    return result;
 }
 
 void FreeListAllocator::Free(VoidPtr data)
