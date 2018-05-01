@@ -397,14 +397,30 @@ void FreeListAllocator::Free(VoidPtr data)
             prevFreeBlock = prevFreeBlock->nextFreeBlock_;
             if (prevFreeBlock->nextFreeBlock_ == nullptr) {
                 // Released block is the last one
-                prevFreeBlock->nextFreeBlock_ = blockHeader;
+                if (prevFreeBlock->IsEndAdjacent(blockHeader)) {
+                    prevFreeBlock->size_ += blockHeader->size_;
+                }
+                else {
+                    prevFreeBlock->nextFreeBlock_ = blockHeader;
+                }
                 return;
             }
         }
 
         // Released block is intermediate
-        blockHeader->nextFreeBlock_ = prevFreeBlock->nextFreeBlock_;
-        prevFreeBlock->nextFreeBlock_ = blockHeader;
+        if (prevFreeBlock->IsEndAdjacent(blockHeader)) {
+            prevFreeBlock->size_ += blockHeader->size_;
+            if (prevFreeBlock->IsEndAdjacent(prevFreeBlock->nextFreeBlock_)) {
+                prevFreeBlock->size_ += prevFreeBlock->size_;
+            }
+        }
+        else if(blockHeader->IsEndAdjacent(prevFreeBlock->nextFreeBlock_)) {
+            blockHeader->size_ += prevFreeBlock->nextFreeBlock_->size_;
+        }
+        else {
+            blockHeader->nextFreeBlock_ = prevFreeBlock->nextFreeBlock_;
+            prevFreeBlock->nextFreeBlock_ = blockHeader;
+        }
     }
     else {
         firstFreeBlock_ = blockHeader;
