@@ -33,36 +33,7 @@ int main()
 
     ///////////////////////////////////////////////////
 
-    Memory::Mibibytes chunkSize{ 10 };
-    void* chunk = malloc(chunkSize);
-
-    Memory::FreeListAllocator allocator{ chunk, chunkSize };
-
-    Size constexpr allocationsCount = 100;
-    CharBuffer40* allocations[allocationsCount];
     
-    for (Size i = 0; i < 3; ++i) {
-        CharBuffer40* buffer = allocator.Alloc<CharBuffer40>();
-        *(allocations + i) = buffer;
-        strcpy_s(buffer->content, sizeof(CharBuffer40), testString);
-    }
-    
-    allocator.Free(*(allocations + 0));
-    allocator.Free(*(allocations + 1));
-
-    for (Size i = 3; i < 7; ++i) {
-        CharBuffer40* buffer = allocator.Alloc<CharBuffer40>();
-        *(allocations + i) = buffer;
-        strcpy_s(buffer->content, sizeof(CharBuffer40), testString);
-    }
-
-    allocator.Free(*(allocations + 5));
-    allocator.Free(*(allocations + 6));
-
-    CharBuffer40* buffer = allocator.Alloc<CharBuffer40>();
-    strcpy_s(buffer->content, sizeof(CharBuffer40), testString);
-    
-    free(chunk);
     
     system("pause");
     return 0;

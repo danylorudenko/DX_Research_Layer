@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Foundation\Macro.hpp>
 #include <Memory\Bytes.hpp>
 #include <Memory\Pointer.hpp>
 
@@ -9,6 +8,38 @@ namespace DXRL
 
 namespace Memory
 {
+
+
+/************************************
+* ==== Generic Allocator interface ====
+*
+*               - Alloc(Size size, Size alignment);
+*               - AllocArray(Size count, Size unitSize, Size unitAlignment);
+*   (opt.)      - Alloc<T>(...);
+*   (opt.)      - AllocArray<T>(Size count, ...);
+*               
+*          
+*          
+*               - Free(VoidPtr data);
+*               - FreeArray(VoidPtr data);
+*   (opt.)      - Free<T>(T* data);
+*   (opt.)      - FreeArray<T>(T* data);
+*
+*
+*
+*
+* ==== Exception: PoolAllocator ====
+*   
+*   - No generic allocator intarface
+*   - Pop();
+*   - Push(T*);
+*
+*
+************************************/
+
+
+
+
 
 ////////////////////////////////////////
 class LinearAllocator
@@ -20,7 +51,10 @@ public:
     ~LinearAllocator();
 
     VoidPtr Alloc(Size size, Size alignment = 4);
-    VoidPtr AllocArray(Size unitSize, Size count = 1, Size unitAlignment = 4);
+    VoidPtr AllocArray(Size count, Size unitSize, Size unitAlignment = 4);
+
+    void Free(VoidPtr data);
+    void FreeArray(VoidPtr data);
 
     void FreeAll();
     void Reset();
@@ -45,7 +79,7 @@ public:
         Size constexpr typeSize = sizeof(TResult);
         Size constexpr typeAlignment = alignof(TResult);
 
-        TResult* arrayStart = reinterpret_cast<TResult*>(AllocArray(typeSize, count, typeAlignment));
+        TResult* arrayStart = reinterpret_cast<TResult*>(AllocArray(count, typeSize, typeAlignment));
 
         for (Size i = 0; i < count; i++)
         {
@@ -54,6 +88,18 @@ public:
 
         return arrayStart;
     }
+
+    template<typename T>
+    void Free(T* data) 
+    {
+        // INVALID OPERATION
+    }
+
+    template<typename T>
+    void FreeArray(T* data) 
+    {
+        // INVALID OPERATION
+    } 
 
 
 private:
@@ -75,8 +121,8 @@ public:
     StackAllocator(VoidPtr chunk, Size size, bool requiresDestruction = true, bool isOwner = false);
     ~StackAllocator();
 
-    VoidPtr Alloc(Size size, Size alignment = 0);
-    VoidPtr AllocArray(Size unitSize, Size Count = 1, Size alignment = 4);
+    VoidPtr Alloc(Size size, Size alignment = 4);
+    VoidPtr AllocArray(Size count, Size unitSize, Size alignment = 4);
 
     void Free(VoidPtr ptr);
     void FreeArray(VoidPtr ptr);
@@ -99,7 +145,7 @@ public:
         Size constexpr typeSize = sizeof(TResult);
         Size constexpr typeAlignment = sizeof(TResult);
         
-        TResult* arrayStart = reinterpret_cast<TResult*>(AllocArray(typeSize, count, typeAlignment));
+        TResult* arrayStart = reinterpret_cast<TResult*>(AllocArray(count, typeSize, typeAlignment));
         
         for (Size i = 0; i < count; i++)
         {
@@ -117,12 +163,16 @@ public:
     }
 
     template<typename T>
-    void FreeArray(Size count, T* dataArray)
+    void FreeArray(T* dataArray)
     {
-        for (Size i = 0; i < count; ++i) {
+        Size const arraySize = GetArraySize(dataArray);
+        for (Size i = 0; i < arraySize; ++i) {
             (dataArray + i)->~T();
         }
     }
+
+private:
+    Size GetArraySize(VoidPtr data) const;
 
 
 private:
@@ -315,6 +365,12 @@ class FreeListAllocator
 {
 private:
 
+    enum AllocType : Byte
+    {
+        Single,
+        Array
+    };
+
     struct AllocationHeader
     {
         Size allocationSize_;
@@ -342,7 +398,10 @@ public:
     ~FreeListAllocator();
 
     VoidPtr Alloc(Size size, Size alignment);
+    VoidPtr AllocArray(Size count, Size unitSize, Size unitAlignment);
+
     void Free(VoidPtr data);
+    void FreeArray(VoidPtr data);
 
     void Reset();
 

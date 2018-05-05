@@ -65,9 +65,19 @@ VoidPtr LinearAllocator::Alloc(Size size, Size alignment)
     return allocationResult;
 }
 
-VoidPtr LinearAllocator::AllocArray(Size unitSize, Size count, Size unitAlignment)
+VoidPtr LinearAllocator::AllocArray(Size count, Size unitSize, Size unitAlignment)
 {
     return Alloc(unitSize * count, unitAlignment);
+}
+
+void LinearAllocator::Free(VoidPtr data)
+{
+    // INVALID OPERATION
+}
+
+void LinearAllocator::FreeArray(VoidPtr data)
+{
+    // INVALID OPERATION
 }
 
 void LinearAllocator::FreeAll()
@@ -167,7 +177,7 @@ VoidPtr StackAllocator::Alloc(Size size, Size alignment)
     return allocationResult;
 }
 
-VoidPtr StackAllocator::AllocArray(Size unitSize, Size unitCount, Size alignment)
+VoidPtr StackAllocator::AllocArray(Size unitCount, Size unitSize, Size alignment)
 {
     Size const allocationSize = CalcSizeWithAlignment(unitSize * unitCount, alignment, sizeof(AllocHeader));
 
@@ -191,7 +201,7 @@ void StackAllocator::Free(VoidPtr ptr)
 {
     Size constexpr headerSize = sizeof(AllocHeader);
 
-    AllocHeader const* header = reinterpret_cast<AllocHeader*>(PtrNegate(ptr, headerSize));
+    AllocHeader const* const header = reinterpret_cast<AllocHeader*>(PtrNegate(ptr, headerSize));
     assert(header->allocationScope_ == currentStackScope_ && "Trying to free not-the-top scope of the stack!");
     assert(header->type_ == AllocHeader::Single && "Trying to free array-type allocation with regular Free()");
 
@@ -203,7 +213,7 @@ void StackAllocator::FreeArray(VoidPtr arrayPtr)
 {
     Size constexpr headerSize = sizeof(AllocHeader);
 
-    AllocHeader const* header = reinterpret_cast<AllocHeader*>(PtrNegate(arrayPtr, headerSize));
+    AllocHeader const* const header = reinterpret_cast<AllocHeader*>(PtrNegate(arrayPtr, headerSize));
     assert(header->allocationScope_ == currentStackScope_ && "Trying to free not-the-top scope of the stack!");
     assert(header->type_ == AllocHeader::Array && "Trying to free single-type allocation with FreeArray()");
 
@@ -236,6 +246,13 @@ Size StackAllocator::ChunkSize() const
     return mainChunkSize_;
 }
 
+Size StackAllocator::GetArraySize(VoidPtr data) const
+{
+    Size constexpr headerSize = sizeof(AllocHeader);
+    AllocHeader const* const header = reinterpret_cast<AllocHeader*>(PtrNegate(data, headerSize));
+    assert(header->type_ == AllocHeader::Array && "Trying to get ArraySize of non-array allocation");
+    return header->arrayHeader_.unitsCount_;
+}
 
 
 ////////////////////////////////////////
@@ -363,6 +380,12 @@ VoidPtr FreeListAllocator::Alloc(Size size, Size alignment)
     return result;
 }
 
+VoidPtr FreeListAllocator::AllocArray(Size count, Size unitSize, Size unitAlignment)
+{
+    Size const allocationSize = count * unitSize;
+    return Alloc(allocationSize, unitAlignment);
+}
+
 void FreeListAllocator::Free(VoidPtr data)
 {
     AllocationHeader const* const allocationHeader = reinterpret_cast<AllocationHeader*>(PtrNegate(data, sizeof(AllocationHeader)));
@@ -425,6 +448,11 @@ void FreeListAllocator::Free(VoidPtr data)
     else {
         firstFreeBlock_ = releasedBlockHeader;
     }
+}
+
+void FreeListAllocator::FreeArray(VoidPtr data)
+{
+
 }
 
 bool FreeListAllocator::FreeBlockHeader::IsEndAdjacent(FreeListAllocator::FreeBlockHeader* block)
