@@ -160,21 +160,7 @@ StackAllocator::~StackAllocator()
 
 VoidPtr StackAllocator::Alloc(Size size, Size alignment)
 {
-    Size allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocHeader));
-    
-    assert((PtrDifference(PtrAdd(stackTopPtr_, allocationSize), mainChunk_) <= static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
-
-    VoidPtr const topPlusHeader = PtrAdd(stackTopPtr_, sizeof(AllocHeader));
-    VoidPtr const allocationResult = PtrAlign(topPlusHeader, alignment);
-
-    AllocHeader* const headerPtr = reinterpret_cast<AllocHeader*>(PtrNegate(allocationResult, sizeof(AllocHeader)));
-    headerPtr->allocationScope_ = ++currentStackScope_;
-    headerPtr->singleHeader_.allocationSize_ = allocationSize;
-    headerPtr->type_ = AllocHeader::Single;
-
-    stackTopPtr_ = PtrAdd(stackTopPtr_, allocationSize);
-
-    return allocationResult;
+   return AllocArray(1, size, alignment);
 }
 
 VoidPtr StackAllocator::AllocArray(Size unitCount, Size unitSize, Size alignment)
@@ -187,10 +173,11 @@ VoidPtr StackAllocator::AllocArray(Size unitCount, Size unitSize, Size alignment
     VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);
 
     AllocHeader* const headerPtr = reinterpret_cast<AllocHeader*>(PtrNegate(allocationResult, sizeof(AllocHeader)));
+    headerPtr->unitSize_ = unitSize;
+    headerPtr->unitCount_ = unitCount;
     headerPtr->allocationScope_ = ++currentStackScope_;
-    headerPtr->arrayHeader_.unitsCount_ = unitCount;
-    headerPtr->arrayHeader_.unitSize_ = unitSize;
-    headerPtr->type_ = AllocHeader::Array;
+    headerPtr->scopeStartOffset_ = static_cast<U16>(PtrDifference(stackTopPtr_, allocationResult));
+
 
     stackTopPtr_ = PtrAdd(stackTopPtr_, allocationSize);
 
@@ -199,14 +186,7 @@ VoidPtr StackAllocator::AllocArray(Size unitCount, Size unitSize, Size alignment
 
 void StackAllocator::Free(VoidPtr ptr)
 {
-    Size constexpr headerSize = sizeof(AllocHeader);
-
-    AllocHeader const* const header = reinterpret_cast<AllocHeader*>(PtrNegate(ptr, headerSize));
-    assert(header->allocationScope_ == currentStackScope_ && "Trying to free not-the-top scope of the stack!");
-    assert(header->type_ == AllocHeader::Single && "Trying to free array-type allocation with regular Free()");
-
-    --currentStackScope_;
-    stackTopPtr_ = PtrNegate(stackTopPtr_, header->singleHeader_.allocationSize_);
+    FreeArray(ptr);
 }
 
 void StackAllocator::FreeArray(VoidPtr arrayPtr)
@@ -215,11 +195,9 @@ void StackAllocator::FreeArray(VoidPtr arrayPtr)
 
     AllocHeader const* const header = reinterpret_cast<AllocHeader*>(PtrNegate(arrayPtr, headerSize));
     assert(header->allocationScope_ == currentStackScope_ && "Trying to free not-the-top scope of the stack!");
-    assert(header->type_ == AllocHeader::Array && "Trying to free single-type allocation with FreeArray()");
 
+    stackTopPtr_ = PtrNegate(arrayPtr, header->scopeStartOffset_);
     --currentStackScope_;
-    Size const allocationSize = header->arrayHeader_.unitSize_ * header->arrayHeader_.unitSize_;
-    stackTopPtr_ = PtrNegate(stackTopPtr_, allocationSize);
 }
 
 void StackAllocator::Reset()
@@ -250,8 +228,7 @@ Size StackAllocator::GetArraySize(VoidPtr data) const
 {
     Size constexpr headerSize = sizeof(AllocHeader);
     AllocHeader const* const header = reinterpret_cast<AllocHeader*>(PtrNegate(data, headerSize));
-    assert(header->type_ == AllocHeader::Array && "Trying to get ArraySize of non-array allocation");
-    return header->arrayHeader_.unitsCount_;
+    return header->unitCount_;
 }
 
 
@@ -389,6 +366,7 @@ VoidPtr FreeListAllocator::AllocArray(Size count, Size unitSize, Size unitAlignm
 void FreeListAllocator::Free(VoidPtr data)
 {
     AllocationHeader const* const allocationHeader = reinterpret_cast<AllocationHeader*>(PtrNegate(data, sizeof(AllocationHeader)));
+    assert(allocationHeader->type_ == AllocType::Single && "Attempting to free array allocation with regular Free().");
 
     VoidPtr const blockStart = PtrNegate(data, allocationHeader->freeBlockStartOffset_);
     Size const releasedBlockSize = allocationHeader->allocationSize_;

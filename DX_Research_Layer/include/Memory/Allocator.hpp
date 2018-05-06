@@ -115,6 +115,17 @@ private:
 ////////////////////////////////////////
 class StackAllocator
 {
+private:
+
+    struct AllocHeader
+    {
+        Size unitSize_;
+        Size unitCount_;
+        Size allocationScope_;
+        U16 scopeStartOffset_;
+    };
+
+
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(StackAllocator)
 
@@ -169,6 +180,8 @@ public:
         for (Size i = 0; i < arraySize; ++i) {
             (dataArray + i)->~T();
         }
+
+        FreeArray(reinterpret_cast<VoidPtr>(dataArray));
     }
 
 private:
@@ -185,37 +198,6 @@ private:
     bool isOwner_;
     bool requiresDestruction_;
 
-private:
-    
-    struct AllocHeaderSingle
-    {
-        Size allocationSize_;
-    };
-
-    struct AllocHeaderArray
-    {
-        Size unitSize_;
-        Size unitsCount_;
-    };
-
-    struct AllocHeader
-    {
-        enum AllocType : Byte
-        {
-            Single,
-            Array
-        };
-        
-        
-        Size allocationScope_;
-        union
-        {
-            AllocHeaderSingle singleHeader_;
-            AllocHeaderArray arrayHeader_;
-        };
-
-        AllocType type_;
-    };
 };
 
 
@@ -375,6 +357,7 @@ private:
     {
         Size allocationSize_;
         U16 freeBlockStartOffset_;
+        AllocType type_;
     };
 
     struct FreeBlockHeader
@@ -397,8 +380,8 @@ public:
     FreeListAllocator(VoidPtr mainChunk, Size mainChunkSize, bool isOwner = false);
     ~FreeListAllocator();
 
-    VoidPtr Alloc(Size size, Size alignment);
-    VoidPtr AllocArray(Size count, Size unitSize, Size unitAlignment);
+    VoidPtr Alloc(Size size, Size alignment = 4);
+    VoidPtr AllocArray(Size count, Size unitSize, Size unitAlignment = 4);
 
     void Free(VoidPtr data);
     void FreeArray(VoidPtr data);
