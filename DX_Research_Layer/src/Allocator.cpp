@@ -173,7 +173,6 @@ VoidPtr StackAllocator::AllocArray(Size unitCount, Size unitSize, Size alignment
     VoidPtr const allocationResult = PtrAlign(headerAdjustedTop, alignment);
 
     AllocHeader* const headerPtr = reinterpret_cast<AllocHeader*>(PtrNegate(allocationResult, sizeof(AllocHeader)));
-    headerPtr->unitSize_ = unitSize;
     headerPtr->unitCount_ = unitCount;
     headerPtr->allocationScope_ = ++currentStackScope_;
     headerPtr->scopeStartOffset_ = static_cast<U16>(PtrDifference(stackTopPtr_, allocationResult));
@@ -304,14 +303,19 @@ void FreeListAllocator::Reset()
 
 VoidPtr FreeListAllocator::Alloc(Size size, Size alignment)
 {
+    return AllocArray(1, size, alignment);
+}
+
+VoidPtr FreeListAllocator::AllocArray(Size count, Size unitSize, Size unitAlignment)
+{
     if (firstFreeBlock_ == nullptr)
         return nullptr;
-    
-    Size allocationSize = CalcSizeWithAlignment(size, alignment, sizeof(AllocationHeader));
+
+    Size allocationSize = CalcSizeWithAlignment(count * unitSize, unitAlignment, sizeof(AllocationHeader));
 
     FreeBlockHeader* prevBlock = nullptr;
     FreeBlockHeader* validBlock = firstFreeBlock_;
-    
+
     while (validBlock->size_ < allocationSize) {
         prevBlock = validBlock;
         validBlock = validBlock->nextFreeBlock_;
@@ -349,30 +353,29 @@ VoidPtr FreeListAllocator::Alloc(Size size, Size alignment)
     }
 
     VoidPtr const validBlockPlusHeader = PtrAdd(validBlock, sizeof(AllocationHeader));
-    VoidPtr const result = PtrAlign(validBlockPlusHeader, alignment);
+    VoidPtr const result = PtrAlign(validBlockPlusHeader, unitAlignment);
     AllocationHeader* const header = reinterpret_cast<AllocationHeader*>(PtrNegate(result, sizeof(AllocationHeader)));
-    header->allocationSize_ = allocationSize;
+    header->blockSize_ = allocationSize;
+    header->unitCount_ = count;
     header->freeBlockStartOffset_ = static_cast<U16>(PtrDifference(result, validBlock));
 
     return result;
 }
 
-VoidPtr FreeListAllocator::AllocArray(Size count, Size unitSize, Size unitAlignment)
-{
-    Size const allocationSize = count * unitSize;
-    return Alloc(allocationSize, unitAlignment);
-}
-
 void FreeListAllocator::Free(VoidPtr data)
 {
+    FreeArray(data);
+}
+
+void FreeListAllocator::FreeArray(VoidPtr data)
+{
     AllocationHeader const* const allocationHeader = reinterpret_cast<AllocationHeader*>(PtrNegate(data, sizeof(AllocationHeader)));
-    assert(allocationHeader->type_ == AllocType::Single && "Attempting to free array allocation with regular Free().");
 
     VoidPtr const blockStart = PtrNegate(data, allocationHeader->freeBlockStartOffset_);
-    Size const releasedBlockSize = allocationHeader->allocationSize_;
+    Size const releasedBlockSize = allocationHeader->blockSize_;
     FreeBlockHeader* releasedBlockHeader = reinterpret_cast<FreeBlockHeader*>(blockStart);
 
-    
+
     if (firstFreeBlock_ != nullptr) {
         if (PtrDifference(blockStart, firstFreeBlock_) < 0) {
             // Released block is the earliest
@@ -428,9 +431,10 @@ void FreeListAllocator::Free(VoidPtr data)
     }
 }
 
-void FreeListAllocator::FreeArray(VoidPtr data)
+Size FreeListAllocator::GetArraySize(VoidPtr data) const
 {
-
+    AllocationHeader const* const allocationHeader = reinterpret_cast<AllocationHeader*>(PtrNegate(data, sizeof(AllocationHeader)));
+    return allocationHeader->unitCount_;
 }
 
 bool FreeListAllocator::FreeBlockHeader::IsEndAdjacent(FreeListAllocator::FreeBlockHeader* block)

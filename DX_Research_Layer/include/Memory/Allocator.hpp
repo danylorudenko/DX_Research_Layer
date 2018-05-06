@@ -119,7 +119,6 @@ private:
 
     struct AllocHeader
     {
-        Size unitSize_;
         Size unitCount_;
         Size allocationScope_;
         U16 scopeStartOffset_;
@@ -355,9 +354,9 @@ private:
 
     struct AllocationHeader
     {
-        Size allocationSize_;
+        Size blockSize_;
+        Size unitCount_;
         U16 freeBlockStartOffset_;
-        AllocType type_;
     };
 
     struct FreeBlockHeader
@@ -398,13 +397,36 @@ public:
         return new (result) TResult{ args... };
     }
 
+    template<typename TResult, typename... TArgs>
+    TResult* AllocArray(Size count, TArgs&&... args)
+    {
+        TResult* result = reinterpret_cast<TResult*>(AllocArray(count, sizeof(TResult), alignof(TResult)));
+        for (Size i = 0; i < count; ++i) {
+            new (result + i) TResult{ args... };
+        }
+    }
+
     template<typename T>
     void Free(T* data)
     {
         data->~T();
         Free(reinterpret_cast<VoidPtr>(data));
     }
+
+    template<typename T>
+    void FreeArray(T* data)
+    {
+        Size const arraySize = GetArraySize(data);
+        for (Size i = 0; i < arraySize; ++i) {
+            (data + i)->~T();
+        }
+        FreeArray(reinterpret_cast<VoidPtr>(data));
+    }
+
     
+private:
+    Size GetArraySize(VoidPtr data) const;
+
 
 private:
     VoidPtr mainChunk_;
