@@ -50,26 +50,104 @@ protected:
 };
 
 
+
 ////////////////////////////////////////
-template<typename T, Size INPLACE_SIZE>
-class InplaceArray : private Array<T, INPLACE_SIZE>
+template<typename T, typename TAllocator>
+class DynamicArray
 {
 public:
-    InplaceArray(InplaceArray<T, INPLACE_SIZE> const& rhs)
-        : inplaceOverflow_{ rhs.inplaceOverflow_ }
-        , size_{ rhs.size_ }
+    DynamicArray(TAllocator* allocator, Size reservedSize = 0)
+        : data_{ nullptr }
+        , size_{ 0 }
+        , elementsStorageSize_{ reservedSize }
     {
-        if (!inplaceOverflow_) {
-            Array<T, INPLACE_SIZE>::operator=(rhs);
-        }
-        else {
-
+        if (elementsStorageSize_ > 0) {
+            data_ = allocator->AllocArray(elementsStorageSize_, sizeof(T), alignof(T));
         }
     }
 
+    DynamicArray(DynamicArray<T, TAllocator> const&) = delete;
+    DynamicArray(DynamicArray<T, TAllocator>&&) = delete;
+
+    DynamicArray<T, TAllocator>& operator=(DynamicArray<T, TAllocator> const&) = delete;
+    DynamicArray<T, TAllocator>& operator=(DynamicArray<T, TAllocator>&&) = delete;
+
+    template<typename TArg>
+    void PushBack(TArg&& arg)
+    {
+        if((size_ + 1) > elementsStorageSize_)
+    }
+
+    Size GetSize() const
+    {
+        return size_;
+    }
+
+
+private:
+    void ExpandStorage(Size newSize)
+    {
+
+    }
+
+
 protected:
-    bool inplaceOverflow_;
+    TAllocator* allocator_;
+    T* data_;
     Size size_;
+    Size elementsStorageSize_;
+};
+
+
+////////////////////////////////////////
+template<typename T, Size INPLACE_SIZE, typename TAllocator>
+class InplaceArray : private Array<T, INPLACE_SIZE>
+{
+public:
+    InplaceArray(TAllocator* allocator, Size size)
+        : allocator_{ allocator }
+        , inplaceOverflow_{ false }
+        , size_{ size }
+    {
+        if (size_ > INPLACE_SIZE) {
+            inplaceOverflow_ = true;
+            overflowData_ = allocator_->AllocArray<T>(size_);
+        }
+    }
+
+    InplaceArray(InplaceArray<T, INPLACE_SIZE, TAllocator> const&) = delete;
+    InplaceArray(InplaceArray<T, INPLACE_SIZE, TAllocator>&&) = delete;
+
+    InplaceArray<T, INPLACE_SIZE, TAllocator>& operator=(InplaceArray<T, INPLACE_SIZE, TAllocator> const& rhs) = delete;
+    InplaceArray<T, INPLACE_SIZE, TAllocator>& operator=(InplaceArray<T, INPLACE_SIZE, TAllocator>&& rhs) = delete;
+
+    void Reset()
+    {
+        if (inplaceOverflow_) {
+            allocator_->FreeArray(overflowData_);
+        }
+        else {
+            for (Size i = 0; i < size_; ++i) {
+                (array_ + i)->~T();
+            }
+        }
+
+        size_ = 0;
+    }
+
+    Size GetSize() const
+    {
+        return size_;
+    }
+
+    Size constexpr GetInplaceSize() { return INPLACE_SIZE; }
+
+protected:
+    TAllocator* allocator_;
+    Size size_;
+    T* overflowData_;
+    bool inplaceOverflow_;
+
 };
 
 

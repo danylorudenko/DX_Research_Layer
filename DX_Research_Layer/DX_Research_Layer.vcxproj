@@ -683,7 +683,7 @@
     <ClInclude Include="include\3rdParty\stb_image.h" />
     <ClInclude Include="include\3rdParty\d3dx12.h" />
     <ClInclude Include="include\Container\DynamicArray.hpp" />
-    <ClInclude Include="include\Container\StaticArray.hpp" />
+    <ClInclude Include="include\Container\Array.hpp" />
     <ClInclude Include="include\Foundation\Constant.hpp" />
     <ClInclude Include="include\Foundation\Macro.hpp" />
     <ClInclude Include="include\Foundation\Types.hpp" />
