@@ -34,20 +34,24 @@ int main()
     ///////////////////////////////////////////////////
 
     Memory::Mibibytes chunkSize = 1;
-    Memory::FreeListAllocator alloc{ malloc(chunkSize), chunkSize, true };
+    Memory::VoidPtr mainChunk = malloc(chunkSize);
+    Memory::FreeListAllocator alloc{ mainChunk, chunkSize, true };
 
-    InplaceDynamicArray<CharBuffer40, 5, Memory::FreeListAllocator> arr{ &alloc };
+    InplaceDynamicArray<CharBuffer40, 5, Memory::FreeListAllocator> container{ &alloc };
+    //StaticArrayStorage<CharBuffer40, 20> container;
+
+    Size kek = sizeof(container);
 
     for (Size i = 0; i < 10; ++i) {
-        arr.EmplaceBack();
+        container.EmplaceBack();
     }
 
     for (Size i = 0; i < 7; ++i) {
-        arr.PopBack();
+        container.PopBack();
     }
 
     for (Size i = 0; i < 10; ++i) {
-        arr.EmplaceBack();
+        container.EmplaceBack();
     }
     
     system("pause");

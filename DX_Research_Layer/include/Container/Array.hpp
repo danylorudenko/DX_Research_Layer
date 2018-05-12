@@ -73,7 +73,7 @@ public:
     template<typename... TArgs>
     void EmplaceBack(TArgs&&... args)
     {
-        assert(size_ + 1 < STORAGE_SIZE);
+        assert(size_ + 1 <= STORAGE_SIZE);
         new (TypePtr(size_++)) T{ std::forward<TArgs>(args)... };
     }
     
