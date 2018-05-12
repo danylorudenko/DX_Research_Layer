@@ -70,7 +70,7 @@ public:
         Size constexpr typeAlignment = alignof(TResult);
 
         VoidPtr const allocationResult = Alloc(typeSize, typeAlignment);
-        return new (allocationResult) TResult(args...);
+        return new (allocationResult) TResult{ std::forward(args)... };
     }
 
     template<typename TResult, typename... TArgs>
@@ -83,7 +83,7 @@ public:
 
         for (Size i = 0; i < count; i++)
         {
-            new (arrayStart + i) TResult{ args... };
+            new (arrayStart + i) TResult{ std::forward(args)... };
         }
 
         return arrayStart;
@@ -146,7 +146,7 @@ public:
     TResult* Alloc(TArgs&&... args)
     {
         VoidPtr allocationResult = Alloc(sizeof(TResult), alignof(TResult));
-        return new (allocationResult) TResult{ args... };
+        return new (allocationResult) TResult{ std::forward(args)... };
     }
 
     template<typename TResult, typename... TArgs>
@@ -159,7 +159,7 @@ public:
         
         for (Size i = 0; i < count; i++)
         {
-            new (arrayStart + i) TResult{ args... };
+            new (arrayStart + i) TResult{ std::forward(args)... };
         }
 
         return arrayStart;
@@ -308,7 +308,7 @@ public:
         freeListStart_ = freeListStart_->nextFree_;
 
         ++allocationsCount_;
-        return new (result) T{ args... };
+        return new (result) T{ std::forward(args)... };
     }
 
     void Push(T* data)
@@ -394,7 +394,7 @@ public:
     TResult* Alloc(TArgs&&... args)
     {
         VoidPtr result = Alloc(sizeof(TResult), alignof(TResult));
-        return new (result) TResult{ args... };
+        return new (result) TResult{ std::forward(args)... };
     }
 
     template<typename TResult, typename... TArgs>
@@ -402,7 +402,7 @@ public:
     {
         TResult* result = reinterpret_cast<TResult*>(AllocArray(count, sizeof(TResult), alignof(TResult)));
         for (Size i = 0; i < count; ++i) {
-            new (result + i) TResult{ args... };
+            new (result + i) TResult{ std::forward(args)... };
         }
     }
 

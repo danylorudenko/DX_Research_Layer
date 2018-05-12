@@ -26,6 +26,8 @@ public:
     T const& operator[](Size i) const { return array_[i]; }
     T& operator[](Size i) { return array_[i]; }
 
+    T* Data() const { return array_; }
+
 private:
     T array_[SIZE];
 };
@@ -43,6 +45,7 @@ class StaticArrayStorage
 
     Size GetSize() const { return size_; }
     Size constexpr GetStorageSize() const { return STORAGE_SIZE; }
+    bool IsFull() const { return size_ == STORAGE_SIZE; }
 
 
     T const& operator[](Size i) const 
@@ -57,13 +60,18 @@ class StaticArrayStorage
         return *TypePtr(i);
     }
 
+    T* Data() const
+    {
+        return array_;
+    }
+
     template<typename... TArgs>
     void EmplaceBack(TArgs&&... args)
     {
         assert(size_ + 1 < STORAGE_SIZE);
-        new (TypePtr(size_++)) T{ args... };
+        new (TypePtr(size_++)) T{ std::forward(args)... };
     }
-
+    
     void PopBack()
     {
         assert(size_ > 0);
@@ -76,6 +84,31 @@ class StaticArrayStorage
             TypePtr(i)->~T();
         }
         size_ = 0;
+    }
+
+    void _MoveData(T* dest)
+    {
+        Size const size = GetSize();
+        for (Size i = 0; i < size; ++i) {
+            std::memcpy((dest + i), TypePtr(i), sizeof(T));
+        }
+        size_ = 0;
+    }
+
+    void _WrapData(T* src, Size count)
+    {
+        assert(GetSize() == 0);
+        assert(STORAGE_SIZE >= count);
+
+        for (Size i = 0; i < count; ++i) {
+            std::memcpy(TypePtr(i), src + i, sizeof(T));
+        }
+        size_ = count;
+    }
+
+    void _ResizePure(Size size)
+    {
+        size_ = size;
     }
 
 private:
@@ -122,6 +155,11 @@ public:
         return storage_[i];
     }
 
+    T* Data() const
+    {
+        return storage_;
+    }
+
     template<typename... TArgs>
     void EmplaceBack(TArgs&&... args)
     {
@@ -130,7 +168,7 @@ public:
         }
 
         T* newElementAddress = (storage_ + size_++);
-        new (newElementAddress) T{ args... };
+        new (newElementAddress) T{ std::forward(args)... };
     }
 
     void PopBack()
@@ -164,6 +202,11 @@ public:
         return storageSize_;
     }
 
+    TAllocator& Allocator()
+    {
+        return allocator_;
+    }
+
     void ExpandStorage(Size newSize)
     {
         assert((newSize > elementsStorageSize) && "newSize is smaller than current elementStorageSize_");
@@ -179,9 +222,27 @@ public:
         storageSize_ = newSize;
     }
 
-    TAllocator& Allocator()
+    void _MoveData(T* dest)
     {
-        return allocator_;
+        Size const size = GetSize();
+        std::memcpy(dest, storage_, size * sizeof(T));
+        size_ = 0;
+    }
+
+    void _WrapData(T* src, Size count)
+    {
+        assert(GetSize() == 0);
+        if (GetStorageSize() < count) {
+            ExpandStorage(count + 2);
+        }
+
+        std::memcpy(storage_, src, count * sizeof(T));
+        size_ = count;
+    }
+
+    void _ResizePure(Size size)
+    {
+        size_ = size;
     }
     
     ~DynamicArray()
@@ -200,19 +261,15 @@ private:
 ////////////////////////////////////////
 template<typename T, Size INPLACE_SIZE, typename TAllocator>
 class InplaceDynamicArray 
-    : private Array<T, INPLACE_SIZE>
+    : private StaticArrayStorage<T, INPLACE_SIZE>
     , private DynamicArray<T, TAllocator>
 {
 public:
-    InplaceDynamicArray(TAllocator* allocator, Size size = 0)
-        : Array<T, INPLACE_SIZE>{}
+    InplaceDynamicArray(TAllocator* allocator)
+        : StaticArrayStorage<T, INPLACE_SIZE>{}
         , DynamicArray<T, TAllocator>{ allocator, 0 }
-        , inplaceOverflow_{ false }
+        , isDynamic_{ false }
     {
-        if (size > INPLACE_ARRAY) {
-            inplaceOverflow_ = true;
-            DynamicArray<T, TAllocator>::ExpandStorage(10);
-        }
     }
 
     InplaceDynamicArray(InplaceDynamicArray<T, INPLACE_SIZE, TAllocator> const&) = delete;
@@ -221,26 +278,89 @@ public:
     InplaceDynamicArray<T, INPLACE_SIZE, TAllocator>& operator=(InplaceDynamicArray<T, INPLACE_SIZE, TAllocator> const& rhs) = delete;
     InplaceDynamicArray<T, INPLACE_SIZE, TAllocator>& operator=(InplaceDynamicArray<T, INPLACE_SIZE, TAllocator>&& rhs) = delete;
 
+    template<typename... TArgs>
+    void EmplaceBack(TArgs&&... args)
+    {
+        if (isDynamic_) {
+            DynamicArray<T, TAllocator>::EmplaceBack(std::forward(args)...);
+        }
+        else {
+            if (StaticArrayStorage<T, INPLACE_SIZE>::IsFull()) {
+                TransferToDynamic();
+                DynamicArray<T, TAllocator>::EmplaceBack(std::forward(args)...);
+                return;
+            }
+
+            StaticArrayStorage<T, INPLACE_SIZE>::EmplaceBack(std::forward(args)...);
+        }
+    }
+
+    void PopBack()
+    {
+        if (isDynamic_) {
+            DynamicArray<T, TAllocator>::PopBack();
+        }
+        else {
+            StaticArrayStorage<T, INPLACE_SIZE>::PopBack();
+        }
+    }
+
+
     void Clear()
     {
-        size_ = 0;
-        if (inplaceOverflow_) {
+        if (isDynamic_) {
             DynamicArray<T, TAllocator>::Clear();
+            isDynamic_ = false;
+        }
+        else {
+            StaticArrayStorage<T, INPLACE_SIZE>::Clear();
         }
     }
 
     void Reset()
     {
-        
+        DynamicArray<T, TAllocator>::Reset();
+        StaticArrayStorage<T, INPLACE_SIZE>::Clear();
     }
 
     Size GetSize() const
     {
-        return size_;
+        if (isDynamic_) {
+            return DynamicArray<T, TAllocator>::GetSize();
+        }
+        else {
+            StaticArrayStorage<T, INPLACE_SIZE>::GetSize();
+        }
     }
 
-protected:
-    bool inplaceOverflow_;
+
+private:
+    void TransferToInplace()
+    {
+        Size const size = DynamicArray<T, TAllocator>::GetSize();
+        DynamicArray<T, TAllocator>::_MoveData(StaticArrayStorage<T, INPLACE_SIZE>::Data());
+        StaticArrayStorage<T, INPLACE_SIZE>::_ResizePure(size);
+
+        isDynamic_ = false;
+    }
+
+    void TransferToDynamic()
+    {
+        Size const size = StaticArrayStorage<T, INPLACE_SIZE>::GetSize();
+        Size const requiredDynamicSize = size * 2;
+        if (DynamicArray<T, TAllocator>::GetStorageSize() < requiredDynamicSize) {
+            DynamicArray<T, TAllocator>::ExpandStorage(requiredDynamicSize);
+        }
+
+        DynamicArray<T, TAllocator>::_ResizePure(size);
+        StaticArrayStorage<T, INPLACE_SIZE>::_MoveData(DynamicArray<T, TAllocator>::Data());
+
+        isDynamic_ = true;
+    }
+
+
+private:
+    bool isDynamic_;
 
 };
 
