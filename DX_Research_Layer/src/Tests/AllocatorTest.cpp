@@ -36,7 +36,7 @@ int main()
     Memory::Mibibytes chunkSize = 1;
     Memory::FreeListAllocator alloc{ malloc(chunkSize), chunkSize, true };
 
-    InplaceArray<CharBuffer40, 10, Memory::FreeListAllocator> arr{ &alloc, 5 };
+    InplaceDynamicArray<CharBuffer40, 10, Memory::FreeListAllocator> arr{ &alloc, 5 };
 
     
     
