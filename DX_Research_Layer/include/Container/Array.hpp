@@ -37,11 +37,12 @@ private:
 template<typename T, Size STORAGE_SIZE>
 class StaticArrayStorage
 {
+public:
     StaticArrayStorage(StaticArrayStorage<T, STORAGE_SIZE> const&) = delete;
     StaticArrayStorage(StaticArrayStorage<T, STORAGE_SIZE>&&) = delete;
 
-    StaticArrayStorage<T, SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE> const&) = delete;
-    StaticArrayStorage<T, SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE>&&) = delete;
+    StaticArrayStorage<T, STORAGE_SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE> const&) = delete;
+    StaticArrayStorage<T, STORAGE_SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE>&&) = delete;
 
     Size GetSize() const { return size_; }
     Size constexpr GetStorageSize() const { return STORAGE_SIZE; }
@@ -69,7 +70,7 @@ class StaticArrayStorage
     void EmplaceBack(TArgs&&... args)
     {
         assert(size_ + 1 < STORAGE_SIZE);
-        new (TypePtr(size_++)) T{ std::forward(args)... };
+        new (TypePtr(size_++)) T{ std::forward<TArgs>(args)... };
     }
     
     void PopBack()
@@ -128,7 +129,8 @@ class DynamicArray
 {
 public:
     DynamicArray(TAllocator* allocator, Size reservedSize = 10)
-        : storage_{ nullptr }
+        : allocator_{ allocator }
+        ,storage_{ nullptr }
         , size_{ 0 }
         , storageSize_{ reservedSize }
     {
@@ -168,7 +170,7 @@ public:
         }
 
         T* newElementAddress = (storage_ + size_++);
-        new (newElementAddress) T{ std::forward(args)... };
+        new (newElementAddress) T{ std::forward<TArgs>(args)... };
     }
 
     void PopBack()
@@ -209,12 +211,12 @@ public:
 
     void ExpandStorage(Size newSize)
     {
-        assert((newSize > elementsStorageSize) && "newSize is smaller than current elementStorageSize_");
+        assert((newSize > storageSize_) && "newSize is smaller than current elementStorageSize_");
 
         T* newStorage = reinterpret_cast<T*>(allocator_->AllocArray(newSize, sizeof(T), alignof(T)));
         std::memcpy(newStorage, storage_, size_ * sizeof(T));
         
-        if (elementsStorageSize_ > 0) {
+        if (storageSize_ > 0) {
             allocator_->FreeArray(storage_);
         }
         
@@ -282,16 +284,16 @@ public:
     void EmplaceBack(TArgs&&... args)
     {
         if (isDynamic_) {
-            DynamicArray<T, TAllocator>::EmplaceBack(std::forward(args)...);
+            DynamicArray<T, TAllocator>::EmplaceBack(std::forward<TArgs>(args)...);
         }
         else {
             if (StaticArrayStorage<T, INPLACE_SIZE>::IsFull()) {
                 TransferToDynamic();
-                DynamicArray<T, TAllocator>::EmplaceBack(std::forward(args)...);
+                DynamicArray<T, TAllocator>::EmplaceBack(std::forward<TArgs>(args)...);
                 return;
             }
 
-            StaticArrayStorage<T, INPLACE_SIZE>::EmplaceBack(std::forward(args)...);
+            StaticArrayStorage<T, INPLACE_SIZE>::EmplaceBack(std::forward<TArgs>(args)...);
         }
     }
 

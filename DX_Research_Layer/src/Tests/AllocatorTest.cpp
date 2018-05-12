@@ -36,9 +36,19 @@ int main()
     Memory::Mibibytes chunkSize = 1;
     Memory::FreeListAllocator alloc{ malloc(chunkSize), chunkSize, true };
 
-    InplaceDynamicArray<CharBuffer40, 10, Memory::FreeListAllocator> arr{ &alloc, 5 };
+    InplaceDynamicArray<CharBuffer40, 5, Memory::FreeListAllocator> arr{ &alloc };
 
-    
+    for (Size i = 0; i < 10; ++i) {
+        arr.EmplaceBack();
+    }
+
+    for (Size i = 0; i < 7; ++i) {
+        arr.PopBack();
+    }
+
+    for (Size i = 0; i < 10; ++i) {
+        arr.EmplaceBack();
+    }
     
     system("pause");
     return 0;
