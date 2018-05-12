@@ -38,6 +38,10 @@ template<typename T, Size STORAGE_SIZE>
 class StaticArrayStorage
 {
 public:
+    StaticArrayStorage()
+        : size_{ 0 }
+    { }
+
     StaticArrayStorage(StaticArrayStorage<T, STORAGE_SIZE> const&) = delete;
     StaticArrayStorage(StaticArrayStorage<T, STORAGE_SIZE>&&) = delete;
 
@@ -117,7 +121,7 @@ private:
     T const* TypePtr(Size i) const { return reinterpret_cast<T*>(array_ + i); }
 
 private:
-    std::aligned_storage<sizeof(T), alignof(T)> array_[STORAGE_SIZE];
+    std::aligned_storage_t<sizeof(T), alignof(T)> array_[STORAGE_SIZE];
     Size size_;
 
 };
@@ -130,7 +134,7 @@ class DynamicArray
 public:
     DynamicArray(TAllocator* allocator, Size reservedSize = 10)
         : allocator_{ allocator }
-        ,storage_{ nullptr }
+        , storage_{ nullptr }
         , size_{ 0 }
         , storageSize_{ reservedSize }
     {
