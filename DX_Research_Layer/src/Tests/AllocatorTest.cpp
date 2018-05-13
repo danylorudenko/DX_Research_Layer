@@ -20,7 +20,7 @@ struct CharBuffer40
     
     union
     {
-        //DXRL::U64 contentInt[5];
+        DXRL::U64 contentInt_;
         char content[40];
     };
 };
@@ -37,23 +37,26 @@ int main()
     Memory::VoidPtr mainChunk = malloc(chunkSize);
     Memory::FreeListAllocator alloc{ mainChunk, chunkSize, true };
 
-    InplaceDynamicArray<CharBuffer40, 5, Memory::FreeListAllocator> container{ &alloc };
-    //StaticArrayStorage<CharBuffer40, 20> container;
+    InplaceDynamicArray<CharBuffer40, 2, Memory::FreeListAllocator> container{ &alloc };
+    
+    Size a = alignof(CharBuffer40);
 
-    Size kek = sizeof(container);
-
-    for (Size i = 0; i < 10; ++i) {
-        container.EmplaceBack();
-    }
-
-    for (Size i = 0; i < 7; ++i) {
-        container.PopBack();
-    }
-
-    for (Size i = 0; i < 10; ++i) {
+    for (Size i = 0; i < 4; ++i) {
         container.EmplaceBack();
     }
     
+    for (Size i = 0; i < 2; ++i) {
+        container.PopBack();
+    }
+    
+    for (Size i = 0; i < 4; ++i) {
+        container.EmplaceBack();
+    }
+    
+    for (Size i = 0; i < 2; ++i) {
+        container.PopBack();
+    }
+
     system("pause");
     return 0;
 }

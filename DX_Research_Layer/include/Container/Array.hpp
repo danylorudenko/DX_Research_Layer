@@ -67,7 +67,7 @@ public:
 
     T* Data() const
     {
-        return array_;
+        return reinterpret_cast<T*>(&array_);
     }
 
     template<typename... TArgs>
@@ -117,11 +117,11 @@ public:
     }
 
 private:
-    T* TypePtr(Size i) { return reinterpret_cast<T*>(array_ + i); }
-    T const* TypePtr(Size i) const { return reinterpret_cast<T*>(array_ + i); }
+    T* TypePtr(Size i) { return reinterpret_cast<T*>(&array_) + i; }
+    T const* TypePtr(Size i) const { return reinterpret_cast<T*>(&array_) + i; }
 
 private:
-    std::aligned_storage_t<sizeof(T), alignof(T)> array_[STORAGE_SIZE];
+    std::aligned_storage_t<sizeof(T) * STORAGE_SIZE, alignof(T)> array_;
     Size size_;
 
 };
@@ -221,7 +221,7 @@ public:
         std::memcpy(newStorage, storage_, size_ * sizeof(T));
         
         if (storageSize_ > 0) {
-            allocator_->FreeArray(storage_);
+            allocator_->FreeArray(reinterpret_cast<Memory::VoidPtr>(storage_));
         }
         
         storage_ = newStorage;
@@ -292,7 +292,7 @@ public:
         }
         else {
             if (StaticArrayStorage<T, INPLACE_SIZE>::IsFull()) {
-                TransferToDynamic();
+                _TransferToDynamic();
                 DynamicArray<T, TAllocator>::EmplaceBack(std::forward<TArgs>(args)...);
                 return;
             }
@@ -341,7 +341,7 @@ public:
 
 
 private:
-    void TransferToInplace()
+    void _TransferToInplace()
     {
         Size const size = DynamicArray<T, TAllocator>::GetSize();
         DynamicArray<T, TAllocator>::_MoveData(StaticArrayStorage<T, INPLACE_SIZE>::Data());
@@ -350,7 +350,7 @@ private:
         isDynamic_ = false;
     }
 
-    void TransferToDynamic()
+    void _TransferToDynamic()
     {
         Size const size = StaticArrayStorage<T, INPLACE_SIZE>::GetSize();
         Size const requiredDynamicSize = size * 2;
