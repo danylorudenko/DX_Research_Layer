@@ -42,7 +42,7 @@ namespace Memory
 
 
 ////////////////////////////////////////
-class LinearAllocator
+class LinearAllocator final
 {
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(LinearAllocator)
@@ -113,7 +113,7 @@ private:
 
 
 ////////////////////////////////////////
-class StackAllocator
+class StackAllocator final
 {
 private:
 
@@ -204,7 +204,7 @@ private:
 
 ////////////////////////////////////////
 template<typename T>
-class PoolAllocator
+class PoolAllocator final
 {
 private:
     struct PoolMember
@@ -342,7 +342,7 @@ private:
 
 
 ////////////////////////////////////////
-class FreeListAllocator
+class FreeListAllocator final
 {
 private:
 
