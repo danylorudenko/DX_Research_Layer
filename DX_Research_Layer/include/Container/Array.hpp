@@ -104,32 +104,32 @@ public:
 
     void _MoveData(T* dest)
     {
-        Size const size = GetSize();
-        for (Size i = 0; i < size; ++i) {
-            std::memcpy((dest + i), TypePtr(i), sizeof(T));
-        }
+        Size const totalSize = GetSize() * sizeof(T);
+
+        if (totalSize > 0)
+            std::memcpy(dest, Data(), totalSize);
         size_ = 0;
     }
 
-    void _WrapData(T* src, Size count)
+    void _WrapData(T const* src, Size count)
     {
         assert(GetSize() == 0);
         assert(STORAGE_SIZE >= count);
 
-        for (Size i = 0; i < count; ++i) {
-            std::memcpy(TypePtr(i), src + i, sizeof(T));
-        }
+        Size const totalSize = count * sizeof(T);
+        if (totalSize > 0)
+            std::memcpy(Data(), src, totalSize);
         size_ = count;
     }
 
-    void _ResizePure(Size size)
+    inline void _ResizePure(Size size)
     {
         size_ = size;
     }
 
 private:
-    T* TypePtr(Size i) { return reinterpret_cast<T*>(&array_) + i; }
-    T const* TypePtr(Size i) const { return reinterpret_cast<T*>(&array_) + i; }
+    inline T* TypePtr(Size i) { return reinterpret_cast<T*>(&array_) + i; }
+    inline T const* TypePtr(Size i) const { return reinterpret_cast<T*>(&array_) + i; }
 
 private:
     std::aligned_storage_t<sizeof(T) * STORAGE_SIZE, alignof(T)> array_;
@@ -246,8 +246,8 @@ public:
 
     void _MoveData(T* dest)
     {
-        Size const size = GetSize();
-        std::memcpy(dest, storage_, size * sizeof(T));
+        Size const totalSize = GetSize() * sizeof(T);
+        std::memcpy(dest, storage_, totalSize);
         size_ = 0;
     }
 
@@ -258,7 +258,8 @@ public:
             ExpandStorage(count + 2);
         }
 
-        std::memcpy(storage_, src, count * sizeof(T));
+        Size const totalSize = count * sizeof(T);
+        std::memcpy(storage_, src, totalSize);
         size_ = count;
     }
 
