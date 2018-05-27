@@ -126,6 +126,9 @@
     <ClCompile Include="src\Tests\AllocatorTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Tests\StringTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pch.hpp">
@@ -260,9 +263,6 @@
     <ClInclude Include="include\Memory\Memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Container\DynamicArray.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Memory\Allocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -270,6 +270,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Container\Array.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\String\String.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

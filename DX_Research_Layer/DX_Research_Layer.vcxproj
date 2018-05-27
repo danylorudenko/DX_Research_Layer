@@ -646,6 +646,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestDebug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\Tests\StringTest.cpp" />
     <ClCompile Include="src\Transform.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">Use</PrecompiledHeader>
@@ -682,7 +683,6 @@
   <ItemGroup>
     <ClInclude Include="include\3rdParty\stb_image.h" />
     <ClInclude Include="include\3rdParty\d3dx12.h" />
-    <ClInclude Include="include\Container\DynamicArray.hpp" />
     <ClInclude Include="include\Container\Array.hpp" />
     <ClInclude Include="include\Foundation\Constant.hpp" />
     <ClInclude Include="include\Foundation\Macro.hpp" />
@@ -727,6 +727,7 @@
     <ClInclude Include="include\Rendering\Data\SceneConstantBuffer.hpp" />
     <ClInclude Include="include\Foundation\Window.hpp" />
     <ClInclude Include="include\Rendering\GPUEngine\GPUSwapChain.hpp" />
+    <ClInclude Include="include\String\String.hpp" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
