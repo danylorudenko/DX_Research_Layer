@@ -3,8 +3,6 @@
 #include <Foundation\Types.hpp>
 #include <Memory\Pointer.hpp>
 
-#include <type_traits>
-
 namespace DXRL
 
 {
@@ -21,12 +19,13 @@ public:
     Array<T, SIZE>& operator=(Array<T, SIZE> const&) = delete;
     Array<T, SIZE>& operator=(Array<T, SIZE>&&) = delete;
 
-    Size constexpr GetSize() const { return SIZE; }
+    inline Size constexpr GetSize() const { return SIZE; }
 
-    T const& operator[](Size i) const { return array_[i]; }
-    T& operator[](Size i) { return array_[i]; }
+    inline T const& operator[](Size i) const { return array_[i]; }
+    inline T& operator[](Size i) { return array_[i]; }
 
-    T* Data() const { return array_; }
+    inline T* Data() { return array_; }
+    inline T const* Data() const { return array_; }
 
 private:
     T array_[SIZE];
@@ -48,26 +47,31 @@ public:
     StaticArrayStorage<T, STORAGE_SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE> const&) = delete;
     StaticArrayStorage<T, STORAGE_SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE>&&) = delete;
 
-    Size GetSize() const { return size_; }
-    Size constexpr GetStorageSize() const { return STORAGE_SIZE; }
-    bool IsFull() const { return size_ == STORAGE_SIZE; }
+    inline Size GetSize() const { return size_; }
+    inline Size constexpr GetStorageSize() const { return STORAGE_SIZE; }
+    inline bool IsFull() const { return size_ == STORAGE_SIZE; }
 
 
-    T const& operator[](Size i) const 
+    inline T const& operator[](Size i) const 
     { 
         assert(i < size_);
         return *TypePtr(i); 
     }
 
-    T& operator[](Size i)
+    inline T& operator[](Size i)
     {
         assert(i < size_);
         return *TypePtr(i);
     }
 
-    T* Data() const
+    inline T* Data()
     {
         return reinterpret_cast<T*>(&array_);
+    }
+
+    inline T const* Data() const
+    {
+        return reinterpret_cast<T const*>(&array_);
     }
 
     template<typename... TArgs>
@@ -75,6 +79,13 @@ public:
     {
         assert(size_ + 1 <= STORAGE_SIZE);
         new (TypePtr(size_++)) T{ std::forward<TArgs>(args)... };
+    }
+
+    void PushBackRange(T* range, Size size)
+    {
+        for (Size i = 0; i < size; ++i) {
+            EmplaceBack(range[i]);
+        }
     }
     
     void PopBack()
@@ -149,19 +160,24 @@ public:
     DynamicArray<T, TAllocator>& operator=(DynamicArray<T, TAllocator> const&) = delete;
     DynamicArray<T, TAllocator>& operator=(DynamicArray<T, TAllocator>&&) = delete;
 
-    T& operator[](Size i)
+    inline T& operator[](Size i)
     {
         assert(i < size_ && "Out-of-bounds access to DynamicArray");
         return storage_[i];
     }
 
-    T const& operator[](Size i) const
+    inline T const& operator[](Size i) const
     {
         assert(i < size_ && "Out-of-bounds access to DynamicArray");
         return storage_[i];
     }
 
-    T* Data() const
+    inline T* Data()
+    {
+        return storage_;
+    }
+
+    inline T const* Data() const
     {
         return storage_;
     }
@@ -198,17 +214,17 @@ public:
         storageSize_ = 0;
     }
 
-    Size GetSize() const
+    inline Size GetSize() const
     {
         return size_;
     }
 
-    Size GetStorageSize() const
+    inline Size GetStorageSize() const
     {
         return storageSize_;
     }
 
-    TAllocator& Allocator()
+    inline TAllocator& Allocator()
     {
         return allocator_;
     }
@@ -235,7 +251,7 @@ public:
         size_ = 0;
     }
 
-    void _WrapData(T* src, Size count)
+    void _WrapData(T const* src, Size count)
     {
         assert(GetSize() == 0);
         if (GetStorageSize() < count) {
@@ -246,7 +262,7 @@ public:
         size_ = count;
     }
 
-    void _ResizePure(Size size)
+    inline void _ResizePure(Size size)
     {
         size_ = size;
     }
