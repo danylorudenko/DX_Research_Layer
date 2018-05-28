@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Container\Array.hpp>
+#include <type_traits>
 
 namespace DXRL
 {
@@ -72,7 +73,12 @@ public:
         _WrapData(str, stringSize);
     }
 
-    template<typename TArg>
+    template<
+        typename TArg,
+        typename = std::enable_if<
+            !std::is_pointer<std::decay<TArg>::value>::value
+        >::value
+    >
     StaticBasicString(TArg&& str)
         : StaticArrayStorage<TChar, INPLACE_SIZE>{}
     {
@@ -97,27 +103,30 @@ public:
         return *this;
     }
 
-    Size GetSize() const
+    inline Size GetSize() const
     {
         return StaticArrayStorage<TChar, INPLACE_SIZE>::GetSize();
     }
 
-    TChar const* Data() const
+    inline TChar const* Data() const
     {
         return StaticArrayStorage<TChar, INPLACE_SIZE>::Data();
     }
 
-    TChar* Data()
+    inline TChar* Data()
     {
         return StaticArrayStorage<TChar, INPLACE_SIZE>::Data();
     }
 
-    TChar operator[](Size i) const
+    inline TChar operator[](Size i) const
     {
         return StaticArrayStorage<TChar, INPLACE_SIZE>::operator[](i);
     }
 
-
+    inline TChar& operator[](Size i)
+    {
+        return StaticArrayStorage<TChar, INPLACE_SIZE>::operator[](i);
+    }
 
 };
 
