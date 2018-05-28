@@ -40,6 +40,16 @@ Size CStringCopy(TChar const* source, TChar* dest)
     return size;
 }
 
+template<typename TChar>
+Size CStringCopy(TChar const* source, TChar* dest, Size sourceSize)
+{
+    Size size = 0;
+    while (size < sourceSize) {
+        dest[size++] = source[dest];
+    }
+
+    return size;
+}
 
 ////////////////////////////////////////
 template<typename TChar, Size INPLACE_SIZE>
@@ -51,48 +61,62 @@ public:
         : StaticArrayStorage<TChar, INPLACE_SIZE>{}
     { }
 
-    StaticBasicString(TChar const* str)
+    StaticBasicString(TChar const* str, Size sizeInMemory)
         : StaticArrayStorage<TChar, INPLACE_SIZE>{}
     {
-        Size const size = CStringCopy<TChar>(str, Data());
+        Size constexpr characterSize = sizeof(str[0]);
+        Size const stringSize = sizeInMemory / characterSize;
+
+        assert(stringSize < INPLACE_SIZE && "Can't fit the string in the internal storage.");
+
+        _WrapData(str, stringSize);
+    }
+
+    template<typename TArg>
+    StaticBasicString(TArg&& str)
+        : StaticArrayStorage<TChar, INPLACE_SIZE>{}
+    {
+        operator=(std::forward<TArg>(str));
+    }
+    
+    StaticBasicString<TChar, INPLACE_SIZE>& operator=(TChar const* str)
+    {
+        Size size = CStringCopy<TChar>(str, Data());
         _ResizePure(size);
-    }
-
-    StaticBasicString(TChar const* str, Size size)
-        : StaticArrayStorage<TChar, INPLACE_SIZE>{}
-    {
-        assert(size < INPLACE_SIZE && "Can't fit the string in the internal storage");
-        _WrapData(str, size);
-    }
-
-    // UNIVERSAL REFERENCE CONSTRUCTION NEEDED.
-
-    StaticBasicString(StaticBasicString<TChar, INPLACE_SIZE> const& rhs)
-    {
-        StaticBasicString<TChar, INPLACE_SIZE>::operator=(rhs);
-    }
-
-    StaticBasicString(StaticBasicString<TChar, INPLACE_SIZE>&& rhs)
-    {
-        StaticBasicString<TChar, INPLACE_SIZE>::operator=(std::move(rhs));
-    }
-
-    StaticBasicString<TChar, INPLACE_SIZE>& operator=(StaticBasicString<TChar, INPLACE_SIZE> const& rhs)
-    {
-        Clear();
-        _WrapData(rhs.Data(), rhs.GetSize());
 
         return *this;
     }
 
-    StaticBasicString<TChar, INPLACE_SIZE>& operator=(StaticBasicString<TChar, INPLACE_SIZE>&& rhs)
+    template<typename TArg>
+    StaticBasicString<TChar, INPLACE_SIZE>& operator=(TArg&& str)
     {
-        Clear();
-        _WrapData(rhs.Data(), rhs.GetSize());
-        rhs.Clear();
+        Size const size = str.GetSize();
+        TChar* data = str.Data();
+        _WrapData(data, size);
 
         return *this;
     }
+
+    Size GetSize() const
+    {
+        return StaticArrayStorage<TChar, INPLACE_SIZE>::GetSize();
+    }
+
+    TChar const* Data() const
+    {
+        return StaticArrayStorage<TChar, INPLACE_SIZE>::Data();
+    }
+
+    TChar* Data()
+    {
+        return StaticArrayStorage<TChar, INPLACE_SIZE>::Data();
+    }
+
+    TChar operator[](Size i) const
+    {
+        return StaticArrayStorage<TChar, INPLACE_SIZE>::operator[](i);
+    }
+
 
 
 };

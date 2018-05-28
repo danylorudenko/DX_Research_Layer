@@ -74,6 +74,16 @@ public:
         return reinterpret_cast<T const*>(&array_);
     }
 
+    inline T const& operator[](Size i) const
+    {
+        return *(TypePtr(i));
+    }
+
+    inline T const& operator[](Size i) const
+    {
+        return *(TypePtr(i));
+    }
+
     template<typename... TArgs>
     void EmplaceBack(TArgs&&... args)
     {
@@ -180,6 +190,16 @@ public:
     inline T const* Data() const
     {
         return storage_;
+    }
+
+    inline T const& operator[](Size i) const
+    {
+        return storage_[i];
+    }
+
+    inline T& operator[](Size i)
+    {
+        return storage_[i];
     }
 
     template<typename... TArgs>
@@ -352,8 +372,53 @@ public:
             return DynamicArray<T, TAllocator>::GetSize();
         }
         else {
-            StaticArrayStorage<T, INPLACE_SIZE>::GetSize();
+            return StaticArrayStorage<T, INPLACE_SIZE>::GetSize();
         }
+    }
+
+    T const* Data() const
+    {
+        if (isDynamic_) {
+            return DynamicArray<T, TAllocator>::Data();
+        }
+        else {
+            return StaticArrayStorage<T, INPLACE_SIZE>::Data();
+        }
+    }
+
+    T* Data()
+    {
+        if (isDynamic_) {
+            return DynamicArray<T, TAllocator>::Data();
+        }
+        else {
+            return StaticArrayStorage<T, INPLACE_SIZE>::Data();
+        }
+    }
+
+    T const& operator[](Size i) const
+    {
+        if (isDynamic_) {
+            return DynamicArray<T, TAllocator>::operator[](i);
+        }
+        else {
+            return StaticArrayStorage<T, INPLACE_SIZE>::operator[](i);
+        }
+    }
+
+    T& operator[](Size i)
+    {
+        if (isDynamic_) {
+            return DynamicArray<T, TAllocator>::operator[](i);
+        }
+        else {
+            return StaticArrayStorage<T, INPLACE_SIZE>::operator[](i);
+        }
+    }
+
+    inline TAllocator& Allocator()
+    {
+        return DynamicArray<T< TAllocator>::Allocator();
     }
 
 
