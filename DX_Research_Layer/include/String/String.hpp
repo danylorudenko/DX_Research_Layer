@@ -37,6 +37,7 @@ Size CStringCopy(TChar const* source, TChar* dest)
     while (str[size] != CStringTerminator<TChar>() && size < CStringMaxSize<Char>()) {
         dest[size++] = source[dest];
     }
+    dest[size] = CStringTerminator<TChar>();
 
     return size;
 }
@@ -48,8 +49,30 @@ Size CStringCopy(TChar const* source, TChar* dest, Size sourceSize)
     while (size < sourceSize) {
         dest[size++] = source[dest];
     }
+    dest[size] = CStringTerminator<TChar>();
 
     return size;
+}
+
+template<typename TChar>
+Size CStringAppend(TChar const* source, TChar* dest)
+{
+    Size destSize = CStringSize(dest);
+    Size counter = 0;
+    while (source[counter] != CStringTerminator<TChar>()) {
+        dest[destSize + counter] = source[counter];
+        ++counter;
+    }
+
+    Size const terminatorI = destSize + counter;
+    dest[terminatorI] = CStringTerminator<TChar>();
+    return terminatorI;
+}
+
+template<typename TChar>
+void CStringTrunc(TChar* str, Size truncSize)
+{
+    str[truncSize] = CStringTerminator<TChar>();
 }
 
 ////////////////////////////////////////
@@ -61,6 +84,12 @@ public:
     StaticBasicString()
         : StaticArrayStorage<TChar, INPLACE_SIZE>{}
     { }
+
+    StaticBasicString(TChar const* str)
+        : StaticArrayStorage<TChar, INPLACE_SIZE>{}
+    {
+        operator=(str);
+    }
 
     StaticBasicString(TChar const* str, Size sizeInMemory)
         : StaticArrayStorage<TChar, INPLACE_SIZE>{}
@@ -76,7 +105,9 @@ public:
     template<
         typename TArg,
         typename = std::enable_if<
-            !std::is_pointer<std::decay<TArg>::value>::value
+            !std::is_pointer<
+                typename std::decay<TArg>::value
+            >::value
         >::value
     >
     StaticBasicString(TArg&& str)
@@ -93,7 +124,13 @@ public:
         return *this;
     }
 
-    template<typename TArg>
+    template<
+        typename TArg,
+        typename = std::enable_if<
+            !std::is_pointer<
+                typename std::decay<TArg>::value>::value
+        >::value
+    >
     StaticBasicString<TChar, INPLACE_SIZE>& operator=(TArg&& str)
     {
         Size const size = str.GetSize();
@@ -116,6 +153,27 @@ public:
     inline TChar* Data()
     {
         return StaticArrayStorage<TChar, INPLACE_SIZE>::Data();
+    }
+
+    StaticBasicString<TChar, INPLACE_SIZE>& operator+=(TChar const* str)
+    {
+        Size const newSize = CStringAppend(str, Data());
+        _ResizePure(newSize);
+        return *this;
+    }
+
+    template<
+        typename TArg,
+        typename = std::enable_if<
+            !std::is_pointer<std::decay<TArg>::value>::value
+        >::value
+    >
+    StaticBasicString<TChar, INPLACE_SIZE>& operator+=(TArg&& str)
+    {
+        TChar const* cStr = str.Data();
+        Size const newSize = CStringAppend(str.Data(), Data());
+        _ResizePure(newSize);
+        return *this;
     }
 
     inline TChar operator[](Size i) const

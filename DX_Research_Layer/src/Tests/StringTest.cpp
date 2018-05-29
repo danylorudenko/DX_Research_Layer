@@ -37,10 +37,12 @@ int main()
     Memory::VoidPtr mainChunk = malloc(chunkSize);
     Memory::FreeListAllocator alloc{ mainChunk, chunkSize, true };
 
-    StaticBasicString<char, 128> string0;
-    StaticBasicString<char, 128> string1;
+    StaticBasicString<char, 128> string0 = "kek";
+    StaticBasicString<char, 128> string1 = "topKek";
 
-    string0 = string1;
+    string0 += ("kek0");
+
+    string0.operator+=( string1 );
 
     system("pause");
     return 0;

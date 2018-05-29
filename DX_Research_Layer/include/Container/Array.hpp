@@ -74,7 +74,7 @@ public:
         return reinterpret_cast<T const*>(&array_);
     }
 
-    inline T const& operator[](Size i) const
+    inline T& operator[](Size i)
     {
         return *(TypePtr(i));
     }
@@ -134,6 +134,7 @@ public:
 
     inline void _ResizePure(Size size)
     {
+        assert(size <= STORAGE_SIZE);
         size_ = size;
     }
 
@@ -285,6 +286,7 @@ public:
 
     inline void _ResizePure(Size size)
     {
+        assert(size <= storageSize_)
         size_ = size;
     }
     
