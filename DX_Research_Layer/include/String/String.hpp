@@ -134,16 +134,16 @@ public:
     >
     StaticBasicString<TChar, INPLACE_SIZE>& operator=(TArg&& str)
     {
-        Size_t const size = str.GetSize();
+        Size_t const size = str.Size();
         TChar* data = str.Data();
         _WrapData(data, size);
 
         return *this;
     }
 
-    inline Size_t GetSize() const
+    inline Size_t Size() const
     {
-        return StaticArrayStorage<TChar, INPLACE_SIZE>::GetSize();
+        return StaticArrayStorage<TChar, INPLACE_SIZE>::Size();
     }
 
     inline TChar const* Data() const

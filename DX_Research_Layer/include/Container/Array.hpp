@@ -22,7 +22,7 @@ public:
     Array<T, SIZE>& operator=(Array<T, SIZE> const&) = delete;
     Array<T, SIZE>& operator=(Array<T, SIZE>&&) = delete;
 
-    inline Size_t constexpr GetSize() const { return SIZE; }
+    inline Size_t constexpr Size() const { return SIZE; }
 
     inline T const& operator[](Size_t i) const { return array_[i]; }
     inline T& operator[](Size_t i) { return array_[i]; }
@@ -50,8 +50,8 @@ public:
     StaticArrayStorage<T, STORAGE_SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE> const&) = delete;
     StaticArrayStorage<T, STORAGE_SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE>&&) = delete;
 
-    inline Size_t GetSize() const { return size_; }
-    inline Size_t constexpr GetStorageSize() const { return STORAGE_SIZE; }
+    inline Size_t Size() const { return size_; }
+    inline Size_t constexpr StorageSize() const { return STORAGE_SIZE; }
     inline bool IsFull() const { return size_ == STORAGE_SIZE; }
 
 
@@ -107,7 +107,7 @@ public:
 
     void _MoveData(T* dest)
     {
-        Size_t const totalSize = GetSize() * sizeof(T);
+        Size_t const totalSize = Size() * sizeof(T);
 
         if (totalSize > 0)
             std::memcpy(dest, Data(), totalSize);
@@ -116,7 +116,7 @@ public:
 
     void _WrapData(T const* src, Size_t count)
     {
-        assert(GetSize() == 0);
+        assert(Size() == 0);
         assert(STORAGE_SIZE >= count);
 
         Size_t const totalSize = count * sizeof(T);
@@ -218,12 +218,12 @@ public:
         storageSize_ = 0;
     }
 
-    inline Size_t GetSize() const
+    inline Size_t Size() const
     {
         return size_;
     }
 
-    inline Size_t GetStorageSize() const
+    inline Size_t StorageSize() const
     {
         return storageSize_;
     }
@@ -250,15 +250,15 @@ public:
 
     void _MoveData(T* dest)
     {
-        Size_t const totalSize = GetSize() * sizeof(T);
+        Size_t const totalSize = Size() * sizeof(T);
         std::memcpy(dest, storage_, totalSize);
         size_ = 0;
     }
 
     void _WrapData(T const* src, Size_t count)
     {
-        assert(GetSize() == 0);
-        if (GetStorageSize() < count) {
+        assert(Size() == 0);
+        if (StorageSize() < count) {
             ExpandStorage(count + 2);
         }
 
@@ -351,13 +351,13 @@ public:
         StaticArrayStorage<T, INPLACE_SIZE>::Clear();
     }
 
-    Size_t GetSize() const
+    Size_t Size() const
     {
         if (isDynamic_) {
-            return DynamicArray<T, TAllocator>::GetSize();
+            return DynamicArray<T, TAllocator>::Size();
         }
         else {
-            return StaticArrayStorage<T, INPLACE_SIZE>::GetSize();
+            return StaticArrayStorage<T, INPLACE_SIZE>::Size();
         }
     }
 
@@ -410,7 +410,7 @@ public:
 private:
     void _TransferToInplace()
     {
-        Size_t const size = DynamicArray<T, TAllocator>::GetSize();
+        Size_t const size = DynamicArray<T, TAllocator>::Size();
         DynamicArray<T, TAllocator>::_MoveData(StaticArrayStorage<T, INPLACE_SIZE>::Data());
         StaticArrayStorage<T, INPLACE_SIZE>::_ResizePure(size);
 
@@ -419,9 +419,9 @@ private:
 
     void _TransferToDynamic()
     {
-        Size_t const size = StaticArrayStorage<T, INPLACE_SIZE>::GetSize();
+        Size_t const size = StaticArrayStorage<T, INPLACE_SIZE>::Size();
         Size_t const requiredDynamicSize = size * 2;
-        if (DynamicArray<T, TAllocator>::GetStorageSize() < requiredDynamicSize) {
+        if (DynamicArray<T, TAllocator>::StorageSize() < requiredDynamicSize) {
             DynamicArray<T, TAllocator>::ExpandStorage(requiredDynamicSize);
         }
 
