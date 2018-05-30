@@ -13,14 +13,35 @@ template<typename T, Size_t SIZE>
 class Array
 {
 public:
-    Array(Array<T, SIZE> const& rhs) 
-    {
-        for()
-    }
-    Array(Array<T, SIZE>&&) = delete;
+    Array() = default;
 
-    Array<T, SIZE>& operator=(Array<T, SIZE> const&) = delete;
-    Array<T, SIZE>& operator=(Array<T, SIZE>&&) = delete;
+    Array(Array const& rhs) 
+    {
+        operator=(rhs);
+    }
+
+    Array(Array&& rhs)
+    {
+        operator=(std::move(rhs));
+    }
+
+    Array& operator=(Array const& rhs)
+    {
+        for (S32_fast_t i = 0; i < SIZE; ++i) {
+            array_[i] = rhs.array_[i];
+        }
+
+        return *this;
+    }
+
+    Array& operator=(Array&& rhs)
+    {
+        for (S32_fast_t i = 0; i < SIZE; ++i) {
+            array_[i] = std::move<T>(rhs.array_[i]);
+        }
+
+        return *this;
+    }
 
     inline Size_t constexpr Size() const { return SIZE; }
 
@@ -44,11 +65,39 @@ public:
         : size_{ 0 }
     { }
 
-    StaticArrayStorage(StaticArrayStorage<T, STORAGE_SIZE> const&) = delete;
-    StaticArrayStorage(StaticArrayStorage<T, STORAGE_SIZE>&&) = delete;
+    StaticArrayStorage(StaticArrayStorage const& rhs)
+    {
+        operator=(rhs);
+    }
+    StaticArrayStorage(StaticArrayStorage&& rhs)
+    {
+        operator=(std::move(rhs));
+    }
 
-    StaticArrayStorage<T, STORAGE_SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE> const&) = delete;
-    StaticArrayStorage<T, STORAGE_SIZE>& operator=(StaticArrayStorage<T, STORAGE_SIZE>&&) = delete;
+    StaticArrayStorage& operator=(StaticArrayStorage const& rhs)
+    {
+        Clear();
+        
+        auto const size = static_cast<S32_fast_t>(Size());
+        for (S32_fast_t i = 0; i < size; ++i) {
+            TypeRef(i) = rhs.TypeRef(i);
+        }
+
+        return *this;
+    }
+
+    StaticArrayStorage& operator=(StaticArrayStorage&& rhs)
+    {
+        Clear();
+
+        auto const size = static_cast<S32_fast_t>(Size());
+        for (S32_fast_t i = 0; i < size; ++i) {
+            TypeRef(i) = std::move<T>(rhs.TypeRef(i));
+        }
+
+        rhs.Clear();
+        return *this;
+    }
 
     inline Size_t Size() const { return size_; }
     inline Size_t constexpr StorageSize() const { return STORAGE_SIZE; }
@@ -58,13 +107,13 @@ public:
     inline T const& operator[](Size_t i) const 
     { 
         assert(i < size_);
-        return *TypePtr(i); 
+        return TypeRef(i); 
     }
 
     inline T& operator[](Size_t i)
     {
         assert(i < size_);
-        return *TypePtr(i);
+        return TypeRef(i);
     }
 
     inline T* Data()
@@ -134,6 +183,9 @@ public:
 private:
     inline T* TypePtr(Size_t i) { return reinterpret_cast<T*>(&array_) + i; }
     inline T const* TypePtr(Size_t i) const { return reinterpret_cast<T*>(&array_) + i; }
+    
+    inline T& TypeRef(Size_t i) { return *TypePtr(i); }
+    inline T const& TypeRef(Size_t i) const { return *TypePtr(i); }
 
 private:
     std::aligned_storage_t<sizeof(T) * STORAGE_SIZE, alignof(T)> array_;
@@ -158,11 +210,43 @@ public:
         }
     }
 
-    DynamicArray(DynamicArray<T, TAllocator> const&) = delete;
-    DynamicArray(DynamicArray<T, TAllocator>&&) = delete;
+    DynamicArray(DynamicArray const& rhs)
+    {
+        operator=(rhs);
+    }
+    DynamicArray(DynamicArray&& rhs)
+    {
+        operator=(std::move(rhs));
+    }
 
-    DynamicArray<T, TAllocator>& operator=(DynamicArray<T, TAllocator> const&) = delete;
-    DynamicArray<T, TAllocator>& operator=(DynamicArray<T, TAllocator>&&) = delete;
+    DynamicArray& operator=(DynamicArray const& rhs)
+    {
+        Clear();
+        auto const size = static_cast<S32_fast_t>(rhs.Size());
+        if (storageSize_ < size) {
+            ExpandStorage(size * 2);
+        }
+        for (S32_fast_t i = 0; i < size; ++i) {
+            operator[](i) = rhs[i];
+        }
+
+        return *this;
+    }
+
+    DynamicArray& operator=(DynamicArray&& rhs)
+    {
+        Clear();
+        auto const size = static_cast<S32_fast_t>(rhs.Size());
+        if (storageSize_ < size) {
+            ExpandStorage(size * 2);
+        }
+        for (S32_fast_t i = 0; i < size; ++i) {
+            operator[](i) = std::move<T>(rhs[i]);
+        }
+
+        rhs.Clear();
+        return *this;
+    }
 
     inline T& operator[](Size_t i)
     {
@@ -300,36 +384,63 @@ public:
     {
     }
 
-    InplaceDynamicArray(InplaceDynamicArray<T, INPLACE_SIZE, TAllocator> const&) = delete;
-    InplaceDynamicArray(InplaceDynamicArray<T, INPLACE_SIZE, TAllocator>&&) = delete;
+    InplaceDynamicArray(InplaceDynamicArray const& rhs)
+    {
+        operator=(rhs);
+    }
+    InplaceDynamicArray(InplaceDynamicArray&& rhs)
+    {
+        operator=(std::move(rhs));
+    }
 
-    InplaceDynamicArray<T, INPLACE_SIZE, TAllocator>& operator=(InplaceDynamicArray<T, INPLACE_SIZE, TAllocator> const& rhs) = delete;
-    InplaceDynamicArray<T, INPLACE_SIZE, TAllocator>& operator=(InplaceDynamicArray<T, INPLACE_SIZE, TAllocator>&& rhs) = delete;
+    InplaceDynamicArray& operator=(InplaceDynamicArray const& rhs)
+    {
+        if (isDynamic_) {
+            DynamicArray::operator=(rhs);
+        }
+        else {
+            StaticArrayStorage::operator=(rhs);
+        }
+
+        return *this;
+    }
+
+    InplaceDynamicArray& operator=(InplaceDynamicArray&& rhs)
+    {
+        if (isDynamic_) {
+            DynamicArray::operator=(std::move(rhs));
+        }
+        else {
+            StaticArrayStorage::operator=(std::move(rhs));
+        }
+
+        return *this;
+    }
 
     template<typename... TArgs>
     void EmplaceBack(TArgs&&... args)
     {
         if (isDynamic_) {
-            DynamicArray<T, TAllocator>::EmplaceBack(std::forward<TArgs>(args)...);
+            DynamicArray::EmplaceBack(std::forward<TArgs>(args)...);
         }
         else {
-            if (StaticArrayStorage<T, INPLACE_SIZE>::IsFull()) {
+            if (StaticArrayStorage::IsFull()) {
                 _TransferToDynamic();
-                DynamicArray<T, TAllocator>::EmplaceBack(std::forward<TArgs>(args)...);
+                DynamicArray::EmplaceBack(std::forward<TArgs>(args)...);
                 return;
             }
 
-            StaticArrayStorage<T, INPLACE_SIZE>::EmplaceBack(std::forward<TArgs>(args)...);
+            StaticArrayStorage::EmplaceBack(std::forward<TArgs>(args)...);
         }
     }
 
     void PopBack()
     {
         if (isDynamic_) {
-            DynamicArray<T, TAllocator>::PopBack();
+            DynamicArray::PopBack();
         }
         else {
-            StaticArrayStorage<T, INPLACE_SIZE>::PopBack();
+            StaticArrayStorage::PopBack();
         }
     }
 
@@ -337,96 +448,96 @@ public:
     void Clear()
     {
         if (isDynamic_) {
-            DynamicArray<T, TAllocator>::Clear();
+            DynamicArray::Clear();
             isDynamic_ = false;
         }
         else {
-            StaticArrayStorage<T, INPLACE_SIZE>::Clear();
+            StaticArrayStorage::Clear();
         }
     }
 
     void Reset()
     {
-        DynamicArray<T, TAllocator>::Reset();
-        StaticArrayStorage<T, INPLACE_SIZE>::Clear();
+        DynamicArray::Reset();
+        StaticArrayStorage::Clear();
     }
 
     Size_t Size() const
     {
         if (isDynamic_) {
-            return DynamicArray<T, TAllocator>::Size();
+            return DynamicArray::Size();
         }
         else {
-            return StaticArrayStorage<T, INPLACE_SIZE>::Size();
+            return StaticArrayStorage::Size();
         }
     }
 
     T const* Data() const
     {
         if (isDynamic_) {
-            return DynamicArray<T, TAllocator>::Data();
+            return DynamicArray::Data();
         }
         else {
-            return StaticArrayStorage<T, INPLACE_SIZE>::Data();
+            return StaticArrayStorage::Data();
         }
     }
 
     T* Data()
     {
         if (isDynamic_) {
-            return DynamicArray<T, TAllocator>::Data();
+            return DynamicArray::Data();
         }
         else {
-            return StaticArrayStorage<T, INPLACE_SIZE>::Data();
+            return StaticArrayStorage::Data();
         }
     }
 
     T const& operator[](Size_t i) const
     {
         if (isDynamic_) {
-            return DynamicArray<T, TAllocator>::operator[](i);
+            return DynamicArray::operator[](i);
         }
         else {
-            return StaticArrayStorage<T, INPLACE_SIZE>::operator[](i);
+            return StaticArrayStorage::operator[](i);
         }
     }
 
     T& operator[](Size_t i)
     {
         if (isDynamic_) {
-            return DynamicArray<T, TAllocator>::operator[](i);
+            return DynamicArray::operator[](i);
         }
         else {
-            return StaticArrayStorage<T, INPLACE_SIZE>::operator[](i);
+            return StaticArrayStorage::operator[](i);
         }
     }
 
     inline TAllocator& Allocator()
     {
-        return DynamicArray<T< TAllocator>::Allocator();
+        return DynamicArray::Allocator();
     }
 
 
 private:
     void _TransferToInplace()
     {
-        Size_t const size = DynamicArray<T, TAllocator>::Size();
-        DynamicArray<T, TAllocator>::_MoveData(StaticArrayStorage<T, INPLACE_SIZE>::Data());
-        StaticArrayStorage<T, INPLACE_SIZE>::_ResizePure(size);
+        Size_t const size = DynamicArray::Size();
+        DynamicArray::_MoveData(StaticArrayStorage::Data());
+        StaticArrayStorage::_ResizePure(size);
 
         isDynamic_ = false;
     }
 
     void _TransferToDynamic()
     {
-        Size_t const size = StaticArrayStorage<T, INPLACE_SIZE>::Size();
+        Size_t const size = StaticArrayStorage::Size();
         Size_t const requiredDynamicSize = size * 2;
-        if (DynamicArray<T, TAllocator>::StorageSize() < requiredDynamicSize) {
-            DynamicArray<T, TAllocator>::ExpandStorage(requiredDynamicSize);
+        if (DynamicArray::StorageSize() < requiredDynamicSize) {
+            DynamicArray::ExpandStorage(requiredDynamicSize);
         }
 
-        DynamicArray<T, TAllocator>::_ResizePure(size);
-        StaticArrayStorage<T, INPLACE_SIZE>::_MoveData(DynamicArray<T, TAllocator>::Data());
+        DynamicArray::_ResizePure(size);
+        StaticArrayStorage::_MoveData(DynamicArray::Data());
 
         isDynamic_ = true;
     }

@@ -24,6 +24,18 @@ struct CharBuffer40
     };
 };
 
+struct Uncopyable {
+
+    Uncopyable()
+    {
+
+    }
+
+    Uncopyable(Uncopyable const&) = delete;
+    Uncopyable& operator=(Uncopyable const&) = delete;
+    char content[32];
+};
+
 int main()
 {
     using namespace DXRL;
@@ -39,12 +51,14 @@ int main()
     //StaticBasicString<char, 128> string0 = "kek";
     //StaticBasicString<char, 128> string1 = string0;
 
-    //string0 += ("kek0");
-    std::vector< CharBuffer40 > vector;
-    std::vector< CharBuffer40 > vec2;
+    Array<CharBuffer40, 10> array_;
+    Array<CharBuffer40, 10> array2_{ array_ };
 
-    vector = vec2;
+    InplaceDynamicArray<CharBuffer40, 10, Memory::FreeListAllocator> inplaceArray{ &alloc };
+    inplaceArray.EmplaceBack();
+    inplaceArray.EmplaceBack(CharBuffer40{});
 
+    auto size = inplaceArray.Size();
     //string0 +=  string1;
 
     system("pause");
