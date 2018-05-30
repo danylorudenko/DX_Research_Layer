@@ -7,7 +7,7 @@ namespace Memory
 {
 
 ////////////////////////////////////////
-Bytes::Bytes(Size bytesCount)
+Bytes::Bytes(Size_t bytesCount)
     : bytesCount_{ bytesCount }
 { }
 
@@ -15,7 +15,7 @@ Bytes::Bytes(Bytes const& bytes)
     : bytesCount_{ bytes.bytesCount_ }
 { }
 
-Bytes::operator Size() const
+Bytes::operator Size_t() const
 {
     return bytesCount_;
 }
@@ -32,7 +32,7 @@ Bytes& Bytes::operator-=(const Bytes& rhs)
     return *this;
 }
 
-Bytes& Bytes::operator*=(Size rhs)
+Bytes& Bytes::operator*=(Size_t rhs)
 {
     bytesCount_ *= rhs;
     return *this;
@@ -40,19 +40,19 @@ Bytes& Bytes::operator*=(Size rhs)
 
 
 ////////////////////////////////////////
-Kibibytes::Kibibytes(Size kibibytesCount) :
+Kibibytes::Kibibytes(Size_t kibibytesCount) :
     Bytes{ kibibytesCount * 1024 }
 { }
 
 
 ////////////////////////////////////////
-Mibibytes::Mibibytes(Size mibibytesCount) :
+Mibibytes::Mibibytes(Size_t mibibytesCount) :
     Kibibytes{ mibibytesCount * 1024 }
 { }
 
 
 ////////////////////////////////////////
-Gibibytes::Gibibytes(Size gibibytesCount)
+Gibibytes::Gibibytes(Size_t gibibytesCount)
     : Mibibytes{ gibibytesCount * 1024 }
 { }
 
@@ -60,17 +60,17 @@ Gibibytes::Gibibytes(Size gibibytesCount)
 ////////////////////////////////////////
 Bytes operator+(const Bytes& lhs, const Bytes& rhs)
 {
-    return Bytes{ (Size)lhs + (Size)rhs };
+    return Bytes{ (Size_t)lhs + (Size_t)rhs };
 }
 
 Bytes operator-(const Bytes& lhs, const Bytes& rhs)
 {
-    return Bytes{ (Size)lhs - (Size)rhs };
+    return Bytes{ (Size_t)lhs - (Size_t)rhs };
 }
 
-Bytes operator*(const Bytes& lhs, Size rhs)
+Bytes operator*(const Bytes& lhs, Size_t rhs)
 {
-    return Bytes{ (Size)lhs * rhs };
+    return Bytes{ (Size_t)lhs * rhs };
 }
 
 } // namespace Memory

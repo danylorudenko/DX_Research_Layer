@@ -8,9 +8,9 @@ namespace DXRL
 
 
 template<typename TChar>
-constexpr Size CStringMaxSize()
+constexpr Size_t CStringMaxSize()
 {
-    return sizeof(U16) * 4;
+    return sizeof(U16_t) * 4;
 }
 
 template<typename TChar>
@@ -20,9 +20,9 @@ constexpr TChar CStringTerminator()
 }
 
 template<typename TChar>
-Size CStringSize(TChar const* str)
+Size_t CStringSize(TChar const* str)
 {
-    Size size = 0;
+    Size_t size = 0;
     while (str[size] != CStringTerminator<TChar>() && size < CStringMaxSize<TChar>()) {
         ++size;
     }
@@ -31,9 +31,9 @@ Size CStringSize(TChar const* str)
 }
 
 template<typename TChar>
-Size CStringCopy(TChar const* source, TChar* dest)
+Size_t CStringCopy(TChar const* source, TChar* dest)
 {
-    Size size = 0;
+    Size_t size = 0;
     while (str[size] != CStringTerminator<TChar>() && size < CStringMaxSize<Char>()) {
         dest[size++] = source[dest];
     }
@@ -43,9 +43,9 @@ Size CStringCopy(TChar const* source, TChar* dest)
 }
 
 template<typename TChar>
-Size CStringCopy(TChar const* source, TChar* dest, Size sourceSize)
+Size_t CStringCopy(TChar const* source, TChar* dest, Size_t sourceSize)
 {
-    Size size = 0;
+    Size_t size = 0;
     while (size < sourceSize) {
         dest[size++] = source[dest];
     }
@@ -55,28 +55,28 @@ Size CStringCopy(TChar const* source, TChar* dest, Size sourceSize)
 }
 
 template<typename TChar>
-Size CStringAppend(TChar const* source, TChar* dest)
+Size_t CStringAppend(TChar const* source, TChar* dest)
 {
-    Size destSize = CStringSize(dest);
-    Size counter = 0;
+    Size_t destSize = CStringSize(dest);
+    Size_t counter = 0;
     while (source[counter] != CStringTerminator<TChar>()) {
         dest[destSize + counter] = source[counter];
         ++counter;
     }
 
-    Size const terminatorI = destSize + counter;
+    Size_t const terminatorI = destSize + counter;
     dest[terminatorI] = CStringTerminator<TChar>();
     return terminatorI;
 }
 
 template<typename TChar>
-void CStringTrunc(TChar* str, Size truncSize)
+void CStringTrunc(TChar* str, Size_t truncSize)
 {
     str[truncSize] = CStringTerminator<TChar>();
 }
 
 ////////////////////////////////////////
-template<typename TChar, Size INPLACE_SIZE>
+template<typename TChar, Size_t INPLACE_SIZE>
 class StaticBasicString
     : private StaticArrayStorage<TChar, INPLACE_SIZE>
 {
@@ -91,11 +91,11 @@ public:
         operator=(str);
     }
 
-    StaticBasicString(TChar const* str, Size sizeInMemory)
+    StaticBasicString(TChar const* str, Size_t sizeInMemory)
         : StaticArrayStorage<TChar, INPLACE_SIZE>{}
     {
-        Size constexpr characterSize = sizeof(str[0]);
-        Size const stringSize = sizeInMemory / characterSize;
+        Size_t constexpr characterSize = sizeof(str[0]);
+        Size_t const stringSize = sizeInMemory / characterSize;
 
         assert(stringSize < INPLACE_SIZE && "Can't fit the string in the internal storage.");
 
@@ -104,11 +104,11 @@ public:
 
     template<
         typename TArg,
-        typename = std::enable_if<
+        typename = typename std::enable_if<
             !std::is_pointer<
                 typename std::decay<TArg>::value
             >::value
-        >::value
+        >::type
     >
     StaticBasicString(TArg&& str)
         : StaticArrayStorage<TChar, INPLACE_SIZE>{}
@@ -118,7 +118,7 @@ public:
     
     StaticBasicString<TChar, INPLACE_SIZE>& operator=(TChar const* str)
     {
-        Size size = CStringCopy<TChar>(str, Data());
+        Size_t size = CStringCopy<TChar>(str, Data());
         _ResizePure(size);
 
         return *this;
@@ -126,21 +126,22 @@ public:
 
     template<
         typename TArg,
-        typename = std::enable_if<
+        typename = typename std::enable_if<
             !std::is_pointer<
-                typename std::decay<TArg>::value>::value
-        >::value
+                typename std::decay<TArg>::value
+            >::value
+        >::type
     >
     StaticBasicString<TChar, INPLACE_SIZE>& operator=(TArg&& str)
     {
-        Size const size = str.GetSize();
+        Size_t const size = str.GetSize();
         TChar* data = str.Data();
         _WrapData(data, size);
 
         return *this;
     }
 
-    inline Size GetSize() const
+    inline Size_t GetSize() const
     {
         return StaticArrayStorage<TChar, INPLACE_SIZE>::GetSize();
     }
@@ -157,7 +158,7 @@ public:
 
     StaticBasicString<TChar, INPLACE_SIZE>& operator+=(TChar const* str)
     {
-        Size const newSize = CStringAppend(str, Data());
+        Size_t const newSize = CStringAppend(str, Data());
         _ResizePure(newSize);
         return *this;
     }
@@ -165,23 +166,25 @@ public:
     template<
         typename TArg,
         typename = std::enable_if<
-            !std::is_pointer<std::decay<TArg>::value>::value
-        >::value
+            !std::is_pointer<
+                std::decay<TArg>::value
+            >::value
+        >::type
     >
     StaticBasicString<TChar, INPLACE_SIZE>& operator+=(TArg&& str)
     {
         TChar const* cStr = str.Data();
-        Size const newSize = CStringAppend(str.Data(), Data());
+        Size_t const newSize = CStringAppend(str.Data(), Data());
         _ResizePure(newSize);
         return *this;
     }
 
-    inline TChar operator[](Size i) const
+    inline TChar operator[](Size_t i) const
     {
         return StaticArrayStorage<TChar, INPLACE_SIZE>::operator[](i);
     }
 
-    inline TChar& operator[](Size i)
+    inline TChar& operator[](Size_t i)
     {
         return StaticArrayStorage<TChar, INPLACE_SIZE>::operator[](i);
     }

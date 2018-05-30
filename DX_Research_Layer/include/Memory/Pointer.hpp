@@ -14,12 +14,12 @@ inline PtrDiff PtrDifference(VoidPtr lhs, VoidPtr rhs)
     return static_cast<PtrDiff>(reinterpret_cast<UintPtr>(lhs) - reinterpret_cast<UintPtr>(rhs));
 }
 
-inline VoidPtr PtrNegate(VoidPtr lhs, Size rhs)
+inline VoidPtr PtrNegate(VoidPtr lhs, Size_t rhs)
 {
     return reinterpret_cast<VoidPtr>(reinterpret_cast<UintPtr>(lhs) - static_cast<UintPtr>(rhs));
 }
 
-inline VoidPtr PtrAdd(VoidPtr lhs, Size rhs)
+inline VoidPtr PtrAdd(VoidPtr lhs, Size_t rhs)
 {
     return reinterpret_cast<VoidPtr>(reinterpret_cast<UintPtr>(lhs) + static_cast<UintPtr>(rhs));
 }
@@ -41,7 +41,7 @@ inline UintPtr PtrAlignmentAdjustment(T* ptr, U alignment)
     return alignedPtr - reinterpret_cast<UintPtr>(ptr);
 }
 
-template<typename T, typename U, typename V = U32>
+template<typename T, typename U, typename V = U32_t>
 inline T CalcSizeWithAlignment(T size, U alignment, V headerSize = 0)
 {
     return static_cast<T>(size + (alignment - 1) + headerSize);

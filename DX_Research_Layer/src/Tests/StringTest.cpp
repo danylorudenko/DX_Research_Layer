@@ -1,7 +1,6 @@
 #include <pch.hpp>
-#include <chrono>
-#include <random>
-#include <bitset>
+#include <iostream>
+#include <type_traits>
 
 #include <Memory\Allocator.hpp>
 #include <String\String.hpp>
@@ -20,7 +19,7 @@ struct CharBuffer40
 
     union
     {
-        DXRL::U64 contentInt_;
+        DXRL::U64_t contentInt_;
         char content[40];
     };
 };
@@ -37,12 +36,16 @@ int main()
     Memory::VoidPtr mainChunk = malloc(chunkSize);
     Memory::FreeListAllocator alloc{ mainChunk, chunkSize, true };
 
-    StaticBasicString<char, 128> string0 = "kek";
-    StaticBasicString<char, 128> string1 = "topKek";
+    //StaticBasicString<char, 128> string0 = "kek";
+    //StaticBasicString<char, 128> string1 = string0;
 
-    string0 += ("kek0");
+    //string0 += ("kek0");
+    std::vector< CharBuffer40 > vector;
+    std::vector< CharBuffer40 > vec2;
 
-    string0.operator+=( string1 );
+    vector = vec2;
+
+    //string0 +=  string1;
 
     system("pause");
     return 0;

@@ -615,7 +615,7 @@ void Direct3DAppDelegate::DisplayFrameTime(Application& application, DXRL::Singl
 //    return pipelineState;
 //}
 
-void Direct3DAppDelegate::MainUpdate(DXRL::U64 frameIndex)
+void Direct3DAppDelegate::MainUpdate(DXRL::U64_t frameIndex)
 {
     auto& graph = gpuDelegate_->FrameGraph();
     auto& graphIterator = graph.GraphQueueStart();

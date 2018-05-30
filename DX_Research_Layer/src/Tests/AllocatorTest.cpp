@@ -20,7 +20,7 @@ struct CharBuffer40
     
     union
     {
-        DXRL::U64 contentInt_;
+        DXRL::U64_t contentInt_;
         char content[40];
     };
 };
@@ -39,21 +39,21 @@ int allocatormain()
 
     InplaceDynamicArray<CharBuffer40, 2, Memory::FreeListAllocator> container{ &alloc };
     
-    Size a = alignof(CharBuffer40);
+    Size_t a = alignof(CharBuffer40);
 
-    for (Size i = 0; i < 4; ++i) {
+    for (Size_t i = 0; i < 4; ++i) {
         container.EmplaceBack();
     }
     
-    for (Size i = 0; i < 2; ++i) {
+    for (Size_t i = 0; i < 2; ++i) {
         container.PopBack();
     }
     
-    for (Size i = 0; i < 4; ++i) {
+    for (Size_t i = 0; i < 4; ++i) {
         container.EmplaceBack();
     }
     
-    for (Size i = 0; i < 2; ++i) {
+    for (Size_t i = 0; i < 2; ++i) {
         container.PopBack();
     }
 

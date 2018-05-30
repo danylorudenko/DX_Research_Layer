@@ -15,43 +15,43 @@ namespace Memory
 class Bytes
 {
 public:
-    Bytes(Size bytesCount);
+    Bytes(Size_t bytesCount);
     Bytes(Bytes const& bytes);
 
-    operator Size() const;
+    operator Size_t() const;
 
     Bytes& operator+=(const Bytes& rhs);
     Bytes& operator-=(const Bytes& rhs);
-    Bytes& operator*=(Size rhs);
+    Bytes& operator*=(Size_t rhs);
 
 protected:
-    Size bytesCount_;
+    Size_t bytesCount_;
 };
 
 ////////////////////////////////////////
 class Kibibytes : public Bytes
 {
 public:
-    Kibibytes(Size kibiBytesCount);
+    Kibibytes(Size_t kibiBytesCount);
 };
 
 ////////////////////////////////////////
 class Mibibytes : public Kibibytes
 {
 public:
-    Mibibytes(Size mibiBytesCount);
+    Mibibytes(Size_t mibiBytesCount);
 };
 
 ////////////////////////////////////////
 class Gibibytes : public Mibibytes
 {
 public:
-    Gibibytes(Size gibiBytesCount);
+    Gibibytes(Size_t gibiBytesCount);
 };
 
 Bytes operator+(const Bytes& lhs, const Bytes& rhs);
 Bytes operator-(const Bytes& lhs, const Bytes& rhs);
-Bytes operator*(const Bytes& lhs, Size rhs);
+Bytes operator*(const Bytes& lhs, Size_t rhs);
 
 } // namespace Memory
 

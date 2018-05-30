@@ -30,10 +30,10 @@ public:
 	float mouseXDelta_;
 	float mouseYDelta_;
 
-	DXRL::U32 keyMap_ = 0; // WASD UJIK
+	DXRL::U32_t keyMap_ = 0; // WASD UJIK
 
-    DXRL::S32 prevMouseX_;
-    DXRL::S32 prevMouseY_;
+    DXRL::S32_t prevMouseX_;
+    DXRL::S32_t prevMouseY_;
 };
 
 class Direct3DAppDelegate : public Application::Delegate
@@ -48,7 +48,7 @@ public:
     DXRL::PerformanceTimer& Timer();
     void DisplayFrameTime(Application& application, DXRL::Single drawTime);
 
-    void MainUpdate(DXRL::U64 frameIndex);
+    void MainUpdate(DXRL::U64_t frameIndex);
 
 public:
     
@@ -59,6 +59,6 @@ public:
     DXRL::Memory::UniquePtr<DXRL::GPUDelegate> gpuDelegate_;
 
     DXRL::PerformanceTimer gameTimer_;
-    DXRL::U64 mainUpdateIterator_;
+    DXRL::U64_t mainUpdateIterator_;
 
 };

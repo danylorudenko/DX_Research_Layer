@@ -13,10 +13,10 @@ namespace Memory
 /************************************
 * ==== Generic Allocator interface ====
 *
-*               - Alloc(Size size, Size alignment);
-*               - AllocArray(Size count, Size unitSize, Size unitAlignment);
+*               - Alloc(Size_t size, Size_t alignment);
+*               - AllocArray(Size_t count, Size_t unitSize, Size_t unitAlignment);
 *   (opt.)      - Alloc<T>(...);
-*   (opt.)      - AllocArray<T>(Size count, ...);
+*   (opt.)      - AllocArray<T>(Size_t count, ...);
 *               
 *          
 *          
@@ -47,11 +47,11 @@ class LinearAllocator final
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(LinearAllocator)
 
-    LinearAllocator(VoidPtr chunk, Size size, bool isOwner = false);
+    LinearAllocator(VoidPtr chunk, Size_t size, bool isOwner = false);
     ~LinearAllocator();
 
-    VoidPtr Alloc(Size size, Size alignment = 4);
-    VoidPtr AllocArray(Size count, Size unitSize, Size unitAlignment = 4);
+    VoidPtr Alloc(Size_t size, Size_t alignment = 4);
+    VoidPtr AllocArray(Size_t count, Size_t unitSize, Size_t unitAlignment = 4);
 
     void Free(VoidPtr data);
     void FreeArray(VoidPtr data);
@@ -60,28 +60,28 @@ public:
     void Reset();
 
     bool IsNull() const;
-    Size ChunkSize() const;
+    Size_t ChunkSize() const;
 
 
     template<typename TResult, typename ...TArgs>
     TResult* Alloc(TArgs&&... args)
     {
-        Size constexpr typeSize = sizeof(TResult);
-        Size constexpr typeAlignment = alignof(TResult);
+        Size_t constexpr typeSize = sizeof(TResult);
+        Size_t constexpr typeAlignment = alignof(TResult);
 
         VoidPtr const allocationResult = Alloc(typeSize, typeAlignment);
         return new (allocationResult) TResult{ std::forward(args)... };
     }
 
     template<typename TResult, typename... TArgs>
-    TResult* AllocArray(Size count = 1, TArgs&&... args)
+    TResult* AllocArray(Size_t count = 1, TArgs&&... args)
     {
-        Size constexpr typeSize = sizeof(TResult);
-        Size constexpr typeAlignment = alignof(TResult);
+        Size_t constexpr typeSize = sizeof(TResult);
+        Size_t constexpr typeAlignment = alignof(TResult);
 
         TResult* arrayStart = reinterpret_cast<TResult*>(AllocArray(count, typeSize, typeAlignment));
 
-        for (Size i = 0; i < count; i++)
+        for (Size_t i = 0; i < count; i++)
         {
             new (arrayStart + i) TResult{ std::forward(args)... };
         }
@@ -104,7 +104,7 @@ public:
 
 private:
     VoidPtr mainChunk_;
-    Size mainChunkSize_;
+    Size_t mainChunkSize_;
     bool isOwner_;
 
     VoidPtr freeAddress_;
@@ -119,20 +119,20 @@ private:
 
     struct AllocHeader
     {
-        Size unitCount_;
-        Size allocationScope_;
-        U16 scopeStartOffset_;
+        Size_t unitCount_;
+        Size_t allocationScope_;
+        U16_t scopeStartOffset_;
     };
 
 
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(StackAllocator)
 
-    StackAllocator(VoidPtr chunk, Size size, bool requiresDestruction = true, bool isOwner = false);
+    StackAllocator(VoidPtr chunk, Size_t size, bool requiresDestruction = true, bool isOwner = false);
     ~StackAllocator();
 
-    VoidPtr Alloc(Size size, Size alignment = 4);
-    VoidPtr AllocArray(Size count, Size unitSize, Size alignment = 4);
+    VoidPtr Alloc(Size_t size, Size_t alignment = 4);
+    VoidPtr AllocArray(Size_t count, Size_t unitSize, Size_t alignment = 4);
 
     void Free(VoidPtr ptr);
     void FreeArray(VoidPtr ptr);
@@ -140,7 +140,7 @@ public:
     void Reset();
 
     bool IsNull() const;
-    Size ChunkSize() const;
+    Size_t ChunkSize() const;
 
     template<typename TResult, typename... TArgs>
     TResult* Alloc(TArgs&&... args)
@@ -150,14 +150,14 @@ public:
     }
 
     template<typename TResult, typename... TArgs>
-    TResult* AllocArray(Size count, TArgs&&... args)
+    TResult* AllocArray(Size_t count, TArgs&&... args)
     {
-        Size constexpr typeSize = sizeof(TResult);
-        Size constexpr typeAlignment = sizeof(TResult);
+        Size_t constexpr typeSize = sizeof(TResult);
+        Size_t constexpr typeAlignment = sizeof(TResult);
         
         TResult* arrayStart = reinterpret_cast<TResult*>(AllocArray(count, typeSize, typeAlignment));
         
-        for (Size i = 0; i < count; i++)
+        for (Size_t i = 0; i < count; i++)
         {
             new (arrayStart + i) TResult{ std::forward(args)... };
         }
@@ -175,8 +175,8 @@ public:
     template<typename T>
     void FreeArray(T* dataArray)
     {
-        Size const arraySize = GetArraySize(dataArray);
-        for (Size i = 0; i < arraySize; ++i) {
+        Size_t const arraySize = GetArraySize(dataArray);
+        for (Size_t i = 0; i < arraySize; ++i) {
             (dataArray + i)->~T();
         }
 
@@ -184,15 +184,15 @@ public:
     }
 
 private:
-    Size GetArraySize(VoidPtr data) const;
+    Size_t GetArraySize(VoidPtr data) const;
 
 
 private:
     VoidPtr mainChunk_;
-    Size mainChunkSize_;
+    Size_t mainChunkSize_;
 
     VoidPtr stackTopPtr_;
-    Size currentStackScope_;
+    Size_t currentStackScope_;
 
     bool isOwner_;
     bool requiresDestruction_;
@@ -227,7 +227,7 @@ public:
         , requiresDestruction_{ true }
     { }
 
-    PoolAllocator(VoidPtr mainChunk, Size mainChunkSize, bool requiresDestruction = true, bool isOwner = false)
+    PoolAllocator(VoidPtr mainChunk, Size_t mainChunkSize, bool requiresDestruction = true, bool isOwner = false)
         : mainChunk_{ mainChunk }
         , mainChunkSize_{ mainChunkSize }
         , freeListStart_{ nullptr }
@@ -236,14 +236,14 @@ public:
         , isOwner_{ isOwner }
         , requiresDestruction_{ requiresDestruction }
     {
-        Size constexpr poolMemberSize = sizeof(PoolMember);
-        Size constexpr poolMemberAlignment = alignof(PoolMember);
+        Size_t constexpr poolMemberSize = sizeof(PoolMember);
+        Size_t constexpr poolMemberAlignment = alignof(PoolMember);
         
         poolSize_ = (mainChunkSize_ - poolMemberAlignment) / poolMemberSize;
 
         freeListStart_ = reinterpret_cast<PoolMember*>(PtrAlign(mainChunk_, poolMemberAlignment));
-        Size const iEnd = poolSize_ - 1;
-        for (Size i = 0; i < iEnd; ++i) {
+        Size_t const iEnd = poolSize_ - 1;
+        for (Size_t i = 0; i < iEnd; ++i) {
             freeListStart_[i].nextFree_ = (freeListStart_ + (i + 1));
         }
     }
@@ -322,18 +322,18 @@ public:
     }
 
     bool IsNull() const { return mainChunk_ == nullptr; }
-    Size ChunkSize() const { return mainChunkSize_; }
+    Size_t ChunkSize() const { return mainChunkSize_; }
 
-    Size PoolSize() const { return poolSize_; }
+    Size_t PoolSize() const { return poolSize_; }
     
 
 private:
     VoidPtr mainChunk_;
-    Size mainChunkSize_;
+    Size_t mainChunkSize_;
 
     PoolMember* freeListStart_;
-    Size poolSize_;
-    Size allocationsCount_;
+    Size_t poolSize_;
+    Size_t allocationsCount_;
 
     bool isOwner_;
     bool requiresDestruction_;
@@ -354,14 +354,14 @@ private:
 
     struct AllocationHeader
     {
-        Size blockSize_;
-        Size unitCount_;
-        U16 freeBlockStartOffset_;
+        Size_t blockSize_;
+        Size_t unitCount_;
+        U16_t freeBlockStartOffset_;
     };
 
     struct FreeBlockHeader
     {
-        Size size_;
+        Size_t size_;
         FreeBlockHeader* nextFreeBlock_;
 
         bool IsStartAdjacent(FreeBlockHeader* block);
@@ -371,16 +371,16 @@ private:
         bool TryMergeWithNextBlock(FreeBlockHeader* block);
     };
 
-    static Size constexpr MIN_FREEBLOCK_TAIL = sizeof(FreeBlockHeader) + 16;
+    static Size_t constexpr MIN_FREEBLOCK_TAIL = sizeof(FreeBlockHeader) + 16;
 
 public:
     DXRL_DEFINE_UNCOPYABLE_MOVABLE(FreeListAllocator)
 
-    FreeListAllocator(VoidPtr mainChunk, Size mainChunkSize, bool isOwner = false);
+    FreeListAllocator(VoidPtr mainChunk, Size_t mainChunkSize, bool isOwner = false);
     ~FreeListAllocator();
 
-    VoidPtr Alloc(Size size, Size alignment = 4);
-    VoidPtr AllocArray(Size count, Size unitSize, Size unitAlignment = 4);
+    VoidPtr Alloc(Size_t size, Size_t alignment = 4);
+    VoidPtr AllocArray(Size_t count, Size_t unitSize, Size_t unitAlignment = 4);
 
     void Free(VoidPtr data);
     void FreeArray(VoidPtr data);
@@ -388,7 +388,7 @@ public:
     void Reset();
 
     bool IsNull() const;
-    Size ChunkSize() const;
+    Size_t ChunkSize() const;
 
     template<typename TResult, typename... TArgs>
     TResult* Alloc(TArgs&&... args)
@@ -398,10 +398,10 @@ public:
     }
 
     template<typename TResult, typename... TArgs>
-    TResult* AllocArray(Size count, TArgs&&... args)
+    TResult* AllocArray(Size_t count, TArgs&&... args)
     {
         TResult* result = reinterpret_cast<TResult*>(AllocArray(count, sizeof(TResult), alignof(TResult)));
-        for (Size i = 0; i < count; ++i) {
+        for (Size_t i = 0; i < count; ++i) {
             new (result + i) TResult{ std::forward(args)... };
         }
     }
@@ -416,8 +416,8 @@ public:
     template<typename T>
     void FreeArray(T* data)
     {
-        Size const arraySize = GetArraySize(data);
-        for (Size i = 0; i < arraySize; ++i) {
+        Size_t const arraySize = GetArraySize(data);
+        for (Size_t i = 0; i < arraySize; ++i) {
             (data + i)->~T();
         }
         FreeArray(reinterpret_cast<VoidPtr>(data));
@@ -425,12 +425,12 @@ public:
 
     
 private:
-    Size GetArraySize(VoidPtr data) const;
+    Size_t GetArraySize(VoidPtr data) const;
 
 
 private:
     VoidPtr mainChunk_;
-    Size mainChunkSize_;
+    Size_t mainChunkSize_;
 
     FreeBlockHeader* firstFreeBlock_;
 

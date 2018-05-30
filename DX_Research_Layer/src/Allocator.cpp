@@ -40,7 +40,7 @@ LinearAllocator& LinearAllocator::operator=(LinearAllocator&& rhs)
     return *this;
 }
 
-LinearAllocator::LinearAllocator(VoidPtr chunk, Size size, bool isOwner)
+LinearAllocator::LinearAllocator(VoidPtr chunk, Size_t size, bool isOwner)
     : mainChunk_{ chunk }
     , mainChunkSize_{ size }
     , isOwner_{ isOwner }
@@ -52,9 +52,9 @@ LinearAllocator::~LinearAllocator()
     Reset();
 }
 
-VoidPtr LinearAllocator::Alloc(Size size, Size alignment)
+VoidPtr LinearAllocator::Alloc(Size_t size, Size_t alignment)
 {
-    Size allocationSize = CalcSizeWithAlignment(size, alignment);
+    Size_t allocationSize = CalcSizeWithAlignment(size, alignment);
 
     assert((PtrDifference(PtrAdd(freeAddress_, allocationSize), mainChunk_) <= static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
@@ -65,7 +65,7 @@ VoidPtr LinearAllocator::Alloc(Size size, Size alignment)
     return allocationResult;
 }
 
-VoidPtr LinearAllocator::AllocArray(Size count, Size unitSize, Size unitAlignment)
+VoidPtr LinearAllocator::AllocArray(Size_t count, Size_t unitSize, Size_t unitAlignment)
 {
     return Alloc(unitSize * count, unitAlignment);
 }
@@ -101,7 +101,7 @@ bool LinearAllocator::IsNull() const
     return mainChunk_ == nullptr;
 }
 
-Size LinearAllocator::ChunkSize() const
+Size_t LinearAllocator::ChunkSize() const
 {
     return mainChunkSize_;
 }
@@ -116,7 +116,7 @@ StackAllocator::StackAllocator()
     , requiresDestruction_{ true }
 { }
 
-StackAllocator::StackAllocator(VoidPtr chunk, Size size, bool requiresDestruction, bool isOwner)
+StackAllocator::StackAllocator(VoidPtr chunk, Size_t size, bool requiresDestruction, bool isOwner)
     : mainChunk_{ chunk }
     , mainChunkSize_{ size }
     , stackTopPtr_{ chunk }
@@ -158,14 +158,14 @@ StackAllocator::~StackAllocator()
     Reset();
 }
 
-VoidPtr StackAllocator::Alloc(Size size, Size alignment)
+VoidPtr StackAllocator::Alloc(Size_t size, Size_t alignment)
 {
    return AllocArray(1, size, alignment);
 }
 
-VoidPtr StackAllocator::AllocArray(Size unitCount, Size unitSize, Size alignment)
+VoidPtr StackAllocator::AllocArray(Size_t unitCount, Size_t unitSize, Size_t alignment)
 {
-    Size const allocationSize = CalcSizeWithAlignment(unitSize * unitCount, alignment, sizeof(AllocHeader));
+    Size_t const allocationSize = CalcSizeWithAlignment(unitSize * unitCount, alignment, sizeof(AllocHeader));
 
     assert((PtrDifference(PtrAdd(stackTopPtr_, allocationSize), mainChunk_) <= static_cast<PtrDiff>(mainChunkSize_)) && "Allocation exceeds chunk size!");
 
@@ -175,7 +175,7 @@ VoidPtr StackAllocator::AllocArray(Size unitCount, Size unitSize, Size alignment
     AllocHeader* const headerPtr = reinterpret_cast<AllocHeader*>(PtrNegate(allocationResult, sizeof(AllocHeader)));
     headerPtr->unitCount_ = unitCount;
     headerPtr->allocationScope_ = ++currentStackScope_;
-    headerPtr->scopeStartOffset_ = static_cast<U16>(PtrDifference(stackTopPtr_, allocationResult));
+    headerPtr->scopeStartOffset_ = static_cast<U16_t>(PtrDifference(stackTopPtr_, allocationResult));
 
 
     stackTopPtr_ = PtrAdd(stackTopPtr_, allocationSize);
@@ -190,7 +190,7 @@ void StackAllocator::Free(VoidPtr ptr)
 
 void StackAllocator::FreeArray(VoidPtr arrayPtr)
 {
-    Size constexpr headerSize = sizeof(AllocHeader);
+    Size_t constexpr headerSize = sizeof(AllocHeader);
 
     AllocHeader const* const header = reinterpret_cast<AllocHeader*>(PtrNegate(arrayPtr, headerSize));
     assert(header->allocationScope_ == currentStackScope_ && "Trying to free not-the-top scope of the stack!");
@@ -218,14 +218,14 @@ bool StackAllocator::IsNull() const
     return mainChunk_ == nullptr;
 }
 
-Size StackAllocator::ChunkSize() const
+Size_t StackAllocator::ChunkSize() const
 {
     return mainChunkSize_;
 }
 
-Size StackAllocator::GetArraySize(VoidPtr data) const
+Size_t StackAllocator::GetArraySize(VoidPtr data) const
 {
-    Size constexpr headerSize = sizeof(AllocHeader);
+    Size_t constexpr headerSize = sizeof(AllocHeader);
     AllocHeader const* const header = reinterpret_cast<AllocHeader*>(PtrNegate(data, headerSize));
     return header->unitCount_;
 }
@@ -239,7 +239,7 @@ FreeListAllocator::FreeListAllocator()
     , isOwner_{ false }
 { }
 
-FreeListAllocator::FreeListAllocator(VoidPtr mainChunk, Size mainChunkSize, bool isOwner)
+FreeListAllocator::FreeListAllocator(VoidPtr mainChunk, Size_t mainChunkSize, bool isOwner)
     : mainChunk_{ mainChunk }
     , mainChunkSize_{ mainChunkSize }
     , firstFreeBlock_{ nullptr }
@@ -285,7 +285,7 @@ bool FreeListAllocator::IsNull() const
     return mainChunk_ == nullptr;
 }
 
-Size FreeListAllocator::ChunkSize() const
+Size_t FreeListAllocator::ChunkSize() const
 {
     return mainChunkSize_;
 }
@@ -301,17 +301,17 @@ void FreeListAllocator::Reset()
     isOwner_ = false;
 }
 
-VoidPtr FreeListAllocator::Alloc(Size size, Size alignment)
+VoidPtr FreeListAllocator::Alloc(Size_t size, Size_t alignment)
 {
     return AllocArray(1, size, alignment);
 }
 
-VoidPtr FreeListAllocator::AllocArray(Size count, Size unitSize, Size unitAlignment)
+VoidPtr FreeListAllocator::AllocArray(Size_t count, Size_t unitSize, Size_t unitAlignment)
 {
     if (firstFreeBlock_ == nullptr)
         return nullptr;
 
-    Size allocationSize = CalcSizeWithAlignment(count * unitSize, unitAlignment, sizeof(AllocationHeader));
+    Size_t allocationSize = CalcSizeWithAlignment(count * unitSize, unitAlignment, sizeof(AllocationHeader));
 
     FreeBlockHeader* prevBlock = nullptr;
     FreeBlockHeader* validBlock = firstFreeBlock_;
@@ -324,7 +324,7 @@ VoidPtr FreeListAllocator::AllocArray(Size count, Size unitSize, Size unitAlignm
             return nullptr;
     }
 
-    Size const validBlockTailSize = validBlock->size_ - allocationSize;
+    Size_t const validBlockTailSize = validBlock->size_ - allocationSize;
     FreeBlockHeader* const tailFreeBlockHeader = reinterpret_cast<FreeBlockHeader*>(PtrAdd(validBlock, allocationSize));
 
     if (prevBlock == nullptr) {
@@ -357,7 +357,7 @@ VoidPtr FreeListAllocator::AllocArray(Size count, Size unitSize, Size unitAlignm
     AllocationHeader* const header = reinterpret_cast<AllocationHeader*>(PtrNegate(result, sizeof(AllocationHeader)));
     header->blockSize_ = allocationSize;
     header->unitCount_ = count;
-    header->freeBlockStartOffset_ = static_cast<U16>(PtrDifference(result, validBlock));
+    header->freeBlockStartOffset_ = static_cast<U16_t>(PtrDifference(result, validBlock));
 
     return result;
 }
@@ -372,7 +372,7 @@ void FreeListAllocator::FreeArray(VoidPtr data)
     AllocationHeader const* const allocationHeader = reinterpret_cast<AllocationHeader*>(PtrNegate(data, sizeof(AllocationHeader)));
 
     VoidPtr const blockStart = PtrNegate(data, allocationHeader->freeBlockStartOffset_);
-    Size const releasedBlockSize = allocationHeader->blockSize_;
+    Size_t const releasedBlockSize = allocationHeader->blockSize_;
     FreeBlockHeader* releasedBlockHeader = reinterpret_cast<FreeBlockHeader*>(blockStart);
 
 
@@ -431,7 +431,7 @@ void FreeListAllocator::FreeArray(VoidPtr data)
     }
 }
 
-Size FreeListAllocator::GetArraySize(VoidPtr data) const
+Size_t FreeListAllocator::GetArraySize(VoidPtr data) const
 {
     AllocationHeader const* const allocationHeader = reinterpret_cast<AllocationHeader*>(PtrNegate(data, sizeof(AllocationHeader)));
     return allocationHeader->unitCount_;
