@@ -100,7 +100,7 @@ public:
     }
 
     inline Size_t Size() const { return size_; }
-    inline Size_t constexpr StorageSize() const { return STORAGE_SIZE; }
+    inline Size_t constexpr StaticStorageSize() const { return STORAGE_SIZE; }
     inline bool IsFull() const { return size_ == STORAGE_SIZE; }
 
 
@@ -224,11 +224,13 @@ public:
         Clear();
         auto const size = static_cast<S32_fast_t>(rhs.Size());
         if (storageSize_ < size) {
-            ExpandStorage(size * 2);
+            ExpandStorage(size * 2 + 2);
         }
         for (S32_fast_t i = 0; i < size; ++i) {
             operator[](i) = rhs[i];
         }
+
+        allocator_ = rhs.allocator_;
 
         return *this;
     }
@@ -238,11 +240,13 @@ public:
         Clear();
         auto const size = static_cast<S32_fast_t>(rhs.Size());
         if (storageSize_ < size) {
-            ExpandStorage(size * 2);
+            ExpandStorage(size * 2 + 2);
         }
         for (S32_fast_t i = 0; i < size; ++i) {
             operator[](i) = std::move<T>(rhs[i]);
         }
+
+        allocator_ = rhs.allocator_;
 
         rhs.Clear();
         return *this;
@@ -274,7 +278,7 @@ public:
     void EmplaceBack(TArgs&&... args)
     {
         if (size_ == storageSize_) {
-            ExpandStorage(storageSize_ != 0 ? size_ * 2 : 10);
+            ExpandStorage(storageSize_ != 0 ? (size_ * 2 + 2) : 10);
         }
 
         T* newElementAddress = (storage_ + size_++);
@@ -307,12 +311,12 @@ public:
         return size_;
     }
 
-    inline Size_t StorageSize() const
+    inline Size_t DynamicStorageSize() const
     {
         return storageSize_;
     }
 
-    inline TAllocator& Allocator()
+    inline TAllocator* Allocator()
     {
         return allocator_;
     }
@@ -342,8 +346,8 @@ public:
     void _WrapData(T const* src, Size_t count)
     {
         assert(Size() == 0);
-        if (StorageSize() < count) {
-            ExpandStorage(count + 2);
+        if (DynamicStorageSize() < count) {
+            ExpandStorage(count * 2 + 2);
         }
 
         Size_t const totalSize = count * sizeof(T);
@@ -371,7 +375,7 @@ private:
 
 
 ////////////////////////////////////////
-template<typename T, Size_t INPLACE_SIZE, typename TAllocator>
+template<typename T, Size_t SIZE, typename TAllocator>
 class InplaceDynamicArray 
     : private StaticArrayStorage<T, INPLACE_SIZE>
     , private DynamicArray<T, TAllocator>
@@ -395,6 +399,11 @@ public:
 
     InplaceDynamicArray& operator=(InplaceDynamicArray const& rhs)
     {
+        auto srcSize = rhs.Size();
+        if (srcSize > INPLACE_SIZE) {
+            _TransferToDynamic();
+        }
+        
         if (isDynamic_) {
             DynamicArray::operator=(rhs);
         }
@@ -443,8 +452,7 @@ public:
             StaticArrayStorage::PopBack();
         }
     }
-
-
+    
     void Clear()
     {
         if (isDynamic_) {
@@ -470,6 +478,27 @@ public:
         else {
             return StaticArrayStorage::Size();
         }
+    }
+
+    bool IsDynamic() const
+    {
+        return isDynamic_;
+    }
+
+    inline Size_t constexpr StaticStorageSize() const
+    {
+        return INPLACE_SIZE;
+    }
+
+    inline Size_t DynamicStorageSize() const
+    {
+        return DynamicArray::DynamicStorageSize();
+    }
+
+    inline void ExpandStorage(Size_t newSize)
+    {
+        DynamicArray::ExpandStorage(newSize);
+        isDynamic_ = true;
     }
 
     T const* Data() const
@@ -512,13 +541,32 @@ public:
         }
     }
 
-    inline TAllocator& Allocator()
+    T const& AccessStatic(Size_t i) const
+    {
+        return StaticArrayStorage::operator[](i);
+    }
+
+    T& AccessStatic(Size_t i)
+    {
+        return StaticArrayStorage::operator[](i);
+    }
+
+    T const& AccessDynamic(Size_t i) const
+    {
+        return DynamicArray::operator[](i);
+    }
+
+    T& AccessDynamic(Size_t i)
+    {
+        return DynamicArray::operator[](i);
+    }
+
+    inline TAllocator* Allocator()
     {
         return DynamicArray::Allocator();
     }
 
 
-private:
     void _TransferToInplace()
     {
         Size_t const size = DynamicArray::Size();
@@ -530,9 +578,10 @@ private:
 
     void _TransferToDynamic()
     {
-        Size_t const size = StaticArrayStorage::Size();
-        Size_t const requiredDynamicSize = size * 2;
-        if (DynamicArray::StorageSize() < requiredDynamicSize) {
+        Size_t const size = Size();
+        Size_t constexpr staticSize = StaticStorageSize();
+        Size_t constexpr requiredDynamicSize = size * 2 + 2;
+        if (DynamicStorageSize() < requiredDynamicSize) {
             DynamicArray::ExpandStorage(requiredDynamicSize);
         }
 
@@ -540,6 +589,16 @@ private:
         StaticArrayStorage::_MoveData(DynamicArray::Data());
 
         isDynamic_ = true;
+    }
+
+    void _ResizePure(Size_t size)
+    {
+        if (isDynamic_) {
+            DynamicArray::_ResizePure(size);
+        }
+        else {
+            StaticArrayStorage::_ResizePure(size);
+        }
     }
 
 

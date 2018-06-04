@@ -75,48 +75,50 @@ void CStringTrunc(TChar* str, Size_t truncSize)
     str[truncSize] = CStringTerminator<TChar>();
 }
 
+
+
 ////////////////////////////////////////
-template<typename TChar, Size_t INPLACE_SIZE>
+template<typename TChar, Size_t SIZE>
 class StaticBasicString
-    : private StaticArrayStorage<TChar, INPLACE_SIZE>
+    : private StaticArrayStorage<TChar, SIZE>
 {
 public:
     StaticBasicString()
-        : StaticArrayStorage<TChar, INPLACE_SIZE>{}
+        : StaticArrayStorage<TChar, SIZE>{}
     { }
 
     StaticBasicString(TChar const* str)
-        : StaticArrayStorage<TChar, INPLACE_SIZE>{}
+        : StaticArrayStorage<TChar, SIZE>{}
     {
         operator=(str);
     }
 
     StaticBasicString(TChar const* str, Size_t sizeInMemory)
-        : StaticArrayStorage<TChar, INPLACE_SIZE>{}
+        : StaticArrayStorage<TChar, SIZE>{}
     {
         Size_t constexpr characterSize = sizeof(str[0]);
         Size_t const stringSize = sizeInMemory / characterSize;
 
-        assert(stringSize < INPLACE_SIZE && "Can't fit the string in the internal storage.");
+        assert(stringSize < SIZE && "Can't fit the string in the internal storage.");
 
         _WrapData(str, stringSize);
     }
 
     template<
         typename TArg,
-        typename = typename std::enable_if<
+        typename = std::enable_if_t<
             !std::is_pointer<
-                typename std::decay<TArg>::value
+                std::decay_t<TArg>
             >::value
-        >::type
+        >
     >
     StaticBasicString(TArg&& str)
-        : StaticArrayStorage<TChar, INPLACE_SIZE>{}
+        : StaticArrayStorage<TChar, SIZE>{}
     {
         operator=(std::forward<TArg>(str));
     }
     
-    StaticBasicString<TChar, INPLACE_SIZE>& operator=(TChar const* str)
+    StaticBasicString& operator=(TChar const* str)
     {
         Size_t size = CStringCopy<TChar>(str, Data());
         _ResizePure(size);
@@ -126,13 +128,13 @@ public:
 
     template<
         typename TArg,
-        typename = typename std::enable_if<
+        typename = std::enable_if_t<
             !std::is_pointer<
-                typename std::decay<TArg>::value
+                std::decay_t<TArg>
             >::value
-        >::type
+        >
     >
-    StaticBasicString<TChar, INPLACE_SIZE>& operator=(TArg&& str)
+    StaticBasicString& operator=(TArg&& str)
     {
         Size_t const size = str.Size();
         TChar* data = str.Data();
@@ -141,19 +143,29 @@ public:
         return *this;
     }
 
+    inline TChar operator[](Size_t i) const
+    {
+        return StaticArrayStorage::operator[](i);
+    }
+
+    inline TChar& operator[](Size_t i)
+    {
+        return StaticArrayStorage::operator[](i);
+    }
+
     inline Size_t Size() const
     {
-        return StaticArrayStorage<TChar, INPLACE_SIZE>::Size();
+        return StaticArrayStorage::Size();
     }
 
     inline TChar const* Data() const
     {
-        return StaticArrayStorage<TChar, INPLACE_SIZE>::Data();
+        return StaticArrayStorage::Data();
     }
 
     inline TChar* Data()
     {
-        return StaticArrayStorage<TChar, INPLACE_SIZE>::Data();
+        return StaticArrayStorage::Data();
     }
 
     StaticBasicString<TChar, INPLACE_SIZE>& operator+=(TChar const* str)
@@ -165,11 +177,11 @@ public:
 
     template<
         typename TArg,
-        typename = std::enable_if<
+        typename = std::enable_if_t<
             !std::is_pointer<
-                std::decay<TArg>::value
+                std::decay_t<TArg>
             >::value
-        >::type
+        >
     >
     StaticBasicString<TChar, INPLACE_SIZE>& operator+=(TArg&& str)
     {
@@ -179,15 +191,138 @@ public:
         return *this;
     }
 
-    inline TChar operator[](Size_t i) const
+};
+
+
+
+////////////////////////////////////////
+template<typename TChar, Size_t SIZE, typename TAllocator>
+class InplaceBasicString
+    : InplaceDynamicArray<TChar, INPLACE_SIZE, TAllocator>
+{
+    InplaceBasicString(TAllocator* allocator, TChar const* string)
+        : InplaceDynamicArray<TChar, INPLACE_SIZE, TAllocator>{ allocator }
     {
-        return StaticArrayStorage<TChar, INPLACE_SIZE>::operator[](i);
+        U32_fast_t counter = 0;
+        while (string[counter] != CStringTerminator<TChar>()) {
+            EmplaceBack(string[counter++]);
+        }
+
+        EmplaceBack(CStringTerminator<TChar>());
     }
 
-    inline TChar& operator[](Size_t i)
+    template<
+        typename TArg,
+        typename = std::enable_if_t<
+            !std::is_pointer<
+                std::decay_t<TArg>
+            >::value
+        >
+    >
+    InplaceBasicString(TArg&& arg)
     {
-        return StaticArrayStorage<TChar, INPLACE_SIZE>::operator[](i);
+        operator=(std::forward<TArg>(arg));
     }
+
+    InplaceBasicString& operator=(TChar const* src)
+    {
+        Clear();
+        U32_fast_t counter = 0;
+        while (string[counter] != CStringTerminator<TChar>()) {
+            EmplaceBack(string[counter++]);
+        }
+
+        EmplaceBack(CStringTerminator<TChar>());
+
+        return *this;
+    }
+
+    template<
+        typename TArg,
+        typename = std::enable_if_t<
+            !std::is_pointer<
+                std::decay_t<TArg>
+            >::value
+        >
+    >
+    InplaceBasicString& operator=(TArg&& rhs)
+    {
+        Clear();
+
+        // Check storage requirements.
+        auto const srcSize = rhs.Size() + 1;
+        auto constexpr staticStorageSize = StaticStorageSize();
+        if (srcSize > staticStorageSize) {
+            auto const dynamicStorageSize = DynamicStorageSize();
+            if (srcSize > dynamicStorageSize) {
+                InplaceDynamicArray::ExpandStorage(srcSize);
+            }
+        }
+
+        auto resultSize = CStringCopy(rhs.Data(), Data());
+        _ResizePure(resultSize);
+
+        return *this;
+    }
+
+    template<typename TArg>
+    void EmpalceBack(TArg&& arg)
+    {
+        InplaceDynamicArray::EmplaceBack(std::forward<TArg>(arg));
+    }
+
+    InplaceBasicString& operator+=(TChar const* str)
+    {
+        U32_fast_t counter = 0;
+        while (str[counter] != CStringTerminator<TChar>()) {
+            EmplaceBack(str[counter++]);
+        }
+        EmplaceBack(CStringTerminator<TChar>());
+
+        return *this;
+    }
+
+    TAllocator* Allocator()
+    {
+        return InplaceDynamicArray::Allocator();
+    }
+
+    inline bool IsDynamic() const
+    {
+        return InplaceDynamicArray::IsDynamic();
+    }
+
+    inline Size_t Size() const
+    {
+        return InplaceDynamicArray::Size();
+    }
+
+    inline Size_t StaticStorageSize() const
+    {
+        return InplaceDynamicArray::StaticStorageSize();
+    }
+
+    inline Size_t DynamicStorageSize() const
+    {
+        return InplaceDynamicArray::DynamicStorageSize();
+    }
+
+    inline void Clear()
+    {
+        InplaceDynamicArray::Clear();
+        InplaceDynamicArray::EmplaceBack(CStringTerminator<TChar>());
+    }
+
+    inline TChar* Data()
+    {
+        return InplaceDynamicArray::Data();
+    }
+
+    inline TChar const* Data() const
+    {
+        return InplaceDynamicArray::Data();
+    }
+
 
 };
 
